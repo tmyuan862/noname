@@ -1,0 +1,56 @@
+/* Reset & 基本样式 */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+    font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    color: #e6eef8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.container, main {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+    backdrop-filter: blur(6px);
+}
+
+h1 {
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #cfe3ff;
+    text-align: center;
+}
+
+/* 神临 大号 金黄色 样式 */
+.shenlin-target {
+    font-family: "ShenLin", "Microsoft YaHei", serif;
+    color: #FFD700 !important; /* 金黄色 */
+    font-size: 3rem !important;
+    font-weight: 800;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.45);
+    letter-spacing: 1px;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+    body { padding: 20px; }
+    h1 { font-size: 1.5rem; }
+    .container, main { padding: 20px; }
+    .shenlin-target { font-size: 2.2rem !important; }
+}
