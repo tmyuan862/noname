@@ -7,7 +7,7 @@ Type=simple
 DynamicUser=yes
 StateDirectory=zero-share
 Environment=FEEDBACK_DATA_DIR=/var/lib/zero-share
-Environment=SITE_ROOT=/home/ubuntu/noname
+Environment=SITE_ROOT=/opt/zero-share/current/site
 EnvironmentFile=-/etc/zero-share-feedback.env
 EnvironmentFile=-/etc/zero-share-release.env
 ExecStart=/usr/bin/python3 /opt/zero-share/current/feedback_server.py

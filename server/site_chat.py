@@ -64,7 +64,10 @@ def search_site(query: str, limit: int = 6) -> list[dict]:
         if rank: candidates.append({"score": rank, "title": title, "url": f"senior.html#post-{post.get('id')}", "snippet": content[:1200], "kind": "学长学姐说"})
     for filename in PUBLIC_HTML:
         path = SITE_ROOT / filename
-        if not path.exists(): continue
+        try:
+            if not path.exists(): continue
+        except OSError:
+            continue
         parser = TextParser()
         try: parser.feed(path.read_text(encoding="utf-8"))
         except OSError: continue

@@ -46,6 +46,10 @@ for module in "$REPO_DIR"/server/*.py; do
   [[ "$(basename "$module")" == "feedback_server.py" ]] && mode=0755
   install -m "$mode" "$module" "$release_dir/$(basename "$module")"
 done
+install -d -m 0755 "$release_dir/site"
+for page in index.html campus.html resources.html senior.html privacy.html; do
+  install -m 0644 "$REPO_DIR/$page" "$release_dir/site/$page"
+done
 
 ln -sfn "$release_dir" "$CURRENT_LINK"
 printf 'APP_VERSION=%s\n' "$short_commit" > /etc/zero-share-release.env
