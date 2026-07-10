@@ -25,7 +25,13 @@ fi
 commit="$(runuser -u ubuntu -- git -C "$REPO_DIR" rev-parse HEAD)"
 short_commit="${commit:0:12}"
 release_dir="$RELEASE_ROOT/$commit"
-previous_release="$(readlink -f "$CURRENT_LINK" 2>/dev/null || true)"
+previous_release=""
+if [[ -L "$CURRENT_LINK" ]]; then
+  candidate="$(readlink -f "$CURRENT_LINK" 2>/dev/null || true)"
+  if [[ -n "$candidate" && "$candidate" != "$CURRENT_LINK" && -d "$candidate" ]]; then
+    previous_release="$candidate"
+  fi
+fi
 
 runuser -u ubuntu -- env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s "$REPO_DIR/server" -p 'test_*.py'
 runuser -u ubuntu -- env PYTHONDONTWRITEBYTECODE=1 python3 "$REPO_DIR/scripts/validate_static.py"
