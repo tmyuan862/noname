@@ -32,6 +32,12 @@ MAX_MESSAGE_LENGTH = 1000
 MIN_MESSAGE_LENGTH = 5
 RATE_LIMIT = 5
 RATE_WINDOW_SECONDS = 600
+PUBLIC_RESOURCE_PAGE_SIZE = 8
+PUBLIC_RESOURCE_MAX_PAGE_SIZE = 12
+RESOURCE_LIST_RATE_LIMIT = 30
+RESOURCE_LIST_RATE_WINDOW = 60
+RESOURCE_DETAIL_RATE_LIMIT = 20
+RESOURCE_DETAIL_RATE_WINDOW = 600
 ALLOWED_CATEGORIES = {"建议", "问题", "内容纠错", "想要的新功能", "其他"}
 ALLOWED_STATUSES = {"new", "processing", "done"}
 
@@ -39,6 +45,7 @@ data_lock = threading.Lock()
 resource_lock = threading.Lock()
 rate_lock = threading.Lock()
 request_times: dict[str, deque[float]] = defaultdict(deque)
+public_request_times: dict[tuple[str, str], deque[float]] = defaultdict(deque)
 
 
 def clean_resource_content(content: str) -> str:
@@ -145,6 +152,30 @@ def is_rate_limited(key: str, now: float) -> bool:
             return True
         recent.append(now)
         return False
+
+
+def is_public_rate_limited(scope: str, key: str, limit: int, window: int, now: float) -> bool:
+    with rate_lock:
+        recent = public_request_times[(scope, key)]
+        while recent and recent[0] <= now - window:
+            recent.popleft()
+        if len(recent) >= limit:
+            return True
+        recent.append(now)
+        return False
+
+
+def log_rate_limit(scope: str, key: str) -> None:
+    anonymous_client = hashlib.sha256(key.encode("utf-8")).hexdigest()[:12]
+    print(f"security rate_limit scope={scope} client={anonymous_client}", flush=True)
+
+
+def positive_int(value: str, default: int, maximum: int) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default
+    return min(maximum, max(1, parsed))
 
 
 def load_feedback() -> list[dict]:
@@ -317,9 +348,16 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"feedback": records, "count": len(records)})
             return
         if parsed.path == "/resources":
+            key = client_key(self)
+            if is_public_rate_limited("resource_list", key, RESOURCE_LIST_RATE_LIMIT, RESOURCE_LIST_RATE_WINDOW, time.monotonic()):
+                log_rate_limit("resource_list", key)
+                self.send_json(429, {"error": "rate_limit", "message": "请求较频繁，请稍后再试。"})
+                return
             query = parse_qs(parsed.query)
             category = query.get("category", [""])[0].strip()
             keyword = query.get("q", [""])[0].strip().casefold()[:100]
+            page = positive_int(query.get("page", ["1"])[0], 1, 10000)
+            page_size = positive_int(query.get("page_size", [str(PUBLIC_RESOURCE_PAGE_SIZE)])[0], PUBLIC_RESOURCE_PAGE_SIZE, PUBLIC_RESOURCE_MAX_PAGE_SIZE)
             with resource_lock:
                 records = load_resources()
             categories: dict[str, int] = {}
@@ -330,11 +368,27 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                 records = [record for record in records if record.get("category") == category]
             if keyword:
                 records = [record for record in records if keyword in f"{record.get('title', '')} {record.get('summary', '')}".casefold()]
-            public_records = [{key: value for key, value in record.items() if key != "content"} for record in records]
-            self.send_json(200, {"resources": public_records, "count": len(public_records), "categories": categories})
+            total = len(records)
+            start = (page - 1) * page_size
+            page_records = records[start:start + page_size]
+            public_records = [{field: value for field, value in record.items() if field != "content"} for record in page_records]
+            self.send_json(200, {
+                "resources": public_records,
+                "count": total,
+                "categories": categories,
+                "page": page,
+                "page_size": page_size,
+                "total_pages": max(1, (total + page_size - 1) // page_size),
+                "has_next": start + page_size < total,
+            })
             return
         resource_prefix = "/resources/"
         if parsed.path.startswith(resource_prefix):
+            key = client_key(self)
+            if is_public_rate_limited("resource_detail", key, RESOURCE_DETAIL_RATE_LIMIT, RESOURCE_DETAIL_RATE_WINDOW, time.monotonic()):
+                log_rate_limit("resource_detail", key)
+                self.send_json(429, {"error": "rate_limit", "message": "正文读取较频繁，请稍后再试。"})
+                return
             record_id = parsed.path[len(resource_prefix):]
             with resource_lock:
                 record = next((item for item in load_resources() if item.get("id") == record_id), None)

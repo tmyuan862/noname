@@ -1,0 +1,25 @@
+.resource-pagination {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.resource-pagination[hidden] { display: none; }
+.resource-pagination button {
+  min-width: 88px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 750;
+  cursor: pointer;
+}
+.resource-pagination button:disabled {
+  border-color: var(--line);
+  background: transparent;
+  color: #9aa198;
+  cursor: not-allowed;
+}
+.resource-pagination span { color: var(--muted); font-size: 12px; font-weight: 700; }

@@ -18,6 +18,7 @@ class FeedbackApiTests(unittest.TestCase):
         api.DATA_FILE = api.DATA_DIR / "feedback.jsonl"
         api.RESOURCE_FILE = api.DATA_DIR / "resources.json"
         api.request_times.clear()
+        api.public_request_times.clear()
         self.original_score_db = game_scores.DB_FILE
         self.original_session_min = game_scores.SESSION_MIN_SECONDS
         self.original_use_wal = game_scores.USE_WAL
@@ -184,6 +185,8 @@ class FeedbackApiTests(unittest.TestCase):
 
         _, listing = self.request("/resources?q=" + quote("校车"))
         self.assertEqual(listing["count"], 1)
+        self.assertEqual(listing["page"], 1)
+        self.assertFalse(listing["has_next"])
         resource_id = listing["resources"][0]["id"]
         self.assertNotIn("content", listing["resources"][0])
 
@@ -194,6 +197,46 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         _, empty = self.request("/resources")
         self.assertEqual(empty["count"], 0)
+
+    def test_resource_listing_is_paginated_and_page_size_is_capped(self):
+        source = [{
+            "title": f"校园资料 {index}",
+            "url": f"https://www.lixin.edu.cn/resource-{index}.htm",
+            "category": "other",
+            "detail": {"content": f"第 {index} 条校园资料完整正文。"},
+        } for index in range(15)]
+        self.request("/admin/resources/import", "POST", {"items": source})
+
+        _, first = self.request("/resources?page=1&page_size=100")
+        self.assertEqual(first["count"], 15)
+        self.assertEqual(len(first["resources"]), api.PUBLIC_RESOURCE_MAX_PAGE_SIZE)
+        self.assertTrue(first["has_next"])
+        self.assertNotIn("content", first["resources"][0])
+
+        _, second = self.request("/resources?page=2&page_size=12")
+        self.assertEqual(len(second["resources"]), 3)
+        self.assertFalse(second["has_next"])
+
+    def test_resource_detail_rate_limit_returns_429(self):
+        original_limit = api.RESOURCE_DETAIL_RATE_LIMIT
+        api.RESOURCE_DETAIL_RATE_LIMIT = 2
+        try:
+            source = [{
+                "title": "限流测试资料",
+                "url": "https://www.lixin.edu.cn/rate-limit.htm",
+                "category": "other",
+                "detail": {"content": "用于验证正文访问频率限制。"},
+            }]
+            self.request("/admin/resources/import", "POST", {"items": source})
+            _, listing = self.request("/resources")
+            record_id = listing["resources"][0]["id"]
+            self.assertEqual(self.request(f"/resources/{record_id}")[0], 200)
+            self.assertEqual(self.request(f"/resources/{record_id}")[0], 200)
+            status, response = self.request(f"/resources/{record_id}")
+            self.assertEqual(status, 429)
+            self.assertEqual(response["error"], "rate_limit")
+        finally:
+            api.RESOURCE_DETAIL_RATE_LIMIT = original_limit
 
     def test_resource_import_rejects_non_array(self):
         status, _ = self.request("/admin/resources/import", "POST", {"items": "not-a-list"})
