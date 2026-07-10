@@ -48,37 +48,45 @@
     </header>
 
     <main id="main-content">
-      <section class="hero section-shell" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow">一个持续生长的分享空间</p>
-          <h1 id="hero-title">来玩一点，<br />也学一点。</h1>
-          <p class="hero-intro">这里收集好玩的小游戏、真正有用的学习资料，以及每一个值得分享的新发现。</p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#games">
-              <i data-lucide="gamepad-2" aria-hidden="true"></i>
-              开始探索
-            </a>
-            <a class="text-link" href="resources.html">浏览学习资料 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+      <section class="welcome-hero" aria-labelledby="hero-title">
+        <img class="welcome-backdrop" src="assets/campus.jpg" alt="绿树环绕的大学校园建筑" />
+        <span class="welcome-shade" aria-hidden="true"></span>
+        <div class="section-shell welcome-layout">
+          <div class="welcome-copy">
+            <p class="welcome-label"><span aria-hidden="true"></span> 2026 迎新指南</p>
+            <h1 id="hero-title">新校园，<br />先从这里熟悉。</h1>
+            <p>把报到、交通、校园生活和常用资料整理到一处。每条信息都会标明适用对象与来源，重要事项请以学校官网通知为准。</p>
+            <div class="hero-actions">
+              <a class="button welcome-primary" href="campus.html">进入迎新指南 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+              <button class="welcome-ai" type="button" data-open-site-chat><i data-lucide="message-square-text" aria-hidden="true"></i> 问问本站 AI</button>
+            </div>
+          </div>
+
+          <nav class="welcome-tasks" aria-label="新生常用入口">
+            <a href="campus.html#academic"><span><i data-lucide="clipboard-check" aria-hidden="true"></i><b>报到准备</b></span><small>材料、流程与时间</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+            <a href="campus.html#bus"><span><i data-lucide="bus-front" aria-hidden="true"></i><b>到校交通</b></span><small>校车与出行路线</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+            <a href="resources.html?q=校园地图"><span><i data-lucide="map" aria-hidden="true"></i><b>校园地图</b></span><small>教学楼与生活设施</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+            <a href="campus.html#canteen"><span><i data-lucide="utensils" aria-hidden="true"></i><b>校园生活</b></span><small>食堂、快递与日常</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+          </nav>
+
+          <div class="cohort-switch" aria-label="按入学年份查看信息">
+            <span>按入学年份查看</span>
+            <div>
+              <a class="active" href="resources.html">通用</a>
+              <a href="resources.html?q=2026级">2026 级</a>
+              <a href="resources.html?q=2025级">2025 级</a>
+              <a href="resources.html?q=2024级">2024 级</a>
+              <a href="resources.html?q=2023级">2023 级</a>
+            </div>
           </div>
         </div>
-
-        <a class="hero-feature" href="campus.html" aria-label="打开新板块：校园生存指南">
-          <img src="assets/campus.jpg" alt="绿树环绕的大学校园建筑" />
-          <span class="feature-shade" aria-hidden="true"></span>
-          <span class="feature-content">
-            <span class="feature-label">新板块</span>
-            <strong>校园生存指南</strong>
-            <span>校车、食堂、地图和选课评价，都放在这里</span>
-          </span>
-          <span class="feature-action" aria-hidden="true"><i data-lucide="arrow-up-right"></i></span>
-        </a>
       </section>
 
       <section class="announcement" aria-label="站点公告">
         <div class="section-shell announcement-inner">
           <span class="status-dot" aria-hidden="true"></span>
-          <strong>共享站正在搭建中</strong>
-          <span>第一批小游戏和资料即将上线</span>
+          <strong>本站为校园信息整理平台，并非学校官方网站</strong>
+          <span>请通过信息来源链接核对最新通知</span>
         </div>
       </section>
 
