@@ -11,6 +11,7 @@ from types import SimpleNamespace
 
 import feedback_server as api
 import game_scores
+import senior_voice
 
 
 class FeedbackApiTests(unittest.TestCase):
@@ -29,6 +30,9 @@ class FeedbackApiTests(unittest.TestCase):
         game_scores.USE_WAL = False
         game_scores.sessions.clear()
         game_scores.init_db()
+        self.original_senior_db = senior_voice.DB_FILE
+        senior_voice.DB_FILE = api.DATA_DIR / "senior_voice.sqlite3"
+        senior_voice.init_db()
         self.server = api.ThreadingHTTPServer(("127.0.0.1", 0), api.FeedbackHandler)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
@@ -42,6 +46,7 @@ class FeedbackApiTests(unittest.TestCase):
         game_scores.SESSION_MIN_SECONDS = self.original_session_min
         game_scores.USE_WAL = self.original_use_wal
         game_scores.sessions.clear()
+        senior_voice.DB_FILE = self.original_senior_db
         self.temp_dir.cleanup()
 
     def post(self, payload, content_type="application/json"):
@@ -72,6 +77,16 @@ class FeedbackApiTests(unittest.TestCase):
             return error.code, json.loads(error.read())
         return response.status, json.loads(response.read())
 
+    def session_request(self, path, method="GET", payload=None, cookie="", csrf=""):
+        body = json.dumps(payload).encode() if payload is not None else None
+        headers = {"Content-Type": "application/json"} if body else {}
+        if cookie: headers["Cookie"] = cookie
+        if csrf: headers["X-CSRF-Token"] = csrf
+        request = urllib.request.Request(self.base_url + path, data=body, headers=headers, method=method)
+        try: response = urllib.request.urlopen(request)
+        except urllib.error.HTTPError as error: return error.code, json.loads(error.read()), error.headers
+        return response.status, json.loads(response.read()), response.headers
+
     def test_valid_feedback_is_saved(self):
         status, response = self.post({"category": "建议", "message": "希望增加校园打印店的位置。", "website": ""})
         self.assertEqual(status, 201)
@@ -80,6 +95,27 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(record["category"], "建议")
         self.assertEqual(record["message"], "希望增加校园打印店的位置。")
         self.assertNotIn("ip", record)
+
+    def test_senior_author_must_change_password_and_admin_approves_post(self):
+        status, created = self.request("/admin/senior/authors", "POST", {"username": "senior_01", "display_name": "计算机学院学姐", "password": "InitialPass123"})
+        self.assertEqual(status, 201)
+        status, login, headers = self.session_request("/senior/login", "POST", {"username": "senior_01", "password": "InitialPass123"})
+        self.assertEqual(status, 200)
+        cookie = headers.get("Set-Cookie").split(";", 1)[0]
+        csrf = login["author"]["csrf_token"]
+        status, _, _ = self.session_request("/senior/posts", "POST", {"title": "给新生的选课建议", "body": "这是足够长的投稿正文，用来说明选课前应该查看培养方案。"}, cookie, csrf)
+        self.assertEqual(status, 403)
+        status, _, _ = self.session_request("/senior/password", "PATCH", {"current_password": "InitialPass123", "new_password": "ChangedPass456"}, cookie, csrf)
+        self.assertEqual(status, 200)
+        status, submitted, _ = self.session_request("/senior/posts", "POST", {"title": "给新生的选课建议", "body": "这是足够长的投稿正文，用来说明选课前应该查看培养方案。"}, cookie, csrf)
+        self.assertEqual(status, 201)
+        _, public = self.request("/senior/posts")
+        self.assertEqual(public["count"], 0)
+        post_id = submitted["post"]["id"]
+        self.assertEqual(self.request(f"/admin/senior/posts/{post_id}", "PATCH", {"status": "published"})[0], 200)
+        _, public = self.request("/senior/posts")
+        self.assertEqual(public["count"], 1)
+        self.assertEqual(public["posts"][0]["display_name"], "计算机学院学姐")
 
     def test_health_reports_platform_status(self):
         status, health = self.request("/health")

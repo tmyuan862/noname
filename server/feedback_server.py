@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import hmac
 import os
 import re
 import smtplib
@@ -16,12 +17,14 @@ import urllib.request
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from email.message import EmailMessage
+from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from app_config import CONFIG
 import game_scores
+import senior_voice
 
 
 HOST = CONFIG.host
@@ -402,15 +405,34 @@ def send_notification(record: dict) -> None:
 class FeedbackHandler(BaseHTTPRequestHandler):
     server_version = "FeedbackAPI/2.0"
 
-    def send_json(self, status: int, payload: dict) -> None:
+    def send_json(self, status: int, payload: dict, headers: dict[str, str] | None = None) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
+        for name, value in (headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
+
+    def senior_token(self) -> str:
+        cookie = SimpleCookie(self.headers.get("Cookie", ""))
+        return cookie["senior_session"].value if "senior_session" in cookie else ""
+
+    def senior_author(self) -> dict | None:
+        return senior_voice.session_author(self.senior_token())
+
+    def require_senior(self, csrf: bool = False) -> dict | None:
+        author = self.senior_author()
+        if author is None:
+            self.send_json(401, {"error": "authentication_required", "message": "请先登录。"})
+            return None
+        if csrf and not hmac.compare_digest(self.headers.get("X-CSRF-Token", ""), author["csrf_token"]):
+            self.send_json(403, {"error": "csrf", "message": "页面已过期，请刷新后重试。"})
+            return None
+        return author
 
     def read_json(self, max_bytes: int = MAX_BODY_BYTES) -> dict | list | None:
         try:
@@ -446,6 +468,19 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                 },
             })
             return
+        if parsed.path == "/senior/posts":
+            query = parse_qs(parsed.query)
+            page = positive_int(query.get("page", ["1"])[0], 1, 10000)
+            self.send_json(200, senior_voice.public_posts(page))
+            return
+        if parsed.path == "/senior/me":
+            author = self.require_senior()
+            if author: self.send_json(200, {"author": author})
+            return
+        if parsed.path == "/senior/my/posts":
+            author = self.require_senior()
+            if author: self.send_json(200, {"posts": senior_voice.author_posts(author["id"])})
+            return
         if parsed.path == "/game/session":
             self.send_json(200, {"token": game_scores.create_session(), "expires_in": game_scores.SESSION_MAX_SECONDS})
             return
@@ -468,6 +503,15 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                 records = load_resources()
             public_records = [{field: value for field, value in record.items() if field != "content"} for record in records]
             self.send_json(200, {"resources": public_records, "count": len(public_records)})
+            return
+        if parsed.path == "/admin/senior/authors":
+            authors = senior_voice.admin_authors()
+            self.send_json(200, {"authors": authors, "count": len(authors)})
+            return
+        if parsed.path == "/admin/senior/posts":
+            status = parse_qs(parsed.query).get("status", [""])[0]
+            posts = senior_voice.admin_posts(status)
+            self.send_json(200, {"posts": posts, "count": len(posts)})
             return
         if parsed.path == "/admin/feedback":
             status_filter = parse_qs(parsed.query).get("status", [""])[0]
@@ -531,6 +575,35 @@ class FeedbackHandler(BaseHTTPRequestHandler):
         self.send_json(404, {"error": "not_found"})
 
     def do_POST(self) -> None:
+        if self.path == "/senior/login":
+            key = client_key(self)
+            if is_public_rate_limited("senior_login", key, 10, 600, time.monotonic()):
+                self.send_json(429, {"error": "rate_limit", "message": "登录尝试过多，请稍后再试。"}); return
+            payload = self.read_json()
+            author, token, message = senior_voice.authenticate(payload.get("username") if isinstance(payload, dict) else None, payload.get("password") if isinstance(payload, dict) else None)
+            if author is None:
+                self.send_json(401, {"error": "invalid_credentials", "message": message}); return
+            cookie = f"senior_session={token}; Path=/; HttpOnly; SameSite=Strict; Max-Age={senior_voice.SESSION_HOURS * 3600}"
+            self.send_json(200, {"ok": True, "author": author}, {"Set-Cookie": cookie}); return
+        if self.path == "/senior/logout":
+            author = self.require_senior(csrf=True)
+            if author is None: return
+            senior_voice.logout(self.senior_token())
+            self.send_json(200, {"ok": True}, {"Set-Cookie": "senior_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"}); return
+        if self.path == "/senior/posts":
+            author = self.require_senior(csrf=True)
+            if author is None: return
+            if author["must_change_password"]:
+                self.send_json(403, {"error": "password_change_required", "message": "请先修改初始密码。"}); return
+            payload = self.read_json(16 * 1024)
+            post, message = senior_voice.create_post(author["id"], payload.get("title") if isinstance(payload, dict) else None, payload.get("body") if isinstance(payload, dict) else None)
+            if post is None: self.send_json(422, {"error": "invalid_post", "message": message}); return
+            self.send_json(201, {"ok": True, "post": post}); return
+        if self.path == "/admin/senior/authors":
+            payload = self.read_json()
+            author, message = senior_voice.create_author(payload.get("username") if isinstance(payload, dict) else None, payload.get("display_name") if isinstance(payload, dict) else None, payload.get("password") if isinstance(payload, dict) else None)
+            if author is None: self.send_json(422, {"error": "invalid_author", "message": message}); return
+            self.send_json(201, {"ok": True, "author": author}); return
         if self.path == "/game/scores":
             payload = self.read_json()
             if not isinstance(payload, dict):
@@ -612,6 +685,26 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
     def do_PATCH(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/senior/password":
+            author = self.require_senior(csrf=True)
+            if author is None: return
+            payload = self.read_json(); message = senior_voice.change_password(author["id"], payload.get("current_password") if isinstance(payload, dict) else None, payload.get("new_password") if isinstance(payload, dict) else None)
+            if message: self.send_json(422, {"error": "password", "message": message}); return
+            self.send_json(200, {"ok": True}); return
+        senior_post_prefix = "/admin/senior/posts/"
+        if parsed.path.startswith(senior_post_prefix):
+            payload = self.read_json(); status = payload.get("status") if isinstance(payload, dict) else ""
+            try: post_id = int(parsed.path[len(senior_post_prefix):])
+            except ValueError: post_id = 0
+            if not senior_voice.set_post_status(post_id, status): self.send_json(422, {"error": "invalid_status"}); return
+            self.send_json(200, {"ok": True}); return
+        senior_author_prefix = "/admin/senior/authors/"
+        if parsed.path.startswith(senior_author_prefix):
+            payload = self.read_json()
+            try: author_id = int(parsed.path[len(senior_author_prefix):])
+            except ValueError: author_id = 0
+            if not senior_voice.set_author_active(author_id, bool(payload.get("active")) if isinstance(payload, dict) else False): self.send_json(404, {"error": "not_found"}); return
+            self.send_json(200, {"ok": True}); return
         game_prefix = "/admin/game/scores/"
         if parsed.path.startswith(game_prefix):
             payload = self.read_json()
@@ -641,6 +734,12 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
     def do_DELETE(self) -> None:
         parsed = urlparse(self.path)
+        senior_post_prefix = "/admin/senior/posts/"
+        if parsed.path.startswith(senior_post_prefix):
+            try: post_id = int(parsed.path[len(senior_post_prefix):])
+            except ValueError: post_id = 0
+            if not senior_voice.delete_post(post_id): self.send_json(404, {"error": "not_found"}); return
+            self.send_json(200, {"ok": True}); return
         game_prefix = "/admin/game/scores/"
         if parsed.path.startswith(game_prefix):
             try:
@@ -671,5 +770,6 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     game_scores.init_db()
+    senior_voice.init_db()
     print(f"{CONFIG.app_name} API {CONFIG.version} listening on {HOST}:{PORT}", flush=True)
     ThreadingHTTPServer((HOST, PORT), FeedbackHandler).serve_forever()
