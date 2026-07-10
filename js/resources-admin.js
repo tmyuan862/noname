@@ -10,6 +10,7 @@
   var pasteStatus = document.querySelector("[data-paste-status]");
   var preview = document.querySelector("[data-analysis-preview]");
   var analysisMode = "ai";
+  var reformatButton = document.querySelector("[data-reformat-resources]");
 
   function request(url, options) {
     return fetch(url, options).then(function (response) {
@@ -106,6 +107,16 @@
   });
 
   document.querySelector("[data-cancel-analysis]").addEventListener("click", function () { preview.hidden = true; preview.reset(); setPasteStatus("已取消本次分析。"); });
+  reformatButton.addEventListener("click", function () {
+    if (!confirm("将把全部已发布资料的正文发送给 DeepSeek，仅进行分段与编号排版整理，是否继续？")) return;
+    reformatButton.disabled = true;
+    reformatButton.textContent = "AI 正在整理…";
+    request("/api/admin/resources/reformat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ limit: 100 }) }).then(function (result) {
+      setPasteStatus("AI 排版整理完成：更新 " + result.updated + " 条" + (result.failed ? "，" + result.failed + " 条未修改。" : "。"), result.failed ? "error" : "success");
+      load();
+    }).catch(function (error) { setPasteStatus(error.message || "AI 排版整理失败。", "error"); })
+      .finally(function () { reformatButton.disabled = false; reformatButton.textContent = "AI 整理全部排版"; });
+  });
   document.querySelector("[data-refresh]").addEventListener("click", load);
   load();
 }());

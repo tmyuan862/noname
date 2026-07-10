@@ -164,6 +164,24 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertIn("2026 年 7 月 9 日 至 7 月 28 日施工。", detail["resource"]["content"])
         self.assertNotIn("2026\n年", detail["resource"]["content"])
 
+    def test_ai_reformat_preserves_resource_metadata_and_updates_content(self):
+        source = [{"title": "安全工作提示", "url": "https://www.lixin.edu.cn/safety.htm", "category": "safety", "detail": {"content": "各单位：做好安全检查。1. 关闭门窗。2. 注意出行。"}}]
+        self.request("/admin/resources/import", "POST", {"items": source})
+        ai_payload = {"choices": [{"message": {"content": json.dumps({"content": "各单位：做好安全检查。\n\n1. 关闭门窗。\n\n2. 注意出行。"}, ensure_ascii=False)}}]}
+
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self): return json.dumps(ai_payload, ensure_ascii=False).encode("utf-8")
+
+        ai_config = SimpleNamespace(notice_ai_enabled=True, notice_ai_api_key="test-key", notice_ai_base_url="https://api.deepseek.com", notice_ai_model="deepseek-chat", data_dir=api.DATA_DIR)
+        with mock.patch("feedback_server.CONFIG", ai_config), mock.patch("feedback_server.AI_URLOPEN", return_value=FakeResponse()):
+            result = api.reformat_resources_with_ai()
+        self.assertEqual(result["updated"], 1)
+        record = api.load_resources()[0]
+        self.assertEqual(record["title"], "安全工作提示")
+        self.assertIn("\n\n1. 关闭门窗。", record["content"])
+
     def test_game_score_session_submission_and_leaderboard(self):
         status, session = self.request("/game/session")
         self.assertEqual(status, 200)
