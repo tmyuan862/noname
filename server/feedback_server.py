@@ -225,7 +225,7 @@ def send_notification(record: dict) -> None:
         return
     try:
         message = EmailMessage()
-        message["Subject"] = f"[零号共享站] 新反馈：{record['category']}"
+        message["Subject"] = f"[梦缘资源站] 新反馈：{record['category']}"
         message["From"] = username
         message["To"] = recipient
         message.set_content(
