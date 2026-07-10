@@ -56,6 +56,8 @@ def normalize_resource(item: dict) -> dict | None:
     title = str(item.get("title", "")).strip()[:300]
     url = str(item.get("url", "")).strip()[:1000]
     category = str(item.get("category", "other")).strip()[:80]
+    if category == "safety" and any(keyword in title for keyword in ("发布会", "讲座", "论坛")):
+        category = "activity_competition"
     content = clean_resource_content(str(detail.get("content", "")))[:100000]
     if not title or not content or not url.startswith(("https://", "http://")):
         return None

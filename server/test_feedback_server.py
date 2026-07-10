@@ -135,6 +135,17 @@ class FeedbackApiTests(unittest.TestCase):
         status, _ = self.request("/admin/resources/import", "POST", {"items": "not-a-list"})
         self.assertEqual(status, 422)
 
+    def test_event_misclassified_as_safety_is_recategorized(self):
+        source = [{
+            "title": "校园主题发布会通知",
+            "url": "https://www.lixin.edu.cn/event.htm",
+            "category": "safety",
+            "detail": {"content": "点击率：\n发布会将于本周举行。\n分享到："},
+        }]
+        self.request("/admin/resources/import", "POST", {"items": source})
+        _, listing = self.request("/resources")
+        self.assertEqual(listing["resources"][0]["category"], "activity_competition")
+
 
 if __name__ == "__main__":
     unittest.main()

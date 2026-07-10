@@ -1,0 +1,24 @@
+.library-disclaimer {
+  border-bottom: 1px solid #b8d444;
+  background: var(--lime);
+}
+
+.library-disclaimer .library-shell {
+  min-height: 82px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.library-disclaimer strong { font-size: 13px; }
+.library-disclaimer p { color: #4e583f; font-size: 12px; line-height: 1.55; }
+.library-disclaimer a { font-size: 12px; font-weight: 800; white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .library-disclaimer .library-shell {
+    padding: 16px 0;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

@@ -18,8 +18,9 @@
       </a>
       <nav aria-label="页面导航">
         <a href="#life">校园生活</a>
+        <a href="#academic">办事日历</a>
         <a href="#courses">选课评价</a>
-        <a href="#news">校内资讯</a>
+        <a href="#news">近期提醒</a>
         <a href="index.html#feedback">意见箱</a>
       </nav>
       <a class="back-link" href="index.html"><i data-lucide="arrow-left" aria-hidden="true"></i> 返回首页</a>
@@ -33,46 +34,73 @@
           <p class="eyebrow">由同学一起补全的校园说明书</p>
           <h1>校园生存指南</h1>
           <p>少走一点弯路，多知道一点校园里真正有用的事。</p>
-          <label class="campus-search">
+          <form class="campus-search" data-campus-search>
             <i data-lucide="search" aria-hidden="true"></i>
             <span class="sr-only">搜索校园信息</span>
-            <input type="search" placeholder="搜索校车、食堂、老师或地点" />
-            <kbd>搜索</kbd>
-          </label>
+            <input type="search" name="q" placeholder="搜索校车、食堂、选课或通知" required />
+            <button type="submit">搜索</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="source-principle">
+        <div class="page-shell source-principle-inner">
+          <i data-lucide="badge-check" aria-hidden="true"></i>
+          <div><strong>这是信息索引，不是学校官方发布平台</strong><p>本站只对上海立信会计金融学院官网公开通知进行检索、分类和简要整理。时间、地点及办理要求可能调整，行动前请点击“官网原文”核对最新信息。</p></div>
+          <a href="resources.html">查看完整资料库 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
         </div>
       </section>
 
       <section class="quick-nav page-shell" aria-label="校园信息分类">
         <a href="#bus"><span class="quick-icon green"><i data-lucide="bus-front" aria-hidden="true"></i></span><strong>校车时刻</strong><small>路线与发车时间</small></a>
         <a href="#canteen"><span class="quick-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><strong>食堂指南</strong><small>位置与窗口推荐</small></a>
-        <a href="#map"><span class="quick-icon blue"><i data-lucide="map" aria-hidden="true"></i></span><strong>校园地图</strong><small>教学楼与生活设施</small></a>
-        <a href="#courses"><span class="quick-icon yellow"><i data-lucide="messages-square" aria-hidden="true"></i></span><strong>选课评价</strong><small>课程体验与建议</small></a>
+        <a href="#academic"><span class="quick-icon blue"><i data-lucide="calendar-days" aria-hidden="true"></i></span><strong>办事日历</strong><small>选课、缴费与报到</small></a>
+        <a href="#news"><span class="quick-icon yellow"><i data-lucide="bell-ring" aria-hidden="true"></i></span><strong>近期提醒</strong><small>修缮、活动与安全</small></a>
       </section>
 
       <section class="page-section page-shell" id="life" aria-labelledby="life-title">
         <div class="section-heading">
           <div><p class="eyebrow">Daily Campus</p><h2 id="life-title">在校园，先解决这些事</h2></div>
-          <span class="data-note"><i data-lucide="info" aria-hidden="true"></i> 内容等待真实校园资料补充</span>
+          <span class="data-note"><i data-lucide="database" aria-hidden="true"></i> 整理自学校官网 · 2026-07-10 抓取</span>
         </div>
         <div class="life-grid">
           <article class="info-card bus-card" id="bus">
-            <div class="card-top"><span class="card-icon"><i data-lucide="bus-front" aria-hidden="true"></i></span><span class="update-label">待更新</span></div>
-            <h3>校车时刻与路线</h3>
-            <p>按校区和方向整理发车时间、上车地点、节假日调整与末班车提醒。</p>
-            <div class="empty-data"><i data-lucide="clock-3" aria-hidden="true"></i><span>提供学校和校车信息后即可补全</span></div>
+            <div class="card-top"><span class="card-icon"><i data-lucide="bus-front" aria-hidden="true"></i></span><span class="update-label temporary">暑期临时安排</span></div>
+            <h3>暑期值班校车</h3>
+            <p>适用期为 2026年7月8日至9月2日。每周三运行，上午 7:30 分别从中山西路、文翔路校区发车，下午 15:15 原路返回。</p>
+            <ul class="fact-list"><li><b>线路一</b><span>中山西路 7:30 → 龙阳路 8:00 → 顾唐路 8:30 → 上川路</span></li><li><b>线路二</b><span>文翔路 7:30 → 松江新城 7:35 → 顾唐路 → 上川路</span></li></ul>
+            <a class="source-link" href="https://www.lixin.edu.cn/tzgg/157748.htm" target="_blank" rel="noopener noreferrer"><span>后勤保障处、资产管理处 · 2026-07-02</span><strong>官网原文 ↗</strong></a>
           </article>
           <article class="info-card" id="canteen">
-            <div class="card-top"><span class="card-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><span class="update-label">待更新</span></div>
-            <h3>今天去哪个食堂？</h3>
-            <p>食堂位置、营业时间、特色窗口、价格区间，以及同学们反复回购的菜品。</p>
-            <ul class="placeholder-list"><li><span>食堂位置与楼层</span><b>待补充</b></li><li><span>热门窗口推荐</span><b>待补充</b></li><li><span>夜宵开放时间</span><b>待补充</b></li></ul>
+            <div class="card-top"><span class="card-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><span class="update-label temporary">暑期临时安排</span></div>
+            <h3>暑期食堂开放</h3>
+            <p>上川路第二食堂一楼、文翔路师苑餐厅在 7月8日至9月2日供应三餐；顾唐路师生食堂二楼仅工作日供应午餐至 7月31日。</p>
+            <ul class="placeholder-list"><li><span>早餐</span><b>6:30—9:00</b></li><li><span>午餐</span><b>10:30—13:00</b></li><li><span>晚餐</span><b>16:30—19:00</b></li></ul>
+            <a class="source-link" href="https://www.lixin.edu.cn/tzgg/157748.htm" target="_blank" rel="noopener noreferrer"><span>后勤保障处、资产管理处 · 2026-07-02</span><strong>官网原文 ↗</strong></a>
           </article>
-          <article class="info-card map-card" id="map">
-            <div class="card-top"><span class="card-icon blue"><i data-lucide="map" aria-hidden="true"></i></span><span class="update-label">规划中</span></div>
-            <h3>一张真正好用的地图</h3>
-            <p>不只标教学楼，还会收录打印店、快递点、自习室、医务室和那些容易迷路的入口。</p>
-            <div class="map-placeholder" aria-hidden="true"><span></span><span></span><span></span><i data-lucide="map-pin"></i></div>
+          <article class="info-card" id="library">
+            <div class="card-top"><span class="card-icon blue"><i data-lucide="library-big" aria-hidden="true"></i></span><span class="update-label temporary">临时施工</span></div>
+            <h3>两校区图书馆修缮</h3>
+            <p>上川路木兰图书馆、文翔路图书馆计划于 2026年7月9日至7月28日维修施工，期间可能有轻微噪音，变化以现场通知为准。</p>
+            <a class="source-link" href="https://www.lixin.edu.cn/tzgg/157912.htm" target="_blank" rel="noopener noreferrer"><span>基建处、图书馆 · 2026-07-08</span><strong>官网原文 ↗</strong></a>
           </article>
+        </div>
+      </section>
+
+      <section class="academic-section" id="academic" aria-labelledby="academic-title">
+        <div class="page-shell">
+          <div class="section-heading"><div><p class="eyebrow">Academic Calendar</p><h2 id="academic-title">选课、缴费与报到</h2><p class="section-intro dark-intro">下面是从三份官网通知中提取的关键时间。摘要用于快速定位，具体对象、例外情况和附件请查看原文。</p></div></div>
+          <div class="academic-grid">
+            <article class="timeline-card">
+              <div class="timeline-head"><span>集中选课</span><a href="https://www.lixin.edu.cn/tzgg/157448.htm" target="_blank" rel="noopener noreferrer">教务处官网原文 ↗</a></div>
+              <ol><li><time>6月26日—29日</time><div><strong>第一轮</strong><p>可选可退，超额课程结束后随机筛选；不同年级起始时间不同。</p></div></li><li><time>7月2日—6日</time><div><strong>第二轮</strong><p>只选不退，先到先得；人数不足的教学班可能关闭。</p></div></li><li><time>7月12日—16日</time><div><strong>第二轮退课</strong><p>全体学生处理多选课程，结束后原则上不能再退。</p></div></li><li><time>7月17日—19日</time><div><strong>第三轮</strong><p>只选不退，用于补选和调整被关闭的课程。</p></div></li></ol>
+            </article>
+            <div class="process-stack">
+              <article class="process-card"><span class="process-number">01</span><div><small>2026年8月21日—9月6日</small><h3>完成学费与住宿费缴纳</h3><p>通过“随申办市民云”搜索学校进入缴费平台。学校提醒不要向不明账户转账。</p><a href="https://www.lixin.edu.cn/tzgg/157618.htm" target="_blank" rel="noopener noreferrer">财务处官网原文 ↗</a></div></article>
+              <article class="process-card"><span class="process-number">02</span><div><small>2026年9月6日</small><h3>线上注册，再线下盖章</h3><p>先由辅导员维护报到状态；缴费状态为“已缴费”后完成线上注册，再携学生证到学院指定地点盖章。</p><a href="https://www.lixin.edu.cn/tzgg/157874.htm" target="_blank" rel="noopener noreferrer">教务处官网原文 ↗</a></div></article>
+              <article class="process-card warning-card"><span class="process-number">!</span><div><small>办理前核对</small><h3>不同年级、专业和特殊情况有差异</h3><p>助学贷款、参军、退宿、暂缓注册、重修等情况请直接查看通知附件或咨询对应部门。</p><a href="resources.html?category=fees">查看费用类资料 →</a></div></article>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -99,16 +127,19 @@
       </section>
 
       <section class="page-section page-shell" id="news" aria-labelledby="news-title">
-        <div class="section-heading"><div><p class="eyebrow">Campus Feed</p><h2 id="news-title">校内资讯</h2></div></div>
-        <div class="news-grid">
-          <article><span>通知</span><h3>校历、放假与重要时间节点</h3><p>整理选课、考试、放假、返校等容易错过的时间信息。</p></article>
-          <article><span>生活</span><h3>校园服务变更</h3><p>食堂、图书馆、快递点和公共设施的临时调整。</p></article>
-          <article><span>活动</span><h3>讲座、比赛与社团活动</h3><p>把值得参加的校内活动放在一个地方，不再依赖群消息。</p></article>
+        <div class="section-heading"><div><p class="eyebrow">Campus Feed</p><h2 id="news-title">近期提醒与机会</h2></div><a class="all-resources-link" href="resources.html">搜索全部 14 条资料 →</a></div>
+        <div class="news-grid sourced-news">
+          <article><span>假期安全</span><h3>离校前断电、关窗并带走贵重物品</h3><p>学校特别提示交通、消防、实习和防诈骗安全，地下车库不建议长期停车。</p><footer><time>2026-07-01</time><a href="https://www.lixin.edu.cn/tzgg/157689.htm" target="_blank" rel="noopener noreferrer">保卫处官网原文 ↗</a></footer></article>
+          <article><span>校园服务</span><h3>暑期快递中心 9:00—17:30</h3><p>上川路、文翔路校园快递中心在 7月8日至9月2日开放，调整以校园网公告为准。</p><footer><time>2026-07-02</time><a href="https://www.lixin.edu.cn/tzgg/157748.htm" target="_blank" rel="noopener noreferrer">后勤官网原文 ↗</a></footer></article>
+          <article><span>创意比赛</span><h3>师德主题微视频征集至 7月31日</h3><p>面向全体师生，可个人或团队参加，作品时长原则上 10 秒至 1 分钟。</p><footer><time>2026-05-27</time><a href="https://www.lixin.edu.cn/tzgg/156624.htm" target="_blank" rel="noopener noreferrer">活动官网原文 ↗</a></footer></article>
+          <article><span>创意比赛</span><h3>会计文化短视频征集至 9月30日</h3><p>围绕校史、校友、潘序伦和会计文物创作，个人或不超过 5 人团队均可参加。</p><footer><time>2026-05-25</time><a href="https://www.lixin.edu.cn/tzgg/156535.htm" target="_blank" rel="noopener noreferrer">活动官网原文 ↗</a></footer></article>
+          <article><span>交流访学</span><h3>国（境）外项目与行前安全</h3><p>资料库收录访学项目宣讲和“平安留学”培训通知，具体批次和新安排以国际交流处发布为准。</p><footer><time>近期资料</time><a href="resources.html?category=exchange">查看交流类资料 →</a></footer></article>
+          <article class="index-card"><span>信息索引</span><h3>没有在这里找到？</h3><p>生存指南只保留高频、可操作的信息。完整通知、部门和发布时间可以在资料库继续搜索。</p><footer><time>14 条已收录</time><a href="resources.html">进入资料库 →</a></footer></article>
         </div>
       </section>
     </main>
 
-    <footer class="campus-footer"><div class="page-shell"><strong>校园生存指南</strong><span>信息来自同学，也服务于同学。</span><a href="index.html#feedback">提交反馈</a></div></footer>
+    <footer class="campus-footer"><div class="page-shell"><strong>校园生存指南</strong><span>本站为非官方信息索引，办理事务请以学校官网最新通知为准。</span><a href="index.html#feedback">提交纠错</a></div></footer>
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script src="js/campus.js"></script>
   </body>
