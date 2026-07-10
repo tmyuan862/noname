@@ -40,11 +40,12 @@ install -d -m 0755 "$RELEASE_ROOT"
 if [[ ! -d "$release_dir" ]]; then
   install -d -m 0755 "$release_dir"
 fi
-install -m 0755 "$REPO_DIR/server/feedback_server.py" "$release_dir/feedback_server.py"
-install -m 0644 "$REPO_DIR/server/app_config.py" "$release_dir/app_config.py"
-install -m 0644 "$REPO_DIR/server/game_scores.py" "$release_dir/game_scores.py"
-install -m 0644 "$REPO_DIR/server/senior_voice.py" "$release_dir/senior_voice.py"
-install -m 0644 "$REPO_DIR/server/site_chat.py" "$release_dir/site_chat.py"
+for module in "$REPO_DIR"/server/*.py; do
+  [[ "$(basename "$module")" == test_*.py ]] && continue
+  mode=0644
+  [[ "$(basename "$module")" == "feedback_server.py" ]] && mode=0755
+  install -m "$mode" "$module" "$release_dir/$(basename "$module")"
+done
 
 ln -sfn "$release_dir" "$CURRENT_LINK"
 printf 'APP_VERSION=%s\n' "$short_commit" > /etc/zero-share-release.env
