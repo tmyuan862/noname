@@ -40,6 +40,20 @@ class FeedbackApiTests(unittest.TestCase):
             return error.code, json.loads(error.read())
         return response.status, json.loads(response.read())
 
+    def request(self, path, method="GET", payload=None):
+        body = json.dumps(payload).encode() if payload is not None else None
+        request = urllib.request.Request(
+            self.base_url + path,
+            data=body,
+            headers={"Content-Type": "application/json"} if body else {},
+            method=method,
+        )
+        try:
+            response = urllib.request.urlopen(request)
+        except urllib.error.HTTPError as error:
+            return error.code, json.loads(error.read())
+        return response.status, json.loads(response.read())
+
     def test_valid_feedback_is_saved(self):
         status, response = self.post({"category": "建议", "message": "希望增加校园打印店的位置。", "website": ""})
         self.assertEqual(status, 201)
@@ -69,6 +83,23 @@ class FeedbackApiTests(unittest.TestCase):
             self.assertEqual(status, 201)
         status, _ = self.post({"category": "其他", "message": "第六条反馈应该被限制", "website": ""})
         self.assertEqual(status, 429)
+
+    def test_admin_can_list_update_and_delete_feedback(self):
+        self.post({"category": "问题", "message": "后台管理接口测试反馈", "website": ""})
+        status, listing = self.request("/admin/feedback")
+        self.assertEqual(status, 200)
+        self.assertEqual(listing["count"], 1)
+        record_id = listing["feedback"][0]["id"]
+
+        status, _ = self.request(f"/admin/feedback/{record_id}", "PATCH", {"status": "done"})
+        self.assertEqual(status, 200)
+        _, done = self.request("/admin/feedback?status=done")
+        self.assertEqual(done["count"], 1)
+
+        status, _ = self.request(f"/admin/feedback/{record_id}", "DELETE")
+        self.assertEqual(status, 200)
+        _, empty = self.request("/admin/feedback")
+        self.assertEqual(empty["count"], 0)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>反馈管理 · 零号共享站</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+  <body>
+    <header class="admin-header"><div><span class="admin-mark">0</span><strong>反馈管理</strong></div><a href="index.html">查看网站</a></header>
+    <main class="admin-shell">
+      <section class="admin-title"><div><p>ADMIN CONSOLE</p><h1>意见箱</h1><span>通过 SSH 加密通道访问</span></div><button type="button" data-refresh>刷新数据</button></section>
+      <nav class="status-tabs" aria-label="反馈状态筛选">
+        <button class="active" type="button" data-status="">全部 <span data-count-all>0</span></button>
+        <button type="button" data-status="new">待处理</button>
+        <button type="button" data-status="processing">处理中</button>
+        <button type="button" data-status="done">已完成</button>
+      </nav>
+      <section class="feedback-list" data-feedback-list aria-live="polite"><p class="loading-state">正在读取反馈……</p></section>
+    </main>
+    <template id="feedback-template">
+      <article class="feedback-item">
+        <div class="feedback-meta"><span data-category></span><time data-time></time></div>
+        <p data-message></p>
+        <div class="feedback-actions">
+          <select data-state aria-label="处理状态"><option value="new">待处理</option><option value="processing">处理中</option><option value="done">已完成</option></select>
+          <button class="delete-button" type="button" data-delete>删除</button>
+        </div>
+      </article>
+    </template>
+    <script src="js/admin.js"></script>
+  </body>
+</html>
