@@ -9,6 +9,7 @@
   var analyzeButton = document.querySelector("[data-analyze]");
   var pasteStatus = document.querySelector("[data-paste-status]");
   var preview = document.querySelector("[data-analysis-preview]");
+  var analysisMode = "ai";
 
   function request(url, options) {
     return fetch(url, options).then(function (response) {
@@ -68,13 +69,22 @@
   analyzeButton.addEventListener("click", function () {
     var text = pasteText.value.trim();
     if (text.length < 10) { setPasteStatus("请先粘贴一段完整通知。", "error"); return; }
-    analyzeButton.disabled = true; setPasteStatus("正在分析标题、日期、部门和分类……");
-    request("/api/admin/resources/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: text }) }).then(function (data) {
+    analyzeButton.disabled = true; setPasteStatus(analysisMode === "ai" ? "DeepSeek 正在整理内容……" : "正在本地识别标题、日期、部门和分类……");
+    request("/api/admin/resources/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: text, mode: analysisMode }) }).then(function (data) {
       Object.keys(data.draft).forEach(function (name) { var field = preview.elements.namedItem(name); if (field) field.value = data.draft[name] || ""; });
-      preview.hidden = false; setPasteStatus("分析完成，请核对识别结果后发布。", "success");
+      preview.hidden = false;
+      setPasteStatus(data.analysis_mode === "local_fallback" ? data.message : (data.analysis_mode === "ai" ? "AI 增强分析完成，请核对后发布。" : "本地分析完成，请核对后发布。"), data.analysis_mode === "local_fallback" ? "error" : "success");
       preview.querySelector('[name="title"]').focus();
     }).catch(function (error) { setPasteStatus(error.message || "分析失败，请稍后再试。", "error"); })
       .finally(function () { analyzeButton.disabled = false; });
+  });
+
+  document.querySelectorAll("[data-analysis-mode]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      analysisMode = button.dataset.analysisMode;
+      document.querySelectorAll("[data-analysis-mode]").forEach(function (item) { item.classList.toggle("active", item === button); });
+      setPasteStatus(analysisMode === "ai" ? "AI 增强会将本次通知发送给 DeepSeek。" : "本地模式不会发送给第三方。", "");
+    });
   });
 
   preview.addEventListener("submit", function (event) {

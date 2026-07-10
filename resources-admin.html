@@ -21,9 +21,9 @@
         <p class="upload-status" data-upload-status role="status" aria-live="polite">尚未选择文件</p>
       </section>
       <section class="paste-panel">
-        <div class="paste-heading"><div><strong>智能粘贴录入</strong><p>粘贴通知全文，系统将在本机服务器上自动整理，不发送给第三方。</p></div><span>先预览，再发布</span></div>
+        <div class="paste-heading"><div><strong>智能粘贴录入</strong><p>本地模式不外发内容；AI 增强模式会将通知发送给 DeepSeek 进行结构化整理。</p></div><span>先预览，再发布</span></div>
         <label class="paste-input"><span>收到的通知内容</span><textarea data-paste-text maxlength="100000" placeholder="把公众号通知、群消息或官网通知全文粘贴到这里……"></textarea></label>
-        <div class="paste-actions"><button type="button" data-analyze>分析内容</button><p data-paste-status role="status" aria-live="polite">尚未分析</p></div>
+        <div class="paste-actions"><div class="analysis-mode" aria-label="分析方式"><button type="button" data-analysis-mode="local">本地</button><button class="active" type="button" data-analysis-mode="ai">AI 增强</button></div><button type="button" data-analyze>分析内容</button><p data-paste-status role="status" aria-live="polite">尚未分析</p></div>
         <form class="analysis-preview" data-analysis-preview hidden>
           <div class="preview-head"><strong>识别结果</strong><span>发布前请核对，带 * 的字段必须填写</span></div>
           <label class="wide"><span>标题 *</span><input name="title" maxlength="300" required /></label>

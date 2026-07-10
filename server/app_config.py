@@ -20,10 +20,17 @@ class AppConfig:
     smtp_username: str
     smtp_password: str
     smtp_recipient: str
+    notice_ai_base_url: str
+    notice_ai_api_key: str
+    notice_ai_model: str
 
     @property
     def email_enabled(self) -> bool:
         return all((self.smtp_host, self.smtp_username, self.smtp_password, self.smtp_recipient))
+
+    @property
+    def notice_ai_enabled(self) -> bool:
+        return bool(self.notice_ai_api_key)
 
 
 def load_config() -> AppConfig:
@@ -40,6 +47,9 @@ def load_config() -> AppConfig:
         smtp_username=os.environ.get("SMTP_USERNAME", "").strip(),
         smtp_password=os.environ.get("SMTP_PASSWORD", ""),
         smtp_recipient=os.environ.get("SMTP_RECIPIENT", "").strip(),
+        notice_ai_base_url=os.environ.get("NOTICE_AI_BASE_URL", "https://api.deepseek.com").strip().rstrip("/"),
+        notice_ai_api_key=os.environ.get("NOTICE_AI_API_KEY", ""),
+        notice_ai_model=os.environ.get("NOTICE_AI_MODEL", "deepseek-chat").strip(),
     )
 
 

@@ -4,8 +4,10 @@ import threading
 import unittest
 import urllib.error
 import urllib.request
+from unittest import mock
 from urllib.parse import quote
 from pathlib import Path
+from types import SimpleNamespace
 
 import feedback_server as api
 import game_scores
@@ -268,6 +270,30 @@ class FeedbackApiTests(unittest.TestCase):
         status, response = self.request("/admin/resources/analyze", "POST", {"text": "太短"})
         self.assertEqual(status, 422)
         self.assertEqual(response["error"], "invalid_notice")
+
+    def test_ai_notice_analysis_uses_structured_result_and_keeps_local_source(self):
+        pasted = "关于暑期班车的通知\n2026年7月10日每日发车。\n原文：https://www.lixin.edu.cn/source.htm"
+        ai_payload = {"choices": [{"message": {"content": json.dumps({
+            "title": "暑期班车安排",
+            "category": "transportation",
+            "summary": "暑期班车运行安排。",
+            "content": "2026年7月10日每日发车。",
+            "publish_date": "2026-07-11",
+            "department": "后勤保障处",
+        }, ensure_ascii=False)}}]}
+
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self): return json.dumps(ai_payload, ensure_ascii=False).encode("utf-8")
+
+        ai_config = SimpleNamespace(notice_ai_enabled=True, notice_ai_api_key="test-key", notice_ai_base_url="https://api.deepseek.com", notice_ai_model="deepseek-chat")
+        with mock.patch("feedback_server.CONFIG", ai_config), mock.patch("feedback_server.AI_URLOPEN", return_value=FakeResponse()):
+            status, response = self.request("/admin/resources/analyze", "POST", {"text": pasted, "mode": "ai"})
+        self.assertEqual(status, 200)
+        self.assertEqual(response["analysis_mode"], "ai")
+        self.assertEqual(response["draft"]["url"], "https://www.lixin.edu.cn/source.htm")
+        self.assertEqual(response["draft"]["publish_date"], "2026-07-10")
 
     def test_event_misclassified_as_safety_is_recategorized(self):
         source = [{
