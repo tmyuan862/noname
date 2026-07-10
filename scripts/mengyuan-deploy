@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_DIR="${MENGYUAN_REPO_DIR:-/home/ubuntu/noname}"
+RELEASE_ROOT="/opt/zero-share/releases"
+CURRENT_LINK="/opt/zero-share/current"
+LOCK_FILE="/run/lock/mengyuan-deploy.lock"
+
+exec 9>"$LOCK_FILE"
+flock -n 9 || exit 0
+
+if [[ -n "$(runuser -u ubuntu -- git -C "$REPO_DIR" status --porcelain)" ]]; then
+  echo "Refusing deployment: repository has uncommitted changes" >&2
+  exit 1
+fi
+
+runuser -u ubuntu -- git -C "$REPO_DIR" fetch origin main
+local_commit="$(runuser -u ubuntu -- git -C "$REPO_DIR" rev-parse HEAD)"
+remote_commit="$(runuser -u ubuntu -- git -C "$REPO_DIR" rev-parse origin/main)"
+
+if [[ "$local_commit" != "$remote_commit" ]]; then
+  runuser -u ubuntu -- git -C "$REPO_DIR" merge --ff-only origin/main
+fi
+
+commit="$(runuser -u ubuntu -- git -C "$REPO_DIR" rev-parse HEAD)"
+short_commit="${commit:0:12}"
+release_dir="$RELEASE_ROOT/$commit"
+previous_release="$(readlink -f "$CURRENT_LINK" 2>/dev/null || true)"
+
+runuser -u ubuntu -- env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s "$REPO_DIR/server" -p 'test_*.py'
+runuser -u ubuntu -- env PYTHONDONTWRITEBYTECODE=1 python3 "$REPO_DIR/scripts/validate_static.py"
+
+install -d -m 0755 "$RELEASE_ROOT"
+if [[ ! -d "$release_dir" ]]; then
+  install -d -m 0755 "$release_dir"
+  install -m 0755 "$REPO_DIR/server/feedback_server.py" "$release_dir/feedback_server.py"
+  install -m 0644 "$REPO_DIR/server/app_config.py" "$release_dir/app_config.py"
+fi
+
+ln -sfn "$release_dir" "$CURRENT_LINK"
+printf 'APP_VERSION=%s\n' "$short_commit" > /etc/zero-share-release.env
+chmod 0644 /etc/zero-share-release.env
+install -m 0644 "$REPO_DIR/server/zero-share-feedback.service" /etc/systemd/system/zero-share-feedback.service
+install -m 0644 "$REPO_DIR/server/nginx-default.conf" /etc/nginx/sites-available/default
+install -m 0755 "$REPO_DIR/scripts/mengyuan-deploy" /usr/local/sbin/mengyuan-deploy
+
+systemctl daemon-reload
+nginx -t
+systemctl restart zero-share-feedback
+systemctl reload nginx
+
+if ! curl --fail --silent --max-time 5 http://127.0.0.1:8787/health >/dev/null; then
+  echo "Health check failed; rolling back application release" >&2
+  if [[ -n "$previous_release" && -d "$previous_release" ]]; then
+    ln -sfn "$previous_release" "$CURRENT_LINK"
+    systemctl restart zero-share-feedback
+  fi
+  exit 1
+fi
+
+find "$RELEASE_ROOT" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
+  | sort -nr | tail -n +6 | cut -d' ' -f2- | xargs -r rm -rf
+
+echo "Deployed 梦缘资源站 $short_commit"

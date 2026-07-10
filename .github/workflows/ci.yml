@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Compile Python
+        run: python -m py_compile server/*.py scripts/*.py
+
+      - name: Run API tests
+        run: python -m unittest discover -s server -p 'test_*.py' -v
+
+      - name: Check JavaScript syntax
+        run: find js -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Validate static references
+        run: python scripts/validate_static.py
+
+      - name: Reject committed runtime secrets
+        run: |
+          if git grep -nE 'SMTP_PASSWORD=.+|BEGIN (RSA |OPENSSH )?PRIVATE KEY' -- ':!*.example'; then
+            echo "Potential secret committed"
+            exit 1
+          fi

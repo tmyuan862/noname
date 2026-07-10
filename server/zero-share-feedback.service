@@ -8,7 +8,8 @@ DynamicUser=yes
 StateDirectory=zero-share
 Environment=FEEDBACK_DATA_DIR=/var/lib/zero-share
 EnvironmentFile=-/etc/zero-share-feedback.env
-ExecStart=/usr/bin/python3 /opt/zero-share/feedback_server.py
+EnvironmentFile=-/etc/zero-share-release.env
+ExecStart=/usr/bin/python3 /opt/zero-share/current/feedback_server.py
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=yes

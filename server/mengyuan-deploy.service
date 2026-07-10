@@ -1,0 +1,11 @@
+[Unit]
+Description=Check and deploy 梦缘资源站 from GitHub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mengyuan-deploy
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

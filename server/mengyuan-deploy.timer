@@ -1,0 +1,11 @@
+[Unit]
+Description=Automatic deployment timer for 梦缘资源站
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+RandomizedDelaySec=30s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
