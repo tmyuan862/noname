@@ -14,6 +14,7 @@ from app_config import CONFIG
 
 DB_FILE = CONFIG.data_dir / "senior_voice.sqlite3"
 POST_STATUSES = {"pending", "published", "hidden"}
+AUDIENCES = {"general", "freshman", "sophomore", "junior", "senior"}
 SESSION_HOURS = 24
 EDITOR_USERNAME = "campus_editor"
 EDITOR_DISPLAY_NAME = "梦缘校园整理员"
@@ -63,6 +64,9 @@ def init_db() -> None:
             CREATE INDEX IF NOT EXISTS idx_senior_posts_public ON senior_posts(status, published_at DESC);
             CREATE INDEX IF NOT EXISTS idx_senior_posts_author ON senior_posts(author_id, updated_at DESC);
         """)
+        columns = {row["name"] for row in database.execute("PRAGMA table_info(senior_posts)")}
+        if "audience" not in columns:
+            database.execute("ALTER TABLE senior_posts ADD COLUMN audience TEXT NOT NULL DEFAULT 'general'")
         database.commit()
 
 
@@ -153,24 +157,30 @@ def change_password(author_id: int, current: object, new_password: object) -> st
     return ""
 
 
-def create_post(author_id: int, title: object, body: object) -> tuple[dict | None, str]:
+def clean_audience(value: object) -> str:
+    return value if value in AUDIENCES else "general"
+
+
+def create_post(author_id: int, title: object, body: object, audience: object = "general") -> tuple[dict | None, str]:
     title = str(title or "").strip()[:120]
     body = str(body or "").strip()[:10000]
     if not 4 <= len(title) <= 120 or not 20 <= len(body) <= 10000:
         return None, "标题需为 4—120 字，正文需为 20—10000 字。"
     created = now_iso()
+    audience = clean_audience(audience)
     with closing(connect()) as database:
-        cursor = database.execute("INSERT INTO senior_posts(author_id,title,body,created_at,updated_at) VALUES(?,?,?,?,?)", (author_id, title, body, created, created))
+        cursor = database.execute("INSERT INTO senior_posts(author_id,title,body,audience,created_at,updated_at) VALUES(?,?,?,?,?,?)", (author_id, title, body, audience, created, created))
         database.commit()
-        return {"id": cursor.lastrowid, "title": title, "body": body, "status": "pending", "created_at": created}, ""
+        return {"id": cursor.lastrowid, "title": title, "body": body, "audience": audience, "status": "pending", "created_at": created}, ""
 
 
-def create_editor_post(title: object, body: object) -> tuple[dict | None, str]:
+def create_editor_post(title: object, body: object, audience: object = "general") -> tuple[dict | None, str]:
     title = str(title or "").strip()[:120]
     body = str(body or "").strip()[:10000]
     if not 4 <= len(title) <= 120 or not 20 <= len(body) <= 10000:
         return None, "标题需为 4—120 字，正文需为 20—10000 字。"
     created = now_iso()
+    audience = clean_audience(audience)
     with closing(connect()) as database:
         author = database.execute("SELECT id FROM senior_authors WHERE username=?", (EDITOR_USERNAME,)).fetchone()
         if author is None:
@@ -184,25 +194,28 @@ def create_editor_post(title: object, body: object) -> tuple[dict | None, str]:
             author_id = author["id"]
             database.execute("UPDATE senior_authors SET display_name=?, active=0 WHERE id=?", (EDITOR_DISPLAY_NAME, author_id))
         cursor = database.execute(
-            "INSERT INTO senior_posts(author_id,title,body,status,created_at,updated_at,published_at) VALUES(?,?,?,'published',?,?,?)",
-            (author_id, title, body, created, created, created),
+            "INSERT INTO senior_posts(author_id,title,body,audience,status,created_at,updated_at,published_at) VALUES(?,?,?,?,'published',?,?,?)",
+            (author_id, title, body, audience, created, created, created),
         )
         database.commit()
-        return {"id": cursor.lastrowid, "title": title, "body": body, "status": "published", "display_name": EDITOR_DISPLAY_NAME}, ""
+        return {"id": cursor.lastrowid, "title": title, "body": body, "audience": audience, "status": "published", "display_name": EDITOR_DISPLAY_NAME}, ""
 
 
-def public_posts(page: int = 1, page_size: int = 8) -> dict:
+def public_posts(page: int = 1, page_size: int = 8, audience: str = "") -> dict:
     page = max(1, page); page_size = min(12, max(1, page_size)); offset = (page - 1) * page_size
+    audience = audience if audience in AUDIENCES - {"general"} else ""
+    audience_clause = " AND p.audience IN ('general', ?)" if audience else ""
+    values = [audience] if audience else []
     with closing(connect()) as database:
-        total = database.execute("SELECT COUNT(*) FROM senior_posts WHERE status='published'").fetchone()[0]
-        rows = database.execute("""SELECT p.id,p.title,p.body,p.published_at,a.display_name FROM senior_posts p
-            JOIN senior_authors a ON a.id=p.author_id WHERE p.status='published' ORDER BY p.published_at DESC LIMIT ? OFFSET ?""", (page_size, offset)).fetchall()
+        total = database.execute("SELECT COUNT(*) FROM senior_posts p WHERE p.status='published'" + audience_clause, values).fetchone()[0]
+        rows = database.execute("""SELECT p.id,p.title,p.body,p.audience,p.published_at,a.display_name FROM senior_posts p
+            JOIN senior_authors a ON a.id=p.author_id WHERE p.status='published'""" + audience_clause + " ORDER BY p.published_at DESC LIMIT ? OFFSET ?", values + [page_size, offset]).fetchall()
     return {"posts": [dict(row) for row in rows], "count": total, "page": page, "total_pages": max(1, (total + page_size - 1) // page_size), "has_next": offset + page_size < total}
 
 
 def author_posts(author_id: int) -> list[dict]:
     with closing(connect()) as database:
-        return [dict(row) for row in database.execute("SELECT id,title,body,status,created_at,updated_at,published_at FROM senior_posts WHERE author_id=? ORDER BY updated_at DESC", (author_id,))]
+        return [dict(row) for row in database.execute("SELECT id,title,body,audience,status,created_at,updated_at,published_at FROM senior_posts WHERE author_id=? ORDER BY updated_at DESC", (author_id,))]
 
 
 def admin_authors() -> list[dict]:
@@ -211,7 +224,7 @@ def admin_authors() -> list[dict]:
 
 
 def admin_posts(status: str = "") -> list[dict]:
-    query = """SELECT p.id,p.title,p.body,p.status,p.created_at,p.updated_at,p.published_at,a.display_name,a.username
+    query = """SELECT p.id,p.title,p.body,p.audience,p.status,p.created_at,p.updated_at,p.published_at,a.display_name,a.username
         FROM senior_posts p JOIN senior_authors a ON a.id=p.author_id"""
     values: list[object] = []
     if status in POST_STATUSES:
