@@ -24,6 +24,7 @@
           <a href="#games">小游戏</a>
           <a href="#resources">学习资料</a>
           <a href="campus.html">校园指南</a>
+          <a href="#feedback">意见箱</a>
           <a href="#more">更多空间</a>
         </nav>
 
@@ -36,6 +37,7 @@
         <a href="#games">小游戏</a>
         <a href="#resources">学习资料</a>
         <a href="campus.html">校园指南</a>
+        <a href="#feedback">意见箱</a>
         <a href="#more">更多空间</a>
       </nav>
     </header>
@@ -55,13 +57,13 @@
           </div>
         </div>
 
-        <a class="hero-feature" href="text-lab.html" aria-label="打开本周推荐：文字实验室">
-          <img src="assets/game-room.jpg" alt="桌面上的游戏控制器和显示器" />
+        <a class="hero-feature" href="campus.html" aria-label="打开新板块：校园生存指南">
+          <img src="assets/campus.jpg" alt="绿树环绕的大学校园建筑" />
           <span class="feature-shade" aria-hidden="true"></span>
           <span class="feature-content">
-            <span class="feature-label">本周推荐</span>
-            <strong>文字实验室</strong>
-            <span>用文字做一次轻量的互动实验</span>
+            <span class="feature-label">新板块</span>
+            <strong>校园生存指南</strong>
+            <span>校车、食堂、地图和选课评价，都放在这里</span>
           </span>
           <span class="feature-action" aria-hidden="true"><i data-lucide="arrow-up-right"></i></span>
         </a>
@@ -81,7 +83,7 @@
             <p class="eyebrow">Playground</p>
             <h2 id="games-title">小游戏体验</h2>
           </div>
-          <a class="text-link muted-link" href="text-lab.html">查看全部 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          <span class="section-status">第一款游戏筹备中</span>
         </div>
 
         <div class="game-layout">
@@ -96,10 +98,10 @@
               </div>
             </div>
             <div class="game-copy">
-              <span class="content-tag">可体验</span>
-              <h3>文字实验室</h3>
-              <p>输入一句话，观察文字在不同规则下发生的变化。简单，但可能让你停留很久。</p>
-              <a class="button button-dark" href="text-lab.html">立即体验 <i data-lucide="play" aria-hidden="true"></i></a>
+              <span class="content-tag">征集中</span>
+              <h3>第一款小游戏，由你提议</h3>
+              <p>想玩答题、反应力挑战、校园闯关，还是别的玩法？把你的想法投进意见箱。</p>
+              <a class="button button-dark" href="#feedback">告诉我你想玩什么 <i data-lucide="message-circle" aria-hidden="true"></i></a>
             </div>
           </article>
 
@@ -185,6 +187,41 @@
             <span><i data-lucide="map" aria-hidden="true"></i> 校园地图</span>
             <span><i data-lucide="messages-square" aria-hidden="true"></i> 选课评价</span>
           </div>
+        </div>
+      </section>
+
+      <section class="feedback-section" id="feedback" aria-labelledby="feedback-title">
+        <div class="section-shell feedback-layout">
+          <div class="feedback-intro">
+            <p class="eyebrow">Open Feedback</p>
+            <h2 id="feedback-title">这里应该变得<br />更好用。</h2>
+            <p>缺了什么、哪里难用、想增加什么内容，都可以直接写下来。每一条反馈都会保存在服务器上。</p>
+            <div class="wechat-card">
+              <span class="wechat-icon"><i data-lucide="message-circle-more" aria-hidden="true"></i></span>
+              <div><small>也可以直接加微信</small><strong>Mty080602</strong></div>
+              <button class="copy-button" type="button" data-copy-wechat aria-label="复制微信号 Mty080602"><i data-lucide="copy" aria-hidden="true"></i><span>复制</span></button>
+            </div>
+          </div>
+
+          <form class="feedback-form" data-feedback-form>
+            <div class="field-group">
+              <label for="feedback-category">反馈类型</label>
+              <select id="feedback-category" name="category" required>
+                <option value="建议">改进建议</option>
+                <option value="问题">发现问题</option>
+                <option value="内容纠错">内容纠错</option>
+                <option value="想要的新功能">想要的新功能</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="label-row"><label for="feedback-message">具体内容</label><span><b data-character-count>0</b> / 1000</span></div>
+              <textarea id="feedback-message" name="message" minlength="5" maxlength="1000" required placeholder="例如：希望校园地图里增加打印店和快递点的位置……"></textarea>
+            </div>
+            <div class="honeypot" aria-hidden="true"><label for="feedback-website">网站</label><input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
+            <button class="submit-button" type="submit"><span>提交反馈</span><i data-lucide="send" aria-hidden="true"></i></button>
+            <p class="form-status" data-form-status role="status" aria-live="polite">不用登录，也不会公开展示你的内容。</p>
+          </form>
         </div>
       </section>
 

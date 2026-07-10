@@ -130,6 +130,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-
 .text-link svg { transition: transform 160ms ease; }
 .text-link:hover svg { transform: translateX(4px); }
 .muted-link { color: var(--muted); }
+.section-status { color: var(--muted); font-size: 13px; font-weight: 650; }
 
 .hero-feature {
   position: relative;
@@ -215,6 +216,30 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-
 .campus-promo-links span { min-height: 104px; padding: 20px; display: flex; align-items: center; gap: 10px; border-right: 1px solid rgba(23,25,21,0.24); border-bottom: 1px solid rgba(23,25,21,0.24); font-weight: 750; }
 .campus-promo-links svg { width: 20px; }
 
+.feedback-section { padding: 112px 0; background: #edf0e7; }
+.feedback-layout { display: grid; grid-template-columns: minmax(0, .82fr) minmax(460px, 1.18fr); gap: 88px; align-items: start; }
+.feedback-intro { position: sticky; top: 112px; }
+.feedback-intro h2 { font-size: clamp(44px, 5.6vw, 76px); line-height: 1.02; }
+.feedback-intro > p:not(.eyebrow) { max-width: 520px; margin-top: 22px; color: var(--muted); font-size: 17px; line-height: 1.7; }
+.wechat-card { margin-top: 36px; padding: 18px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; border: 1px solid #cdd1c6; background: var(--white); }
+.wechat-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--lime); }
+.wechat-icon svg { width: 21px; }
+.wechat-card div { display: grid; }.wechat-card small { color: var(--muted); font-size: 11px; }.wechat-card strong { margin-top: 2px; font-size: 17px; }
+.copy-button { min-height: 36px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); color: var(--ink); cursor: pointer; font-weight: 700; }
+.copy-button svg { width: 15px; }
+.feedback-form { padding: 36px; border: 1px solid #cdd1c6; background: var(--white); }
+.field-group + .field-group { margin-top: 26px; }
+.field-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 750; }
+.field-group select, .field-group textarea { width: 100%; border: 1px solid var(--line); border-radius: 5px; background: #fafbf8; color: var(--ink); font: inherit; outline: 0; }
+.field-group select { height: 48px; padding: 0 14px; }
+.field-group textarea { min-height: 220px; padding: 16px; resize: vertical; line-height: 1.65; }
+.field-group select:focus, .field-group textarea:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(91,121,255,.16); }
+.label-row { display: flex; justify-content: space-between; gap: 16px; }.label-row span { color: var(--muted); font-size: 11px; }.label-row b { font-weight: 650; }
+.honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.submit-button { width: 100%; min-height: 52px; margin-top: 22px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border: 0; border-radius: 5px; background: var(--ink); color: var(--white); cursor: pointer; font: inherit; font-weight: 750; transition: background 160ms ease; }
+.submit-button:hover { background: #30332d; }.submit-button:disabled { cursor: wait; opacity: .65; }.submit-button svg { width: 18px; }
+.form-status { min-height: 20px; margin-top: 12px; color: var(--muted); font-size: 12px; }.form-status.success { color: #33703c; }.form-status.error { color: #b43d31; }
+
 .more-section { display: grid; grid-template-columns: 0.9fr 1.1fr; align-items: center; gap: 80px; }
 .more-copy p:last-child { max-width: 520px; margin-top: 24px; color: var(--muted); font-size: 18px; line-height: 1.7; }
 .more-visual { aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--radius); }
@@ -236,11 +261,12 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-
 @media (max-width: 900px) {
   .hero { min-height: auto; grid-template-columns: 1fr; gap: 40px; }
   .hero-feature { min-height: 520px; }
-  .game-layout, .resource-grid, .more-section, .campus-promo-inner { grid-template-columns: 1fr; }
+  .game-layout, .resource-grid, .more-section, .campus-promo-inner, .feedback-layout { grid-template-columns: 1fr; }
   .game-primary { grid-template-columns: 1fr 1fr; }
   .coming-card { min-height: 240px; }
   .more-section { gap: 40px; }
   .campus-promo-inner { gap: 40px; }
+  .feedback-layout { gap: 40px; }.feedback-intro { position: static; }
 }
 
 @media (max-width: 680px) {
@@ -275,6 +301,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-
   .campus-promo { padding: 64px 0; }
   .campus-promo-copy > p:not(.eyebrow) { font-size: 16px; }
   .campus-promo-links span { min-height: 88px; padding: 14px; font-size: 14px; }
+  .feedback-section { padding: 72px 0; }.feedback-layout { gap: 32px; }.feedback-intro h2 { font-size: 42px; }.feedback-intro > p:not(.eyebrow) { font-size: 16px; }.feedback-form { padding: 22px 18px; }.field-group textarea { min-height: 190px; }.wechat-card { grid-template-columns: auto 1fr; }.copy-button { grid-column: 1 / -1; justify-content: center; }
   .more-visual { aspect-ratio: 4 / 3; }
   .footer-inner { grid-template-columns: 1fr auto; gap: 20px; }
   .footer-inner > p { grid-column: 1 / -1; grid-row: 2; }

@@ -1,0 +1,25 @@
+[Unit]
+Description=Zero Share feedback API
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=zero-share
+Environment=FEEDBACK_DATA_DIR=/var/lib/zero-share
+ExecStart=/usr/bin/python3 /opt/zero-share/feedback_server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target
