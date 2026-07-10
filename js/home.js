@@ -48,6 +48,41 @@
     var count = feedbackForm.querySelector("[data-character-count]");
     var status = feedbackForm.querySelector("[data-form-status]");
     var submitButton = feedbackForm.querySelector("button[type='submit']");
+    var inbox = feedbackForm.querySelector("[data-feedback-inbox]");
+    var replyList = feedbackForm.querySelector("[data-reply-list]");
+    var receiptStorageKey = "mengyuan_feedback_receipts";
+
+    function getReceipts() {
+      try { return JSON.parse(localStorage.getItem(receiptStorageKey) || "[]"); } catch (_) { return []; }
+    }
+
+    function saveReceipt(ticket, key) {
+      var receipts = getReceipts().filter(function (item) { return item.ticket !== ticket; });
+      receipts.unshift({ ticket: ticket, key: key });
+      localStorage.setItem(receiptStorageKey, JSON.stringify(receipts.slice(0, 10)));
+    }
+
+    function loadReplies() {
+      var receipts = getReceipts();
+      inbox.hidden = !receipts.length;
+      replyList.textContent = "";
+      receipts.forEach(function (receipt) {
+        fetch("/api/feedback/reply?ticket=" + encodeURIComponent(receipt.ticket) + "&key=" + encodeURIComponent(receipt.key), { cache: "no-store" })
+          .then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
+          .then(function (data) {
+            var record = data.feedback;
+            var article = document.createElement("article"); article.className = "feedback-receipt";
+            var head = document.createElement("header");
+            var category = document.createElement("strong"); category.textContent = record.category;
+            var state = document.createElement("span"); state.textContent = record.reply ? "已回信" : "等待回复";
+            head.append(category, state);
+            var original = document.createElement("p"); original.textContent = record.message;
+            article.append(head, original);
+            if (record.reply) { var answer = document.createElement("blockquote"); answer.textContent = record.reply; article.appendChild(answer); }
+            replyList.appendChild(article);
+          }).catch(function () {});
+      });
+    }
 
     messageInput.addEventListener("input", function () {
       count.textContent = String(messageInput.value.length);
@@ -78,10 +113,12 @@
           return data;
         });
       }).then(function (data) {
+        if (data.ticket && data.reply_key) saveReceipt(data.ticket, data.reply_key);
         feedbackForm.reset();
         count.textContent = "0";
         status.className = "form-status success";
         status.textContent = data.message || "反馈已提交，谢谢。";
+        loadReplies();
       }).catch(function (error) {
         status.className = "form-status error";
         status.textContent = error.message || "提交失败，请稍后再试。";
@@ -89,6 +126,8 @@
         submitButton.disabled = false;
       });
     });
+    feedbackForm.querySelector("[data-refresh-replies]").addEventListener("click", loadReplies);
+    loadReplies();
   }
 
   var revealTargets = document.querySelectorAll(".content-section, .resources-section .section-shell, .campus-promo-inner, .feedback-layout, .more-section");

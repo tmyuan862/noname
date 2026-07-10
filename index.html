@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/feedback-inbox.css" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -220,6 +221,7 @@
             <div class="honeypot" aria-hidden="true"><label for="feedback-website">网站</label><input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
             <button class="submit-button" type="submit"><span>提交反馈</span><i data-lucide="send" aria-hidden="true"></i></button>
             <p class="form-status" data-form-status role="status" aria-live="polite">不用登录，也不会公开展示你的内容。</p>
+            <section class="feedback-inbox" data-feedback-inbox hidden><div><strong>我的反馈与回信</strong><button type="button" data-refresh-replies>刷新</button></div><div data-reply-list></div></section>
           </form>
         </div>
       </section>

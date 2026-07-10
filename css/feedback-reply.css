@@ -1,0 +1,6 @@
+.feedback-reply { margin-top: 22px; padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 10px; border: 1px solid var(--line); background: var(--paper); }
+.feedback-reply label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; }
+.feedback-reply textarea { min-height: 90px; padding: 10px; border: 1px solid var(--line); background: #fff; font: inherit; resize: vertical; }
+.feedback-reply button { align-self: end; min-height: 40px; padding: 0 13px; border: 0; background: var(--ink); color: #fff; cursor: pointer; font-weight: 750; }
+.feedback-reply span { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+@media (max-width: 620px) { .feedback-reply { grid-template-columns: 1fr; } .feedback-reply button { width: 100%; } }

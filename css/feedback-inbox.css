@@ -1,0 +1,8 @@
+.feedback-inbox { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(26,32,27,.16); }
+.feedback-inbox[hidden] { display: none; }
+.feedback-inbox > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.feedback-inbox > div:first-child button { border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 12px; font-weight: 750; text-decoration: underline; }
+.feedback-receipt { margin-top: 10px; padding: 12px; border: 1px solid rgba(26,32,27,.16); }
+.feedback-receipt header { display: flex; justify-content: space-between; gap: 12px; color: #6c746d; font-size: 11px; }
+.feedback-receipt p { margin-top: 8px; font-size: 13px; line-height: 1.6; }
+.feedback-receipt blockquote { margin-top: 10px; padding: 10px; border-left: 3px solid #536447; background: rgba(83,100,71,.08); font-size: 13px; line-height: 1.65; }

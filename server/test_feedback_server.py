@@ -217,6 +217,17 @@ class FeedbackApiTests(unittest.TestCase):
         _, empty = self.request("/admin/feedback")
         self.assertEqual(empty["count"], 0)
 
+    def test_admin_reply_is_only_visible_with_private_feedback_key(self):
+        status, submitted = self.post({"category": "建议", "message": "希望增加一项新的校园服务说明", "website": ""})
+        self.assertEqual(status, 201)
+        ticket, reply_key = submitted["ticket"], submitted["reply_key"]
+        self.assertEqual(self.request(f"/feedback/reply?ticket={ticket}&key=wrong")[0], 404)
+        status, _ = self.request(f"/admin/feedback/{ticket}", "PATCH", {"status": "done", "reply": "已经收到，我们会在下一次资料更新时补充。"})
+        self.assertEqual(status, 200)
+        status, response = self.request(f"/feedback/reply?ticket={ticket}&key={quote(reply_key)}")
+        self.assertEqual(status, 200)
+        self.assertEqual(response["feedback"]["reply"], "已经收到，我们会在下一次资料更新时补充。")
+
     def test_resources_can_be_imported_searched_and_deleted(self):
         source = [{
             "title": "关于校车安排的通知",

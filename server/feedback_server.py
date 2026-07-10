@@ -8,6 +8,7 @@ import hashlib
 import hmac
 import os
 import re
+import secrets
 import smtplib
 import threading
 import time
@@ -337,22 +338,24 @@ def write_feedback(records: list[dict]) -> None:
             temporary.unlink(missing_ok=True)
 
 
-def append_feedback(category: str, message: str) -> dict:
+def append_feedback(category: str, message: str) -> tuple[dict, str]:
+    reply_key = secrets.token_urlsafe(24)
     record = {
         "id": uuid.uuid4().hex,
         "category": category,
         "message": message,
         "status": "new",
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "reply_key_hash": hashlib.sha256(reply_key.encode("utf-8")).hexdigest(),
     }
     with data_lock:
         records = load_feedback()
         records.append(record)
         write_feedback(records)
-    return record
+    return record, reply_key
 
 
-def update_feedback(record_id: str, status: str) -> bool:
+def update_feedback(record_id: str, status: str, reply: str | None = None) -> bool:
     with data_lock:
         records = load_feedback()
         found = False
@@ -360,11 +363,25 @@ def update_feedback(record_id: str, status: str) -> bool:
             if record.get("id") == record_id:
                 record["status"] = status
                 record["updated_at"] = datetime.now(timezone.utc).isoformat()
+                if reply is not None:
+                    record["reply"] = reply
+                    record["replied_at"] = datetime.now(timezone.utc).isoformat() if reply else ""
                 found = True
                 break
         if found:
             write_feedback(records)
         return found
+
+
+def feedback_reply(record_id: str, reply_key: str) -> dict | None:
+    if not record_id or not reply_key:
+        return None
+    expected = hashlib.sha256(reply_key.encode("utf-8")).hexdigest()
+    with data_lock:
+        record = next((item for item in load_feedback() if item.get("id") == record_id), None)
+    if record is None or not hmac.compare_digest(str(record.get("reply_key_hash", "")), expected):
+        return None
+    return {field: record.get(field, "") for field in ("id", "category", "message", "status", "created_at", "reply", "replied_at")}
 
 
 def delete_feedback(record_id: str) -> bool:
@@ -473,6 +490,14 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             page = positive_int(query.get("page", ["1"])[0], 1, 10000)
             self.send_json(200, senior_voice.public_posts(page))
             return
+        if parsed.path == "/feedback/reply":
+            query = parse_qs(parsed.query)
+            key = client_key(self)
+            if is_public_rate_limited("feedback_reply", key, 30, 600, time.monotonic()):
+                self.send_json(429, {"error": "rate_limit", "message": "查询较频繁，请稍后再试。"}); return
+            record = feedback_reply(query.get("ticket", [""])[0], query.get("key", [""])[0])
+            if record is None: self.send_json(404, {"error": "not_found"}); return
+            self.send_json(200, {"feedback": record}); return
         if parsed.path == "/senior/me":
             author = self.require_senior()
             if author: self.send_json(200, {"author": author})
@@ -681,12 +706,12 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             self.send_json(429, {"error": "rate_limit", "message": "提交得有点频繁，请稍后再试。"})
             return
         try:
-            record = append_feedback(category, message)
+            record, reply_key = append_feedback(category, message)
         except OSError:
             self.send_json(500, {"error": "storage", "message": "暂时无法保存，请稍后再试。"})
             return
         threading.Thread(target=send_notification, args=(record,), daemon=True).start()
-        self.send_json(201, {"ok": True, "message": "已收到，谢谢你让这里变得更好。"})
+        self.send_json(201, {"ok": True, "message": "已收到，谢谢你让这里变得更好。", "ticket": record["id"], "reply_key": reply_key})
 
     def do_PATCH(self) -> None:
         parsed = urlparse(self.path)
@@ -729,10 +754,13 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             return
         payload = self.read_json()
         status = payload.get("status") if isinstance(payload, dict) else None
+        reply = payload.get("reply") if isinstance(payload, dict) else None
         if status not in ALLOWED_STATUSES:
             self.send_json(422, {"error": "status"})
             return
-        if not update_feedback(parsed.path[len(prefix):], status):
+        if reply is not None and (not isinstance(reply, str) or len(reply.strip()) > 2000):
+            self.send_json(422, {"error": "reply"}); return
+        if not update_feedback(parsed.path[len(prefix):], status, reply.strip() if isinstance(reply, str) else None):
             self.send_json(404, {"error": "not_found"})
             return
         self.send_json(200, {"ok": True})
