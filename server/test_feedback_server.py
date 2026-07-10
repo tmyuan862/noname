@@ -12,6 +12,7 @@ from types import SimpleNamespace
 import feedback_server as api
 import game_scores
 import senior_voice
+import site_chat
 
 
 class FeedbackApiTests(unittest.TestCase):
@@ -136,6 +137,24 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertFalse(health["email_enabled"])
         self.assertEqual(health["counts"]["snake_scores"], 0)
 
+    def test_site_chat_returns_clickable_sources_before_ai_answer(self):
+        source = [{"title": "校车运行安排", "url": "https://www.lixin.edu.cn/bus.htm", "category": "transportation", "detail": {"content": "校车每天七点三十分从浦东校区发车。"}}]
+        self.request("/admin/resources/import", "POST", {"items": source})
+        ai_payload = {"choices": [{"message": {"content": "校车每天七点三十分从浦东校区发车，具体调整请查看来源。"}}]}
+
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self): return json.dumps(ai_payload, ensure_ascii=False).encode("utf-8")
+
+        ai_config = SimpleNamespace(notice_ai_enabled=True, notice_ai_api_key="test-key", notice_ai_base_url="https://api.deepseek.com", notice_ai_model="deepseek-chat", data_dir=api.DATA_DIR)
+        with mock.patch("site_chat.CONFIG", ai_config), mock.patch("site_chat.AI_URLOPEN", return_value=FakeResponse()):
+            status, response = self.request("/site-chat", "POST", {"question": "校车几点发车？"})
+        self.assertEqual(status, 200)
+        self.assertEqual(response["mode"], "ai")
+        self.assertTrue(response["sources"][0]["url"].startswith("resources.html?open="))
+        self.assertIn("七点三十分", response["answer"])
+
     def test_game_score_session_submission_and_leaderboard(self):
         status, session = self.request("/game/session")
         self.assertEqual(status, 200)
@@ -227,6 +246,15 @@ class FeedbackApiTests(unittest.TestCase):
         status, response = self.request(f"/feedback/reply?ticket={ticket}&key={quote(reply_key)}")
         self.assertEqual(status, 200)
         self.assertEqual(response["feedback"]["reply"], "已经收到，我们会在下一次资料更新时补充。")
+
+    def test_new_feedback_and_reply_appear_in_public_history(self):
+        _, submitted = self.post({"category": "问题", "message": "公开反馈历史功能测试内容", "website": ""})
+        ticket = submitted["ticket"]
+        self.request(f"/admin/feedback/{ticket}", "PATCH", {"status": "done", "reply": "这条回复可以在公开历史中看到。"})
+        status, history = self.request("/feedback/public")
+        self.assertEqual(status, 200)
+        self.assertEqual(history["count"], 1)
+        self.assertEqual(history["feedback"][0]["reply"], "这条回复可以在公开历史中看到。")
 
     def test_resources_can_be_imported_searched_and_deleted(self):
         source = [{

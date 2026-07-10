@@ -26,6 +26,7 @@ from urllib.parse import parse_qs, urlparse
 from app_config import CONFIG
 import game_scores
 import senior_voice
+import site_chat
 
 
 HOST = CONFIG.host
@@ -318,6 +319,7 @@ def load_feedback() -> list[dict]:
                 continue
             record.setdefault("id", uuid.uuid4().hex)
             record.setdefault("status", "new")
+            record.setdefault("public", False)
             records.append(record)
     return records
 
@@ -347,6 +349,7 @@ def append_feedback(category: str, message: str) -> tuple[dict, str]:
         "status": "new",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "reply_key_hash": hashlib.sha256(reply_key.encode("utf-8")).hexdigest(),
+        "public": True,
     }
     with data_lock:
         records = load_feedback()
@@ -355,7 +358,7 @@ def append_feedback(category: str, message: str) -> tuple[dict, str]:
     return record, reply_key
 
 
-def update_feedback(record_id: str, status: str, reply: str | None = None) -> bool:
+def update_feedback(record_id: str, status: str, reply: str | None = None, public: bool | None = None) -> bool:
     with data_lock:
         records = load_feedback()
         found = False
@@ -366,6 +369,8 @@ def update_feedback(record_id: str, status: str, reply: str | None = None) -> bo
                 if reply is not None:
                     record["reply"] = reply
                     record["replied_at"] = datetime.now(timezone.utc).isoformat() if reply else ""
+                if public is not None:
+                    record["public"] = public
                 found = True
                 break
         if found:
@@ -382,6 +387,18 @@ def feedback_reply(record_id: str, reply_key: str) -> dict | None:
     if record is None or not hmac.compare_digest(str(record.get("reply_key_hash", "")), expected):
         return None
     return {field: record.get(field, "") for field in ("id", "category", "message", "status", "created_at", "reply", "replied_at")}
+
+
+def public_feedback(page: int, page_size: int = 10) -> dict:
+    with data_lock:
+        records = [record for record in load_feedback() if record.get("public")]
+    records.sort(key=lambda item: item.get("created_at", ""), reverse=True)
+    page = max(1, page); page_size = min(20, max(1, page_size)); start = (page - 1) * page_size
+    fields = ("id", "category", "message", "status", "created_at", "reply", "replied_at")
+    return {
+        "feedback": [{field: record.get(field, "") for field in fields} for record in records[start:start + page_size]],
+        "count": len(records), "page": page, "total_pages": max(1, (len(records) + page_size - 1) // page_size), "has_next": start + page_size < len(records),
+    }
 
 
 def delete_feedback(record_id: str) -> bool:
@@ -498,6 +515,9 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             record = feedback_reply(query.get("ticket", [""])[0], query.get("key", [""])[0])
             if record is None: self.send_json(404, {"error": "not_found"}); return
             self.send_json(200, {"feedback": record}); return
+        if parsed.path == "/feedback/public":
+            query = parse_qs(parsed.query); page = positive_int(query.get("page", ["1"])[0], 1, 10000)
+            self.send_json(200, public_feedback(page)); return
         if parsed.path == "/senior/me":
             author = self.require_senior()
             if author: self.send_json(200, {"author": author})
@@ -600,6 +620,14 @@ class FeedbackHandler(BaseHTTPRequestHandler):
         self.send_json(404, {"error": "not_found"})
 
     def do_POST(self) -> None:
+        if self.path == "/site-chat":
+            key = client_key(self)
+            if is_public_rate_limited("site_chat", key, 10, 600, time.monotonic()):
+                self.send_json(429, {"error": "rate_limit", "message": "问询次数较多，请十分钟后再试。"}); return
+            payload = self.read_json(8 * 1024)
+            result, message = site_chat.answer_question(payload.get("question") if isinstance(payload, dict) else None)
+            if result is None: self.send_json(422, {"error": "invalid_question", "message": message}); return
+            self.send_json(200, result); return
         if self.path == "/senior/login":
             key = client_key(self)
             if is_public_rate_limited("senior_login", key, 10, 600, time.monotonic()):
@@ -755,12 +783,13 @@ class FeedbackHandler(BaseHTTPRequestHandler):
         payload = self.read_json()
         status = payload.get("status") if isinstance(payload, dict) else None
         reply = payload.get("reply") if isinstance(payload, dict) else None
+        public = payload.get("public") if isinstance(payload, dict) and isinstance(payload.get("public"), bool) else None
         if status not in ALLOWED_STATUSES:
             self.send_json(422, {"error": "status"})
             return
         if reply is not None and (not isinstance(reply, str) or len(reply.strip()) > 2000):
             self.send_json(422, {"error": "reply"}); return
-        if not update_feedback(parsed.path[len(prefix):], status, reply.strip() if isinstance(reply, str) else None):
+        if not update_feedback(parsed.path[len(prefix):], status, reply.strip() if isinstance(reply, str) else None, public):
             self.send_json(404, {"error": "not_found"})
             return
         self.send_json(200, {"ok": True})

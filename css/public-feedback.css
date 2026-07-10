@@ -1,0 +1,8 @@
+.public-feedback-section { padding-top: 72px; padding-bottom: 40px; }
+.public-feedback-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.public-feedback-card { padding: 20px; border: 1px solid var(--line); background: var(--white); }
+.public-feedback-card header { display: flex; justify-content: space-between; gap: 14px; color: var(--muted); font-size: 11px; }
+.public-feedback-card > p { margin-top: 14px; white-space: pre-wrap; line-height: 1.65; }
+.public-feedback-card blockquote { margin-top: 14px; padding: 12px; border-left: 3px solid var(--lime-dark); background: var(--paper); font-size: 13px; line-height: 1.65; }
+.public-feedback-more { min-height: 42px; margin-top: 16px; padding: 0 16px; border: 1px solid var(--ink); background: transparent; cursor: pointer; font-weight: 750; }
+@media(max-width:700px){.public-feedback-list{grid-template-columns:1fr}.public-feedback-section{padding-top:52px}}

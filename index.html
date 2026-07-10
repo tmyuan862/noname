@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/home.css" />
     <link rel="stylesheet" href="css/feedback-inbox.css" />
+    <link rel="stylesheet" href="css/site-chat.css" />
+    <link rel="stylesheet" href="css/public-feedback.css" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -220,10 +222,16 @@
             </div>
             <div class="honeypot" aria-hidden="true"><label for="feedback-website">网站</label><input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
             <button class="submit-button" type="submit"><span>提交反馈</span><i data-lucide="send" aria-hidden="true"></i></button>
-            <p class="form-status" data-form-status role="status" aria-live="polite">不用登录，也不会公开展示你的内容。</p>
+            <p class="form-status" data-form-status role="status" aria-live="polite">不用登录。请勿填写个人隐私，反馈内容和站长回复会公开展示。</p>
             <section class="feedback-inbox" data-feedback-inbox hidden><div><strong>我的反馈与回信</strong><button type="button" data-refresh-replies>刷新</button></div><div data-reply-list></div></section>
           </form>
         </div>
+      </section>
+
+      <section class="public-feedback-section section-shell" aria-labelledby="public-feedback-title">
+        <div class="section-heading"><div><p class="eyebrow">Public Feedback</p><h2 id="public-feedback-title">公开反馈历史</h2></div><span data-public-feedback-count></span></div>
+        <div class="public-feedback-list" data-public-feedback-list aria-live="polite"><p>正在读取反馈……</p></div>
+        <button class="public-feedback-more" type="button" data-public-feedback-more hidden>查看更多</button>
       </section>
 
       <section class="more-section section-shell" id="more" aria-labelledby="more-title">
@@ -249,7 +257,15 @@
       </div>
     </footer>
 
+    <button class="site-chat-trigger" type="button" data-chat-trigger aria-label="打开 AI 站内问询"><i data-lucide="message-square-text" aria-hidden="true"></i></button>
+    <section class="site-chat-panel" data-chat-panel hidden aria-label="AI 站内问询">
+      <header><div><span>AI</span><strong>问问本站</strong></div><button type="button" data-chat-close aria-label="关闭问询">×</button></header>
+      <div class="site-chat-result" data-chat-result aria-live="polite"><p>可以问校车、选课、报到、校园生活或站内资料。</p></div>
+      <form data-chat-form><label for="site-chat-question">问题</label><textarea id="site-chat-question" maxlength="500" required placeholder="例如：浦东校区的校车几点发车？"></textarea><button type="submit">发送</button></form>
+    </section>
+
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script src="js/home.js"></script>
+    <script src="js/site-chat.js"></script>
   </body>
 </html>

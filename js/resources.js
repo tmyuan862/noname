@@ -11,6 +11,7 @@
   var initialParams = new URLSearchParams(window.location.search);
   var activeCategory = initialParams.get("category") || "";
   var currentPage = Math.max(1, Number(initialParams.get("page")) || 1);
+  var initialOpen = initialParams.get("open") || "";
   var timer;
   search.value = initialParams.get("q") || "";
 
@@ -91,6 +92,7 @@
         var summary = document.createElement("p"); summary.textContent = resource.summary; card.append(meta, title, summary);
         card.addEventListener("click", function () { showDetail(resource.id, card); }); list.appendChild(card);
       });
+      if (initialOpen) { var resourceId = initialOpen; initialOpen = ""; showDetail(resourceId, null); }
     }).catch(function (error) {
       pagination.hidden = true; list.innerHTML = '<p class="library-state"></p>';
       list.querySelector("p").textContent = error.status === 429 ? "访问较频繁，请稍后再试。" : "资料暂时无法读取，请稍后再试。";

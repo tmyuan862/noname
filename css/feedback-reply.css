@@ -4,3 +4,4 @@
 .feedback-reply button { align-self: end; min-height: 40px; padding: 0 13px; border: 0; background: var(--ink); color: #fff; cursor: pointer; font-weight: 750; }
 .feedback-reply span { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
 @media (max-width: 620px) { .feedback-reply { grid-template-columns: 1fr; } .feedback-reply button { width: 100%; } }
+.public-toggle { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; }

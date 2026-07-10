@@ -130,6 +130,35 @@
     loadReplies();
   }
 
+  var publicFeedbackList = document.querySelector("[data-public-feedback-list]");
+  if (publicFeedbackList) {
+    var publicFeedbackPage = 1;
+    var publicFeedbackMore = document.querySelector("[data-public-feedback-more]");
+    function loadPublicFeedback(append) {
+      fetch("/api/feedback/public?page=" + publicFeedbackPage, { cache: "no-store" }).then(function (response) {
+        if (!response.ok) throw new Error(); return response.json();
+      }).then(function (data) {
+        document.querySelector("[data-public-feedback-count]").textContent = data.count + " 条";
+        if (!append) publicFeedbackList.textContent = "";
+        if (!data.feedback.length && !append) publicFeedbackList.innerHTML = "<p>还没有公开反馈。</p>";
+        data.feedback.forEach(function (record) {
+          var article = document.createElement("article"); article.className = "public-feedback-card";
+          var head = document.createElement("header");
+          var category = document.createElement("strong"); category.textContent = record.category;
+          var time = document.createElement("time"); time.textContent = new Date(record.created_at).toLocaleString("zh-CN");
+          head.append(category, time);
+          var message = document.createElement("p"); message.textContent = record.message;
+          article.append(head, message);
+          if (record.reply) { var reply = document.createElement("blockquote"); reply.textContent = "站长回复：" + record.reply; article.appendChild(reply); }
+          publicFeedbackList.appendChild(article);
+        });
+        publicFeedbackMore.hidden = !data.has_next;
+      }).catch(function () { if (!append) publicFeedbackList.innerHTML = "<p>反馈历史暂时无法读取。</p>"; });
+    }
+    publicFeedbackMore.addEventListener("click", function () { publicFeedbackPage += 1; loadPublicFeedback(true); });
+    loadPublicFeedback(false);
+  }
+
   var revealTargets = document.querySelectorAll(".content-section, .resources-section .section-shell, .campus-promo-inner, .feedback-layout, .more-section");
   if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     revealTargets.forEach(function (target) { target.classList.add("reveal"); });

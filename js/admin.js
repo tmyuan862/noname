@@ -31,6 +31,11 @@
         item.querySelector("[data-time]").textContent = new Date(record.created_at).toLocaleString("zh-CN");
         var state = item.querySelector("[data-state]");
         state.value = record.status;
+        var publicToggle = item.querySelector("[data-public]");
+        publicToggle.checked = !!record.public;
+        publicToggle.addEventListener("change", function () {
+          request("/api/admin/feedback/" + record.id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: state.value, public: publicToggle.checked }) });
+        });
         var reply = item.querySelector("[data-reply]");
         var replyStatus = item.querySelector("[data-reply-status]");
         reply.value = record.reply || "";

@@ -27,6 +27,7 @@
         <p data-message></p>
         <div class="feedback-reply"><label>回信<textarea data-reply maxlength="2000" placeholder="写给这位反馈者的回复……"></textarea></label><button type="button" data-send-reply>保存回信</button><span data-reply-status></span></div>
         <div class="feedback-actions">
+          <label class="public-toggle"><input type="checkbox" data-public /> 公开展示</label>
           <select data-state aria-label="处理状态"><option value="new">待处理</option><option value="processing">处理中</option><option value="done">已完成</option></select>
           <button class="delete-button" type="button" data-delete>删除</button>
         </div>
