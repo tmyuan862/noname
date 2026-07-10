@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+import re
 import smtplib
 import threading
 import time
@@ -28,6 +29,7 @@ DATA_FILE = DATA_DIR / "feedback.jsonl"
 RESOURCE_FILE = DATA_DIR / "resources.json"
 MAX_BODY_BYTES = 4096
 MAX_RESOURCE_BODY_BYTES = 2 * 1024 * 1024
+MAX_NOTICE_BODY_BYTES = 128 * 1024
 MAX_MESSAGE_LENGTH = 1000
 MIN_MESSAGE_LENGTH = 5
 RATE_LIMIT = 5
@@ -68,7 +70,7 @@ def normalize_resource(item: dict) -> dict | None:
     category = str(item.get("category", "other")).strip()[:80]
     if category == "safety" and any(keyword in title for keyword in ("发布会", "讲座", "论坛")):
         category = "activity_competition"
-    content = clean_resource_content(str(detail.get("content", "")))[:100000]
+    content = clean_resource_content(str(detail.get("content", item.get("content", ""))))[:100000]
     if not title or not content or not url.startswith(("https://", "http://")):
         return None
     return {
@@ -78,11 +80,70 @@ def normalize_resource(item: dict) -> dict | None:
         "category": category,
         "content": content,
         "summary": content[:180] + ("…" if len(content) > 180 else ""),
-        "publish_date": str(detail.get("publish_date", "")).strip()[:20],
-        "department": str(detail.get("department", "")).strip()[:120],
+        "publish_date": str(detail.get("publish_date", item.get("publish_date", ""))).strip()[:20],
+        "department": str(detail.get("department", item.get("department", ""))).strip()[:120],
         "crawl_time": str(item.get("crawl_time", detail.get("crawl_time", ""))).strip()[:40],
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+RESOURCE_CATEGORY_KEYWORDS = {
+    "transportation": ("校车", "班车", "发车", "乘车", "交通"),
+    "course_selection": ("选课", "课程", "教务", "补选", "退课"),
+    "fees": ("缴费", "学费", "费用", "收费"),
+    "holiday": ("放假", "假期", "暑假", "寒假", "调休"),
+    "library": ("图书馆", "借阅", "还书"),
+    "registration": ("报到", "注册", "迎新", "新生"),
+    "safety": ("安全", "防诈骗", "消防", "预警"),
+    "exchange": ("交换", "交流", "留学", "访学"),
+    "activity_competition": ("活动", "竞赛", "比赛", "讲座", "论坛", "发布会"),
+}
+
+
+def analyze_notice(text: object) -> tuple[dict | None, str]:
+    if not isinstance(text, str):
+        return None, "请粘贴文字内容。"
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip()
+    if not 10 <= len(normalized) <= 100000:
+        return None, "通知内容应为 10—100000 个字符。"
+    lines = [line.strip() for line in normalized.splitlines() if line.strip()]
+    if not lines:
+        return None, "没有识别到有效内容。"
+
+    url_match = re.search(r"https?://[^\s<>\"']+", normalized)
+    source_url = url_match.group(0).rstrip("。；，,;)）]") if url_match else ""
+    date_match = re.search(r"(20\d{2})[年./-](\d{1,2})[月./-](\d{1,2})日?", normalized)
+    publish_date = ""
+    if date_match:
+        publish_date = f"{date_match.group(1)}-{int(date_match.group(2)):02d}-{int(date_match.group(3)):02d}"
+
+    title = next((line[:300] for line in lines if not re.match(r"^(发布日期|发布时间|来源|原文|http)", line)), lines[0][:300])
+    department = ""
+    department_pattern = re.compile(r"^[\u4e00-\u9fffA-Za-z0-9·（）()]{2,40}(处|部|学院|中心|办公室|委员会|研究院|书院)$")
+    for line in reversed(lines):
+        candidate = re.sub(r"^(来源|发布部门|发布单位)[：:]\s*", "", line)
+        if department_pattern.match(candidate):
+            department = candidate[:120]
+            break
+
+    haystack = f"{title}\n{normalized}"
+    category = "other"
+    for category_name, keywords in RESOURCE_CATEGORY_KEYWORDS.items():
+        if any(keyword in haystack for keyword in keywords):
+            category = category_name
+            break
+
+    content_lines = [line for line in lines if line != title and not line.startswith(("原文：", "原文:", "来源链接：", "来源链接:"))]
+    content = "\n".join(content_lines).strip() or normalized
+    return {
+        "title": title,
+        "url": source_url,
+        "category": category,
+        "content": content,
+        "summary": content[:180] + ("…" if len(content) > 180 else ""),
+        "publish_date": publish_date,
+        "department": department,
+    }, ""
 
 
 def load_resources() -> list[dict]:
@@ -338,6 +399,12 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             scores = game_scores.admin_scores(status)
             self.send_json(200, {"scores": scores, "count": len(scores)})
             return
+        if parsed.path == "/admin/resources":
+            with resource_lock:
+                records = load_resources()
+            public_records = [{field: value for field, value in record.items() if field != "content"} for record in records]
+            self.send_json(200, {"resources": public_records, "count": len(public_records)})
+            return
         if parsed.path == "/admin/feedback":
             status_filter = parse_qs(parsed.query).get("status", [""])[0]
             with data_lock:
@@ -410,6 +477,14 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                 self.send_json(422, {"error": "invalid_score", "message": message})
                 return
             self.send_json(201, {"ok": True, "score": record})
+            return
+        if self.path == "/admin/resources/analyze":
+            payload = self.read_json(MAX_NOTICE_BODY_BYTES)
+            draft, message = analyze_notice(payload.get("text") if isinstance(payload, dict) else None)
+            if draft is None:
+                self.send_json(422, {"error": "invalid_notice", "message": message})
+                return
+            self.send_json(200, {"ok": True, "draft": draft})
             return
         if self.path == "/admin/resources/import":
             payload = self.read_json(MAX_RESOURCE_BODY_BYTES)

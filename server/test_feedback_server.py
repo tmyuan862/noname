@@ -242,6 +242,33 @@ class FeedbackApiTests(unittest.TestCase):
         status, _ = self.request("/admin/resources/import", "POST", {"items": "not-a-list"})
         self.assertEqual(status, 422)
 
+    def test_pasted_notice_is_analyzed_before_publication(self):
+        pasted = """关于2026年暑期校车运行安排的通知
+发布日期：2026-07-10
+暑假期间校车每日七点三十分从浦东校区发车，请提前候车。
+咨询电话：021-12345678
+后勤保障处
+原文：https://www.lixin.edu.cn/bus-2026.htm"""
+        status, analyzed = self.request("/admin/resources/analyze", "POST", {"text": pasted})
+        self.assertEqual(status, 200)
+        draft = analyzed["draft"]
+        self.assertEqual(draft["title"], "关于2026年暑期校车运行安排的通知")
+        self.assertEqual(draft["category"], "transportation")
+        self.assertEqual(draft["publish_date"], "2026-07-10")
+        self.assertEqual(draft["department"], "后勤保障处")
+        self.assertEqual(draft["url"], "https://www.lixin.edu.cn/bus-2026.htm")
+        self.assertIn("校车每日七点三十分", draft["content"])
+        status, imported = self.request("/admin/resources/import", "POST", {"items": [draft]})
+        self.assertEqual(status, 200)
+        self.assertEqual(imported["inserted"], 1)
+        _, listing = self.request("/resources?q=" + quote("校车"))
+        self.assertEqual(listing["count"], 1)
+
+    def test_pasted_notice_analysis_rejects_short_text(self):
+        status, response = self.request("/admin/resources/analyze", "POST", {"text": "太短"})
+        self.assertEqual(status, 422)
+        self.assertEqual(response["error"], "invalid_notice")
+
     def test_event_misclassified_as_safety_is_recategorized(self):
         source = [{
             "title": "校园主题发布会通知",

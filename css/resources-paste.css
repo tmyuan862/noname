@@ -1,0 +1,23 @@
+.paste-panel { margin-top: 24px; padding: 24px; border: 1px solid var(--line); background: var(--white); }
+.paste-heading, .preview-head, .paste-actions, .preview-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.paste-heading p, .paste-heading > span, .preview-head span, .paste-actions p { color: var(--muted); font-size: 12px; }
+.paste-heading p { margin-top: 5px; }
+.paste-input { margin-top: 20px; display: grid; gap: 8px; }
+.paste-input span, .analysis-preview label span { font-size: 12px; font-weight: 750; }
+.paste-input textarea, .analysis-preview input, .analysis-preview select, .analysis-preview textarea { width: 100%; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; }
+.paste-input textarea { min-height: 190px; padding: 14px; resize: vertical; line-height: 1.65; }
+.paste-actions { margin-top: 14px; justify-content: flex-start; }
+.paste-actions button, .preview-actions button { min-height: 42px; padding: 0 16px; border: 1px solid var(--ink); background: var(--ink); color: var(--white); cursor: pointer; font-weight: 750; }
+.paste-actions button:disabled, .preview-actions button:disabled { opacity: .45; cursor: wait; }
+.paste-actions p.error { color: var(--danger); }
+.paste-actions p.success { color: #34713d; }
+.analysis-preview { margin-top: 22px; padding-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 1px solid var(--line); }
+.analysis-preview[hidden] { display: none; }
+.analysis-preview .preview-head, .analysis-preview .wide { grid-column: 1 / -1; }
+.analysis-preview label { display: grid; gap: 7px; }
+.analysis-preview input, .analysis-preview select { min-height: 44px; padding: 0 12px; }
+.analysis-preview textarea { min-height: 220px; padding: 12px; resize: vertical; line-height: 1.65; }
+.preview-actions { justify-content: flex-end; }
+.preview-actions button:first-child { border-color: var(--line); background: transparent; color: var(--ink); }
+.preview-actions .publish-button { background: #315b35; border-color: #315b35; }
+@media (max-width: 700px) { .paste-panel { padding: 18px 14px; } .paste-heading, .preview-head { align-items: flex-start; flex-direction: column; } .analysis-preview { grid-template-columns: 1fr; } .analysis-preview label { grid-column: 1; } .preview-actions { justify-content: stretch; } .preview-actions button { flex: 1; } }
