@@ -13,10 +13,12 @@
   var currentPage = Math.max(1, Number(initialParams.get("page")) || 1);
   var initialOpen = initialParams.get("open") || "";
   var timer;
+  var listController = null;
+  var listRequestId = 0;
   search.value = initialParams.get("q") || "";
 
-  function api(url) {
-    return fetch(url, { cache: "no-store" }).then(function (response) {
+  function api(url, options) {
+    return fetch(url, Object.assign({ cache: "no-store" }, options || {})).then(function (response) {
       return response.json().catch(function () { return {}; }).then(function (data) {
         if (!response.ok) { var error = new Error(data.message || "请求失败"); error.status = response.status; throw error; }
         return data;
@@ -87,8 +89,13 @@
   function load() {
     var params = new URLSearchParams({ page: String(currentPage), page_size: "8" });
     if (activeCategory) params.set("category", activeCategory); if (search.value.trim()) params.set("q", search.value.trim());
+    if (listController) listController.abort();
+    listController = new AbortController();
+    listRequestId += 1;
+    var requestId = listRequestId;
     list.innerHTML = '<p class="library-state">正在加载资料……</p>'; syncUrl();
-    api("/api/resources?" + params).then(function (data) {
+    api("/api/resources?" + params, { signal: listController.signal }).then(function (data) {
+      if (requestId !== listRequestId) return;
       var total = Object.values(data.categories || {}).reduce(function (sum, count) { return sum + count; }, 0);
       document.querySelector("[data-total]").textContent = total + " 条资料"; document.querySelector("[data-result-count]").textContent = "找到 " + data.count + " 条";
       if (!categories.children.length) renderCategories(data.categories, total); renderPagination(data); list.textContent = "";
@@ -104,8 +111,11 @@
       });
       if (initialOpen) { var resourceId = initialOpen; initialOpen = ""; showDetail(resourceId, null); }
     }).catch(function (error) {
+      if (error.name === "AbortError" || requestId !== listRequestId) return;
       pagination.hidden = true; list.innerHTML = '<p class="library-state"></p>';
       list.querySelector("p").textContent = error.status === 429 ? "访问较频繁，请稍后再试。" : "资料暂时无法读取，请稍后再试。";
+    }).finally(function () {
+      if (requestId === listRequestId) listController = null;
     });
   }
 

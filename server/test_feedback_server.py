@@ -459,6 +459,21 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(len(response["draft"]["image_urls"]), 2)
         self.assertTrue(response["draft"]["image_urls"][1].endswith("/images/bus-table.png"))
 
+    def test_webpage_analysis_rejects_redirect_to_private_address(self):
+        class RedirectedResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self, *_): return b"<html><body><p>private content</p></body></html>"
+            def geturl(self): return "http://127.0.0.1/internal"
+            @property
+            def headers(self): return {"Content-Type": "text/html; charset=utf-8"}
+
+        with mock.patch("feedback_server.is_private_hostname", side_effect=[False, True]), \
+             mock.patch("feedback_server.WEB_URLOPEN", return_value=RedirectedResponse()):
+            result, message = api.fetch_notice_webpage("https://www.lixin.edu.cn/redirect")
+        self.assertIsNone(result)
+        self.assertIn("受限地址", message)
+
     def test_resource_import_preserves_image_urls(self):
         source = [{
             "title": "校车路线图",

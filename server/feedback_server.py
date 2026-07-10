@@ -315,6 +315,9 @@ def fetch_notice_webpage(url: object) -> tuple[dict | None, str]:
             final_url = response.geturl()
     except (urllib.error.URLError, TimeoutError, ValueError):
         return None, "网页暂时无法读取，请确认链接可以公开访问。"
+    final_parsed = urlparse(final_url)
+    if not final_parsed.hostname or is_private_hostname(final_parsed.hostname):
+        return None, "网页跳转到了受限地址，已停止抓取。"
     if len(raw) > MAX_WEBPAGE_FETCH_BYTES:
         return None, "网页内容过大，暂时无法自动分析。"
 
@@ -374,35 +377,12 @@ def fetch_notice_webpage(url: object) -> tuple[dict | None, str]:
 def analyze_notice_with_ai(text: str, local_draft: dict) -> tuple[dict | None, str]:
     if not CONFIG.notice_ai_enabled:
         return None, "AI 服务尚未配置。"
-    request_body = json.dumps({
-        "model": CONFIG.notice_ai_model,
-        "messages": [
-            {"role": "system", "content": NOTICE_AI_SYSTEM_PROMPT},
-            {"role": "user", "content": "请整理以下校园通知：\n<notice>\n" + text + "\n</notice>"},
-        ],
-        "response_format": {"type": "json_object"},
-        "temperature": 0.1,
-        "max_tokens": 1400,
-        "stream": False,
-    }, ensure_ascii=False).encode("utf-8")
-    request = urllib.request.Request(
-        CONFIG.notice_ai_base_url + "/chat/completions",
-        data=request_body,
-        headers={"Authorization": "Bearer " + CONFIG.notice_ai_api_key, "Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with AI_URLOPEN(request, timeout=25) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-        content = payload["choices"][0]["message"]["content"].strip()
-        if content.startswith("```"):
-            content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content, flags=re.IGNORECASE)
-        result = json.loads(content)
-    except (urllib.error.URLError, TimeoutError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as error:
-        print(f"notice AI failed: {type(error).__name__}", flush=True)
+    result = call_notice_ai([
+        {"role": "system", "content": NOTICE_AI_SYSTEM_PROMPT},
+        {"role": "user", "content": "请整理以下校园通知：\n<notice>\n" + text + "\n</notice>"},
+    ], max_tokens=1400, temperature=0.1)
+    if result is None:
         return None, "AI 暂时不可用，已改用本地分析。"
-    if not isinstance(result, dict):
-        return None, "AI 返回格式异常，已改用本地分析。"
 
     allowed_categories = set(RESOURCE_CATEGORY_KEYWORDS) | {"other"}
     category = result.get("category") if result.get("category") in allowed_categories else local_draft["category"]
@@ -410,7 +390,7 @@ def analyze_notice_with_ai(text: str, local_draft: dict) -> tuple[dict | None, s
         "title": str(result.get("title", "")).strip()[:300] or local_draft["title"],
         "category": category,
         "summary": str(result.get("summary", "")).strip()[:180],
-        "content": str(result.get("content", "")).strip()[:100000] or local_draft["content"],
+        "content": clean_resource_content(str(result.get("content", "")))[:100000] or local_draft["content"],
         "publish_date": str(result.get("publish_date", "")).strip()[:20],
         "department": str(result.get("department", "")).strip()[:120],
         "url": local_draft["url"],
@@ -428,31 +408,13 @@ def format_resource_content_with_ai(content: object) -> tuple[str | None, str]:
         return None, "正文为空。"
     if not CONFIG.notice_ai_enabled:
         return None, "AI 服务尚未配置。"
-    request_body = json.dumps({
-        "model": CONFIG.notice_ai_model,
-        "messages": [
-            {"role": "system", "content": NOTICE_FORMAT_SYSTEM_PROMPT},
-            {"role": "user", "content": "请只整理下面通知正文的排版：\n<notice>\n" + source + "\n</notice>"},
-        ],
-        "response_format": {"type": "json_object"},
-        "temperature": 0,
-        "max_tokens": 1800,
-        "stream": False,
-    }, ensure_ascii=False).encode("utf-8")
-    request = urllib.request.Request(
-        CONFIG.notice_ai_base_url + "/chat/completions", data=request_body,
-        headers={"Authorization": "Bearer " + CONFIG.notice_ai_api_key, "Content-Type": "application/json"}, method="POST",
-    )
-    try:
-        with AI_URLOPEN(request, timeout=25) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-        reply = payload["choices"][0]["message"]["content"].strip()
-        if reply.startswith("```"):
-            reply = re.sub(r"^```(?:json)?\s*|\s*```$", "", reply, flags=re.IGNORECASE)
-        formatted = clean_resource_content(str(json.loads(reply).get("content", "")))
-    except (urllib.error.URLError, TimeoutError, KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as error:
-        print(f"notice format AI failed: {type(error).__name__}", flush=True)
+    result = call_notice_ai([
+        {"role": "system", "content": NOTICE_FORMAT_SYSTEM_PROMPT},
+        {"role": "user", "content": "请只整理下面通知正文的排版：\n<notice>\n" + source + "\n</notice>"},
+    ], max_tokens=1800, temperature=0)
+    if result is None:
         return None, "AI 暂时不可用。"
+    formatted = clean_resource_content(str(result.get("content", "")))
     if len(formatted) < max(10, len(source) // 4):
         return None, "AI 返回内容不完整，未保存该条资料。"
     return formatted[:100000], ""
