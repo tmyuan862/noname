@@ -8,6 +8,7 @@ from urllib.parse import quote
 from pathlib import Path
 
 import feedback_server as api
+import game_scores
 
 
 class FeedbackApiTests(unittest.TestCase):
@@ -17,6 +18,14 @@ class FeedbackApiTests(unittest.TestCase):
         api.DATA_FILE = api.DATA_DIR / "feedback.jsonl"
         api.RESOURCE_FILE = api.DATA_DIR / "resources.json"
         api.request_times.clear()
+        self.original_score_db = game_scores.DB_FILE
+        self.original_session_min = game_scores.SESSION_MIN_SECONDS
+        self.original_use_wal = game_scores.USE_WAL
+        game_scores.DB_FILE = api.DATA_DIR / "snake_scores.sqlite3"
+        game_scores.SESSION_MIN_SECONDS = 0
+        game_scores.USE_WAL = False
+        game_scores.sessions.clear()
+        game_scores.init_db()
         self.server = api.ThreadingHTTPServer(("127.0.0.1", 0), api.FeedbackHandler)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
@@ -26,6 +35,10 @@ class FeedbackApiTests(unittest.TestCase):
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(timeout=2)
+        game_scores.DB_FILE = self.original_score_db
+        game_scores.SESSION_MIN_SECONDS = self.original_session_min
+        game_scores.USE_WAL = self.original_use_wal
+        game_scores.sessions.clear()
         self.temp_dir.cleanup()
 
     def post(self, payload, content_type="application/json"):
@@ -71,6 +84,50 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(health["app"], "梦缘资源站")
         self.assertIn("resources", health["counts"])
         self.assertFalse(health["email_enabled"])
+        self.assertEqual(health["counts"]["snake_scores"], 0)
+
+    def test_game_score_session_submission_and_leaderboard(self):
+        status, session = self.request("/game/session")
+        self.assertEqual(status, 200)
+
+        status, submitted = self.request("/game/scores", "POST", {
+            "token": session["token"], "name": "Player", "score": 120,
+            "mode": "classic", "diff": "normal",
+        })
+        self.assertEqual(status, 201)
+        self.assertEqual(submitted["score"]["score"], 120)
+
+        status, listing = self.request("/game/leaderboard")
+        self.assertEqual(status, 200)
+        self.assertEqual(listing["scores"][0]["name"], "Player")
+
+        status, _ = self.request("/game/scores", "POST", {
+            "token": session["token"], "name": "Replay", "score": 100,
+            "mode": "classic", "diff": "normal",
+        })
+        self.assertEqual(status, 422)
+
+    def test_admin_can_hide_restore_and_delete_game_score(self):
+        _, session = self.request("/game/session")
+        self.request("/game/scores", "POST", {
+            "token": session["token"], "name": "Admin Test", "score": 88,
+            "mode": "level", "diff": "hard",
+        })
+        _, scores = self.request("/admin/game/scores")
+        record_id = scores["scores"][0]["id"]
+
+        status, _ = self.request(f"/admin/game/scores/{record_id}", "PATCH", {"status": "hidden"})
+        self.assertEqual(status, 200)
+        _, public = self.request("/game/leaderboard")
+        self.assertEqual(public["count"], 0)
+
+        status, _ = self.request(f"/admin/game/scores/{record_id}", "PATCH", {"status": "visible"})
+        self.assertEqual(status, 200)
+        _, public = self.request("/game/leaderboard")
+        self.assertEqual(public["count"], 1)
+
+        status, _ = self.request(f"/admin/game/scores/{record_id}", "DELETE")
+        self.assertEqual(status, 200)
 
     def test_invalid_category_is_rejected(self):
         status, _ = self.post({"category": "管理员", "message": "这是一条足够长的反馈", "website": ""})

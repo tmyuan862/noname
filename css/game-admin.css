@@ -1,0 +1,14 @@
+.score-table-wrap { overflow-x: auto; border: 1px solid var(--line, #dfe3e8); background: #fff; }
+.score-table { width: 100%; min-width: 780px; border-collapse: collapse; }
+.score-table th, .score-table td { padding: 14px 16px; border-bottom: 1px solid #edf0f2; text-align: left; vertical-align: middle; }
+.score-table th { color: #667085; font-size: 12px; font-weight: 700; background: #f8fafb; }
+.score-table td { color: #20262d; font-size: 14px; }
+.score-table .score-value { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.score-state { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.score-state::before { width: 7px; height: 7px; border-radius: 50%; background: #20a464; content: ""; }
+.score-state.hidden::before { background: #98a2b3; }
+.score-actions { display: flex; gap: 8px; }
+.score-actions button { min-height: 34px; padding: 0 12px; border: 1px solid #cfd5dc; background: #fff; color: #344054; cursor: pointer; }
+.score-actions .danger { border-color: #f0b7b7; color: #b42318; }
+.score-actions button:focus-visible { outline: 3px solid rgba(21, 112, 239, .25); outline-offset: 2px; }
+@media (max-width: 640px) { .admin-shell { padding-left: 12px; padding-right: 12px; } .score-table th, .score-table td { padding: 12px; } }

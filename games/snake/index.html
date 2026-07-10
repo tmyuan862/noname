@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1024">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="贪吃蛇">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="超进化版贪吃蛇">
+<title>贪吃蛇 Plus</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="stylesheet" href="./css/main.css">
+</head>
+<body tabindex="0">
+
+<header class="game-sitebar">
+  <a href="/" aria-label="返回梦缘资源站首页">← 梦缘资源站</a>
+  <span>ARCADE · 01</span>
+</header>
+
+<h1>🐍 贪吃蛇 PLUS</h1>
+
+<div id="bossBarWrap" style="display:none;width:100%;max-width:520px;background:rgba(15,18,40,0.85);border:2px solid #ff1744;border-radius:8px;height:24px;position:relative;overflow:hidden;margin-bottom:8px;box-shadow:0 0 15px rgba(255,23,68,.4)">
+  <div id="bossBar" style="width:100%;height:100%;background:linear-gradient(90deg,#ff1744,#d500f9);transition:width .1s"></div>
+  <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;text-shadow:0 1px 4px #000" id="bossName">👿 噬界巨蟒 BOSS</span>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="label">生命</div><div class="val" id="lives" style="color:#ff3366">❤️ x3</div></div>
+  <div class="stat"><div class="label">得分</div><div class="val" id="score">0</div></div>
+  <div class="stat"><div class="label">最高分</div><div class="val gold" id="best">0</div></div>
+  <div class="stat" style="border-color:rgba(255,215,0,.4)"><div class="label">🐍 蛇等级</div><div class="val" id="snakeLv" style="color:var(--gold)">Lv.1</div></div>
+  <div class="stat" id="lvBox"><div class="label">关卡</div><div class="val" id="level">-</div></div>
+  <div class="stat"><div class="label">击杀</div><div class="val" id="kills" style="color:var(--enemy)">0</div></div>
+  <div class="stat" style="border-color:rgba(255,215,0,.3)"><div class="label">💰 金币</div><div class="val gold" id="goldAmt">0</div></div>
+</div>
+
+<div class="xp-bar-wrap" id="xpBarWrap" style="display:none">
+  <div class="xp-bar-fill" id="xpBarFill"></div>
+  <span class="xp-bar-text" id="xpBarText">Lv.1 · 0/500</span>
+</div>
+
+<div class="wrap">
+  <canvas id="game" aria-label="贪吃蛇游戏画布"></canvas>
+  <div id="combo"></div><div id="fx"></div><div id="weather"></div>
+</div>
+
+<div class="joystick-wrap" id="joystickWrap">
+  <div class="joystick-base" id="joystickBase">
+    <div class="joystick-thumb" id="joystickThumb"></div>
+  </div>
+</div>
+
+<div class="dpad" id="dpad">
+  <button class="up" data-dir="0,-1" aria-label="上">▲</button>
+  <button class="left" data-dir="-1,0" aria-label="左">◀</button><button class="mid" aria-hidden="true"></button>
+  <button class="right" data-dir="1,0" aria-label="右">▶</button><button class="down" data-dir="0,1" aria-label="下">▼</button>
+</div>
+
+<div class="controls">
+  <div class="ctrl-row primary-ctrl">
+    <button id="pauseBtn" class="ctrl-lg">暂停</button>
+    <button id="shedBtn" class="ctrl-lg ctrl-shed">💥 蜕皮</button>
+    <button id="restartBtn" class="ctrl-lg">重开</button>
+  </div>
+  <div class="ctrl-row secondary-ctrl">
+    <button id="muteBtn" class="ctrl-sm">🔊</button>
+    <button id="menuBtn" class="ctrl-sm">菜单</button>
+    <button id="helpBtn" class="ctrl-sm">📖</button>
+    <button id="installBtn" class="ctrl-sm">📲</button>
+  </div>
+</div>
+<div id="tip">方向键/WASD/滑动/摇杆/手柄 · 空格暂停 · Shift/F 蜕皮</div>
+
+<div class="overlay" id="menu">
+  <div class="menu-card" id="mainMenuCard">
+    <div class="menu-header">
+      <div class="menu-logo">🐍</div>
+      <div class="menu-title">贪吃蛇 <span>PLUS</span></div>
+      <div class="menu-version">v2.0</div>
+    </div>
+    <div class="menu-user-bar">
+      <div class="menu-user" id="menuNickDisplay" title="点击修改昵称"></div>
+      <div class="menu-gold" id="menuGoldDisplay">0</div>
+    </div>
+    <button class="menu-start" id="startBtn">开始游戏</button>
+    <div class="menu-section">
+      <div class="menu-label">养成</div>
+      <div class="menu-row">
+        <button class="menu-btn accent-gold" id="openMissionsBtn">📋 每日</button>
+        <button class="menu-btn accent-purple" id="openShopBtn">🛒 皮肤</button>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label">记录</div>
+      <div class="menu-row">
+        <button class="menu-btn" id="openAchBtn">🏅 成就</button>
+        <button class="menu-btn" id="openLeaderboardBtn">🏆 排行</button>
+        <button class="menu-btn" id="openGhostBtn">👻 回放</button>
+        <button class="menu-btn" id="openRedeemBtn">🎁 兑换</button>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label">其他</div>
+      <div class="menu-row">
+        <button class="menu-btn accent-green" id="openTutorialBtn">🔰 教程</button>
+        <button class="menu-btn" id="openSettingsBtn">⚙️ 设置</button>
+        <button class="menu-btn" id="openHelpBtn">📖 指南</button>
+      </div>
+    </div>
+    <div class="menu-footer">© 梦缘</div>
+  </div>
+
+  <div class="card hidden" id="tutorialCard" style="max-height:88vh;overflow-y:auto">
+    <h2>🔰 新手教学</h2><div class="sub">一步步掌握核心操作</div>
+    <div class="tut-steps" id="tutSteps">
+      <span class="tut-dot active" data-step="0"></span><span class="tut-dot" data-step="1"></span>
+      <span class="tut-dot" data-step="2"></span><span class="tut-dot" data-step="3"></span>
+    </div>
+    <div class="tut-panel active" data-step="0">
+      <div class="tut-icon">🍎</div><h3 class="tut-head">第一步：基础生存</h3>
+      <p>吃掉苹果或金币获得积分。方向键/WASD/触屏/摇杆控制移动。<br><b>别撞自己、墙壁或边界！</b></p>
+    </div>
+    <div class="tut-panel" data-step="1">
+      <div class="tut-icon">💥</div><h3 class="tut-head">第二步：蜕皮避险</h3>
+      <p>按 <b>Shift / F</b>（或点蜕皮按钮）释放能量波：清除弹幕、击退敌蛇、伤 Boss、1.5秒无敌。</p>
+      <p style="font-size:11px;color:var(--shrink)">⚠ 消耗 30% 身长，长度 ≥ 6 才可用</p>
+    </div>
+    <div class="tut-panel" data-step="2">
+      <div class="tut-icon">⬆️</div><h3 class="tut-head">第三步：肉鸽升级</h3>
+      <p>每级得分达标后<b>三选一</b>能力，Lv.5 起出现超级技能。所有能力可叠加。</p>
+    </div>
+    <div class="tut-panel" data-step="3">
+      <div class="tut-icon">👿</div><h3 class="tut-head">第四步：Boss 挑战</h3>
+      <p>得分到阈值出 Boss。击杀奖励 <b>❤️+1</b>（上限5）。撞敌蛇身体直接杀，撞头才会死。</p>
+    </div>
+    <div class="tut-nav">
+      <button class="tut-nav-btn" id="tutPrevBtn" disabled>← 上一步</button>
+      <span class="tut-prog" id="tutProg">1 / 4</span>
+      <button class="tut-nav-btn" id="tutNextBtn">下一步 →</button>
+    </div>
+    <button class="primary btn-full" id="backTutorialBtn" style="margin-top:8px">关闭</button>
+  </div>
+
+  <div class="card hidden" id="settingsCard">
+    <h2>⚙️ 游戏设置</h2>
+    <div class="field-label">游戏模式</div>
+    <div class="seg" id="modeSeg"><button data-m="classic" class="active">经典</button><button data-m="level">闯关</button><button data-m="chaos">混沌</button><button data-m="bossRush">挑战赛</button></div>
+    <div class="field-label">难度</div>
+    <div class="seg" id="diffSeg"><button data-d="easy">简单</button><button data-d="normal" class="active">普通</button><button data-d="hard">困难</button><button data-d="hell">地狱</button></div>
+    <div class="row"><span>显示方向手柄/摇杆</span><input type="checkbox" id="dpadChk"></div>
+    <button class="primary btn-full" id="saveSettingsBtn">确定返回</button>
+  </div>
+
+  <div class="card hidden" id="missionsCard">
+    <h2>📋 每日任务</h2><div class="sub">完成每日任务赚取金币</div>
+    <div id="missionsList"></div>
+    <button class="btn-full" id="backMissionsBtn" style="margin-top:12px">返回</button>
+  </div>
+
+  <div class="card hidden" id="shopCard">
+    <h2>🛒 皮肤商店</h2><div class="sub">选择蛇身皮肤</div>
+    <div class="skin-grid" id="skinGrid"></div>
+    <div style="text-align:center;font-size:12px;color:var(--gold);margin:10px 0" id="shopGold"></div>
+    <button class="btn-full" id="backShopBtn">返回</button>
+  </div>
+
+  <div class="card hidden" id="achCard">
+    <h2>🏅 成就系统</h2><div class="sub" id="achSub"></div>
+    <div id="achList" style="max-height:220px;overflow-y:auto"></div>
+    <button class="btn-full" id="backAchBtn" style="margin-top:10px">返回</button>
+  </div>
+
+  <div class="card hidden" id="redeemCard">
+    <h2>🎁 兑换码</h2><div class="sub">输入兑换码获取奖励</div>
+    <input class="name" id="redeemInput" maxlength="16" placeholder="请输入兑换码" autocomplete="off">
+    <button class="primary btn-full" id="redeemSubmitBtn">兑换</button>
+    <div id="redeemMsg" style="text-align:center;font-size:12px;margin-top:10px;min-height:20px"></div>
+    <button class="btn-full" id="backRedeemBtn" style="margin-top:8px">返回</button>
+  </div>
+
+  <div class="card hidden" id="ghostCard">
+    <h2>👻 Ghost 挑战</h2><div class="sub">挑战历史最佳幻影</div>
+    <div id="ghostList" style="max-height:180px;overflow-y:auto"></div>
+    <button class="btn-full" id="backGhostBtn" style="margin-top:10px">返回</button>
+  </div>
+
+  <div class="card hidden" id="leaderboardCard" style="max-height:90vh;overflow-y:auto">
+    <h2>🏆 排行榜</h2>
+    <div class="seg" style="margin-bottom:8px"><button id="tabLocal" class="active" style="flex:1;padding:7px 0;font-size:12px">📱 本地</button><button id="tabGlobal" style="flex:1;padding:7px 0;font-size:12px">🌐 全站</button></div>
+    <div id="globalTimeSeg" class="seg hidden" style="margin-bottom:8px"><button id="timeDay" class="active" style="flex:1;padding:5px 0;font-size:11px">日榜</button><button id="timeWeek" style="flex:1;padding:5px 0;font-size:11px">周榜</button><button id="timeAll" style="flex:1;padding:5px 0;font-size:11px">总榜</button></div>
+    <div style="display:flex;gap:5px;margin-bottom:10px">
+      <select id="filterMode" style="flex:1;background:#070914;color:#fff;border:1px solid rgba(0,255,170,.3);border-radius:6px;padding:6px;font-size:12px"><option value="all">所有模式</option><option value="经典">经典</option><option value="闯关">闯关</option><option value="混沌">混沌</option><option value="bossRush">挑战赛</option></select>
+      <select id="filterDiff" style="flex:1;background:#070914;color:#fff;border:1px solid rgba(0,255,170,.3);border-radius:6px;padding:6px;font-size:12px"><option value="all">所有难度</option><option value="简单">简单</option><option value="普通">普通</option><option value="困难">困难</option><option value="地狱">地狱</option></select>
+    </div>
+    <ul class="hlist" id="hlist"></ul>
+    <div style="display:flex;gap:8px;margin-top:14px"><span class="link" id="clearBtn" style="margin:0;flex:1;text-align:center;padding:10px 0">清除本地记录</span><button id="backLeaderboardBtn" style="flex:1;padding:6px;font-size:12px">返回</button></div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="gameover">
+  <div class="card">
+    <h2 id="goTitle">游戏结束</h2><div class="sub" id="goSub">得分 0</div>
+    <button class="btn-full" id="reviveBtn" style="display:none;border-color:var(--gold);color:var(--gold);margin-bottom:8px">💖 复活一次</button>
+    <button class="primary btn-full" id="againBtn">再来一局</button>
+    <button class="btn-full" id="backBtn" style="margin-top:8px">返回菜单</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="help">
+  <div class="card" style="max-width:450px;max-height:88vh;overflow:auto">
+    <h2>🐍 玩法指南</h2><div class="sub">肉鸽进化版</div>
+    <h3 class="hsec">🎮 操作</h3>
+    <p class="htext">方向键/WASD/触屏/摇杆/手柄 · 空格暂停 · Shift/F 蜕皮</p>
+    <h3 class="hsec">⬆️ 肉鸽升级</h3>
+    <p class="htext">得分达标后三选一能力叠加，Lv.5起超级技能。</p>
+    <h3 class="hsec">🐍 敌蛇</h3>
+    <p class="htext">撞敌蛇身体直接杀 · 撞蛇头才死 · 敌蛇咬你扣尾巴 · Boss三种随机</p>
+    <h3 class="hsec">🌦️ 天气</h3>
+    <p class="htext">酸雨/食物雨/黑暗/地震随机降临</p>
+    <button class="primary btn-full" id="helpClose" style="margin-top:14px">知道了</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="noticeOverlay" style="z-index:30">
+  <div class="card" style="border:2px solid var(--accent)">
+    <h2>📢 肉鸽进化</h2>
+    <div class="htext" style="margin-bottom:14px">⬆️肉鸽 🎨皮肤 🌦️天气 👿Boss 🏅成就 👻回放</div>
+    <button class="primary btn-full" id="noticeCloseBtn">我知道了</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="nicknameOverlay" style="z-index:35">
+  <div class="card"><h2>🐍 贪吃蛇 PLUS</h2><div class="sub">请设定昵称</div>
+    <input class="name" id="globalNicknameInput" maxlength="8" placeholder="昵称(最多8字)">
+    <button class="primary btn-full" id="saveNicknameBtn">进入游戏</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="levelUpOverlay" style="z-index:40">
+  <div class="card" style="text-align:center;border:2px solid var(--gold);box-shadow:0 0 30px rgba(255,215,0,.3)">
+    <h2 style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent">选择能力</h2>
+    <div class="sub" id="levelUpSub">Lv.1 → Lv.2</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin:10px 0" id="levelUpChoices"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="./js/app.js?v=51"></script>
+</body>
+</html>

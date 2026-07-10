@@ -18,6 +18,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from app_config import CONFIG
+import game_scores
 
 
 HOST = CONFIG.host
@@ -285,8 +286,26 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                     "feedback": feedback_count,
                     "resources": len(resources),
                     "resource_categories": len({item.get("category") for item in resources}),
+                    "snake_scores": game_scores.score_count(),
                 },
             })
+            return
+        if parsed.path == "/game/session":
+            self.send_json(200, {"token": game_scores.create_session(), "expires_in": game_scores.SESSION_MAX_SECONDS})
+            return
+        if parsed.path == "/game/leaderboard":
+            query = parse_qs(parsed.query)
+            scores = game_scores.leaderboard(
+                query.get("range", ["all"])[0],
+                query.get("mode", [""])[0],
+                query.get("diff", [""])[0],
+            )
+            self.send_json(200, {"scores": scores, "count": len(scores)})
+            return
+        if parsed.path == "/admin/game/scores":
+            status = parse_qs(parsed.query).get("status", [""])[0]
+            scores = game_scores.admin_scores(status)
+            self.send_json(200, {"scores": scores, "count": len(scores)})
             return
         if parsed.path == "/admin/feedback":
             status_filter = parse_qs(parsed.query).get("status", [""])[0]
@@ -327,6 +346,17 @@ class FeedbackHandler(BaseHTTPRequestHandler):
         self.send_json(404, {"error": "not_found"})
 
     def do_POST(self) -> None:
+        if self.path == "/game/scores":
+            payload = self.read_json()
+            if not isinstance(payload, dict):
+                self.send_json(400, {"error": "invalid_request", "message": "成绩格式不正确。"})
+                return
+            record, message = game_scores.submit_score(payload)
+            if record is None:
+                self.send_json(422, {"error": "invalid_score", "message": message})
+                return
+            self.send_json(201, {"ok": True, "score": record})
+            return
         if self.path == "/admin/resources/import":
             payload = self.read_json(MAX_RESOURCE_BODY_BYTES)
             items = payload.get("items") if isinstance(payload, dict) else payload
@@ -378,6 +408,19 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
     def do_PATCH(self) -> None:
         parsed = urlparse(self.path)
+        game_prefix = "/admin/game/scores/"
+        if parsed.path.startswith(game_prefix):
+            payload = self.read_json()
+            status = payload.get("status") if isinstance(payload, dict) else None
+            try:
+                record_id = int(parsed.path[len(game_prefix):])
+            except ValueError:
+                record_id = 0
+            if not game_scores.set_score_status(record_id, status):
+                self.send_json(422, {"error": "invalid_score_status"})
+                return
+            self.send_json(200, {"ok": True})
+            return
         prefix = "/admin/feedback/"
         if not parsed.path.startswith(prefix):
             self.send_json(404, {"error": "not_found"})
@@ -394,6 +437,17 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
     def do_DELETE(self) -> None:
         parsed = urlparse(self.path)
+        game_prefix = "/admin/game/scores/"
+        if parsed.path.startswith(game_prefix):
+            try:
+                record_id = int(parsed.path[len(game_prefix):])
+            except ValueError:
+                record_id = 0
+            if not game_scores.delete_score(record_id):
+                self.send_json(404, {"error": "not_found"})
+                return
+            self.send_json(200, {"ok": True})
+            return
         resource_prefix = "/admin/resources/"
         if parsed.path.startswith(resource_prefix):
             if not delete_resource(parsed.path[len(resource_prefix):]):
@@ -412,5 +466,6 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    game_scores.init_db()
     print(f"{CONFIG.app_name} API {CONFIG.version} listening on {HOST}:{PORT}", flush=True)
     ThreadingHTTPServer((HOST, PORT), FeedbackHandler).serve_forever()

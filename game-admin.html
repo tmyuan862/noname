@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>排行榜管理 · 梦缘资源站</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/game-admin.css" />
+  </head>
+  <body>
+    <header class="admin-header"><div><span class="admin-mark">梦</span><strong>管理后台</strong></div><nav><a href="admin.html">反馈</a><a href="resources-admin.html">资料库</a><a class="active" href="game-admin.html">排行榜</a><a href="index.html">查看网站</a></nav></header>
+    <main class="admin-shell">
+      <section class="admin-title"><div><p>GAME CONSOLE</p><h1>贪吃蛇排行榜</h1><span>隐藏异常成绩，或恢复误隐藏的记录</span></div><button type="button" data-refresh>刷新数据</button></section>
+      <nav class="status-tabs" aria-label="成绩状态筛选">
+        <button class="active" type="button" data-status="">全部 <span data-count>0</span></button>
+        <button type="button" data-status="visible">公开</button>
+        <button type="button" data-status="hidden">已隐藏</button>
+      </nav>
+      <section class="score-table-wrap" aria-live="polite">
+        <table class="score-table">
+          <thead><tr><th>玩家</th><th>分数</th><th>模式</th><th>难度</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody data-score-list><tr><td colspan="7" class="loading-state">正在读取成绩…</td></tr></tbody>
+        </table>
+      </section>
+    </main>
+    <script src="js/game-admin.js"></script>
+  </body>
+</html>
