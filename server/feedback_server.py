@@ -65,8 +65,11 @@ def clean_resource_content(content: str) -> str:
         content = content.split(marker, 1)[1]
     if "分享到：" in content:
         content = content.split("分享到：", 1)[0]
-    lines = [line.strip() for line in content.splitlines()]
-    return "\n".join(line for line in lines if line).strip()
+    # Official pages often insert layout newlines between short fragments. Keeping
+    # each one makes dates and numbers render vertically in the resource reader.
+    paragraphs = re.split(r"\n\s*\n+", content)
+    cleaned = [re.sub(r"\s+", " ", paragraph).strip() for paragraph in paragraphs]
+    return "\n\n".join(paragraph for paragraph in cleaned if paragraph).strip()
 
 
 def normalize_resource(item: dict) -> dict | None:
@@ -615,7 +618,9 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             if record is None:
                 self.send_json(404, {"error": "not_found"})
                 return
-            self.send_json(200, {"resource": record})
+            public_record = dict(record)
+            public_record["content"] = clean_resource_content(str(record.get("content", "")))
+            self.send_json(200, {"resource": public_record})
             return
         self.send_json(404, {"error": "not_found"})
 

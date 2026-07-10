@@ -155,6 +155,15 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertTrue(response["sources"][0]["url"].startswith("resources.html?open="))
         self.assertIn("七点三十分", response["answer"])
 
+    def test_resource_detail_collapses_official_page_layout_linebreaks(self):
+        source = [{"title": "图书馆施工通知", "url": "https://www.lixin.edu.cn/library.htm", "category": "library", "detail": {"content": "图书馆定于\n2026\n年\n7\n月\n9\n日\n至\n7\n月\n28\n日施工。\n\n请提前安排借阅。"}}]
+        self.request("/admin/resources/import", "POST", {"items": source})
+        _, listing = self.request("/resources")
+        status, detail = self.request("/resources/" + listing["resources"][0]["id"])
+        self.assertEqual(status, 200)
+        self.assertIn("2026 年 7 月 9 日 至 7 月 28 日施工。", detail["resource"]["content"])
+        self.assertNotIn("2026\n年", detail["resource"]["content"])
+
     def test_game_score_session_submission_and_leaderboard(self):
         status, session = self.request("/game/session")
         self.assertEqual(status, 200)
