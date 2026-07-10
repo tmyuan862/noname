@@ -14,13 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
 
@@ -38,7 +38,8 @@ jobs:
 
       - name: Reject committed runtime secrets
         run: |
-          if git grep -nE 'SMTP_PASSWORD=.+|BEGIN (RSA |OPENSSH )?PRIVATE KEY' -- ':!*.example'; then
+          if git grep -nE '(^|[[:space:]])(SMTP_PASSWORD|NOTICE_AI_API_KEY)=.+|BEGIN (RSA |OPENSSH )?PRIVATE KEY' -- \
+            ':!*.example' ':!.github/workflows/ci.yml'; then
             echo "Potential secret committed"
             exit 1
           fi
