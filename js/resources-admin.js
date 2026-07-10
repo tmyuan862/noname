@@ -11,6 +11,8 @@
   var preview = document.querySelector("[data-analysis-preview]");
   var analysisMode = "ai";
   var reformatButton = document.querySelector("[data-reformat-resources]");
+  var webUrl = document.querySelector("[data-web-url]");
+  var analyzeUrlButton = document.querySelector("[data-analyze-url]");
 
   function request(url, options) {
     return fetch(url, options).then(function (response) {
@@ -23,7 +25,19 @@
 
   function setPasteStatus(message, type) {
     pasteStatus.textContent = message;
-    pasteStatus.className = type || "";
+    pasteStatus.className = "paste-status" + (type ? " " + type : "");
+  }
+
+  function fillPreview(draft) {
+    Object.keys(draft).forEach(function (name) {
+      var field = preview.elements.namedItem(name);
+      if (!field) return;
+      field.value = name === "image_urls" && Array.isArray(draft[name])
+        ? draft[name].join("\n")
+        : draft[name] || "";
+    });
+    preview.hidden = false;
+    preview.querySelector('[name="title"]').focus();
   }
 
   function load() {
@@ -72,12 +86,46 @@
     if (text.length < 10) { setPasteStatus("请先粘贴一段完整通知。", "error"); return; }
     analyzeButton.disabled = true; setPasteStatus(analysisMode === "ai" ? "DeepSeek 正在整理内容……" : "正在本地识别标题、日期、部门和分类……");
     request("/api/admin/resources/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: text, mode: analysisMode }) }).then(function (data) {
-      Object.keys(data.draft).forEach(function (name) { var field = preview.elements.namedItem(name); if (field) field.value = data.draft[name] || ""; });
-      preview.hidden = false;
+      fillPreview(data.draft);
       setPasteStatus(data.analysis_mode === "local_fallback" ? data.message : (data.analysis_mode === "ai" ? "AI 增强分析完成，请核对后发布。" : "本地分析完成，请核对后发布。"), data.analysis_mode === "local_fallback" ? "error" : "success");
-      preview.querySelector('[name="title"]').focus();
     }).catch(function (error) { setPasteStatus(error.message || "分析失败，请稍后再试。", "error"); })
       .finally(function () { analyzeButton.disabled = false; });
+  });
+
+  document.querySelectorAll("[data-source-mode]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var mode = button.dataset.sourceMode;
+      document.querySelectorAll("[data-source-mode]").forEach(function (item) { item.classList.toggle("active", item === button); });
+      document.querySelectorAll("[data-source-panel]").forEach(function (panel) { panel.hidden = panel.dataset.sourcePanel !== mode; });
+      setPasteStatus(mode === "url" ? "输入公开网页链接后，系统会抓取正文和图片。" : "粘贴完整通知后再选择分析方式。");
+      (mode === "url" ? webUrl : pasteText).focus();
+    });
+  });
+
+  analyzeUrlButton.addEventListener("click", function () {
+    var url = webUrl.value.trim();
+    if (!/^https?:\/\//i.test(url)) { setPasteStatus("请输入完整的 http 或 https 网页链接。", "error"); return; }
+    analyzeUrlButton.disabled = true;
+    setPasteStatus("正在抓取网页正文和图片，并交给 DeepSeek 整理……");
+    request("/api/admin/resources/analyze-url", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url })
+    }).then(function (data) {
+      fillPreview(data.draft);
+      var selectedCount = Array.isArray(data.draft.image_urls) ? data.draft.image_urls.length : 0;
+      var imageText = selectedCount ? "，已选取 " + selectedCount + " 张图片" : "，未选取图片";
+      setPasteStatus(
+        data.analysis_mode === "ai"
+          ? "网页分析完成" + imageText + "，请核对后发布。"
+          : (data.message || "网页已生成本地草稿") + imageText,
+        data.analysis_mode === "ai" ? "success" : "error"
+      );
+    }).catch(function (error) {
+      setPasteStatus(error.message || "网页抓取失败，请确认链接可以公开访问。", "error");
+    }).finally(function () {
+      analyzeUrlButton.disabled = false;
+    });
   });
 
   document.querySelectorAll("[data-analysis-mode]").forEach(function (button) {
@@ -94,6 +142,10 @@
     var publishButton = preview.querySelector('[type="submit"]'); publishButton.disabled = true; setPasteStatus("正在发布……");
     var draft = {};
     ["title", "category", "publish_date", "department", "url", "content"].forEach(function (name) { draft[name] = preview.elements.namedItem(name).value.trim(); });
+    draft.image_urls = preview.elements.namedItem("image_urls").value
+      .split(/\r?\n/)
+      .map(function (value) { return value.trim(); })
+      .filter(Boolean);
     var target = preview.elements.namedItem("publish_target").value;
     var publishRequest = target === "senior"
       ? request("/api/admin/senior/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: draft.title, body: draft.content }) })

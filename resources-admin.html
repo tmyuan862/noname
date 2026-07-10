@@ -21,9 +21,21 @@
         <p class="upload-status" data-upload-status role="status" aria-live="polite">尚未选择文件</p>
       </section>
       <section class="paste-panel">
-        <div class="paste-heading"><div><strong>智能粘贴录入</strong><p>本地模式不外发内容；AI 增强模式会将通知发送给 DeepSeek 进行结构化整理。</p></div><span>先预览，再发布</span></div>
-        <label class="paste-input"><span>收到的通知内容</span><textarea data-paste-text maxlength="100000" placeholder="把公众号通知、群消息或官网通知全文粘贴到这里……"></textarea></label>
-        <div class="paste-actions"><div class="analysis-mode" aria-label="分析方式"><button type="button" data-analysis-mode="local">本地</button><button class="active" type="button" data-analysis-mode="ai">AI 增强</button></div><button type="button" data-analyze>分析内容</button><p data-paste-status role="status" aria-live="polite">尚未分析</p></div>
+        <div class="paste-heading"><div><strong>智能资料工作台</strong><p>可以粘贴通知全文，也可以直接输入公开网页链接。DeepSeek 只负责结构化整理，发布前仍由你确认。</p></div><span>抓取 → 分析 → 核对 → 发布</span></div>
+        <div class="source-mode" aria-label="资料来源方式">
+          <button class="active" type="button" data-source-mode="text">粘贴文字</button>
+          <button type="button" data-source-mode="url">分析网页</button>
+        </div>
+        <div data-source-panel="text">
+          <label class="paste-input"><span>收到的通知内容</span><textarea data-paste-text maxlength="100000" placeholder="把公众号通知、群消息或官网通知全文粘贴到这里……"></textarea></label>
+          <div class="paste-actions"><div class="analysis-mode" aria-label="分析方式"><button type="button" data-analysis-mode="local">本地</button><button class="active" type="button" data-analysis-mode="ai">AI 增强</button></div><button type="button" data-analyze>分析内容</button></div>
+        </div>
+        <div class="web-source-panel" data-source-panel="url" hidden>
+          <label class="web-source-input"><span>公开网页链接</span><input type="url" data-web-url placeholder="https://学校官网或公开文章链接" /></label>
+          <div class="web-source-note"><strong>自动处理</strong><span>抓取网页标题、正文和图片，交给 DeepSeek 分类、摘要并挑选有用图片。</span></div>
+          <button type="button" data-analyze-url>抓取并分析网页</button>
+        </div>
+        <p class="paste-status" data-paste-status role="status" aria-live="polite">尚未分析</p>
         <form class="analysis-preview" data-analysis-preview hidden>
           <div class="preview-head"><strong>识别结果</strong><span>发布前请核对，带 * 的字段必须填写</span></div>
           <label class="wide"><span>发布目标 *</span><select name="publish_target" required><option value="resources">校园资料库</option><option value="senior">学长学姐说 · 梦缘校园整理员</option></select></label>
@@ -32,6 +44,7 @@
           <label><span>发布日期</span><input name="publish_date" type="date" /></label>
           <label class="wide"><span>发布部门</span><input name="department" maxlength="120" placeholder="例如：后勤保障处" /></label>
           <label class="wide"><span>官网原文链接 *</span><input name="url" type="url" maxlength="1000" required placeholder="https://… 没有信源链接时不能发布" /></label>
+          <label class="wide"><span>网页图片</span><textarea name="image_urls" rows="4" placeholder="每行一个图片链接；网页分析后会自动填入，可删减。"></textarea></label>
           <label class="wide"><span>正文 *</span><textarea name="content" maxlength="100000" required></textarea></label>
           <div class="preview-actions wide"><button type="button" data-cancel-analysis>取消</button><button class="publish-button" type="submit">确认发布</button></div>
         </form>

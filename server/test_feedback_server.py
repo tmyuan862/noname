@@ -408,6 +408,74 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(response["draft"]["url"], "https://www.lixin.edu.cn/source.htm")
         self.assertEqual(response["draft"]["publish_date"], "2026-07-10")
 
+    def test_webpage_analysis_extracts_content_and_images_with_ai(self):
+        html = """
+        <html><head><title>2026 秋季校车安排</title></head><body>
+        <article>
+          <h1>关于 2026 秋季校车安排的通知</h1>
+          <p>发布时间：2026-09-01</p>
+          <p>后勤保障处</p>
+          <p>浦东校区至松江校区校车将于工作日 7:30 发车。</p>
+          <img src="https://www.lixin.edu.cn/images/bus-map.jpg" />
+          <img src="/images/bus-table.png" />
+        </article>
+        </body></html>
+        """
+        ai_payload = {"choices": [{"message": {"content": json.dumps({
+            "title": "2026 秋季校车安排",
+            "category": "transportation",
+            "summary": "工作日 7:30 发车，建议提前候车。",
+            "content": "工作日 7:30 从浦东校区发车，具体线路见配图。",
+            "publish_date": "2026-09-01",
+            "department": "后勤保障处",
+            "picked_image_urls": [
+                "https://www.lixin.edu.cn/images/bus-map.jpg",
+                "https://www.lixin.edu.cn/images/bus-table.png",
+            ],
+        }, ensure_ascii=False)}}]}
+
+        class FakeWebResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self, *_): return html.encode("utf-8")
+            def geturl(self): return "https://www.lixin.edu.cn/bus-2026.html"
+            @property
+            def headers(self): return {"Content-Type": "text/html; charset=utf-8"}
+
+        class FakeAiResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self): return json.dumps(ai_payload, ensure_ascii=False).encode("utf-8")
+
+        ai_config = SimpleNamespace(notice_ai_enabled=True, notice_ai_api_key="test-key", notice_ai_base_url="https://api.deepseek.com", notice_ai_model="deepseek-chat")
+        with mock.patch("feedback_server.is_private_hostname", return_value=False), \
+             mock.patch("feedback_server.WEB_URLOPEN", return_value=FakeWebResponse()), \
+             mock.patch("feedback_server.AI_URLOPEN", return_value=FakeAiResponse()), \
+             mock.patch("feedback_server.CONFIG", ai_config):
+            status, response = self.request("/admin/resources/analyze-url", "POST", {"url": "https://www.lixin.edu.cn/bus-2026.html"})
+        self.assertEqual(status, 200)
+        self.assertEqual(response["analysis_mode"], "ai")
+        self.assertEqual(response["draft"]["category"], "transportation")
+        self.assertEqual(len(response["draft"]["image_urls"]), 2)
+        self.assertTrue(response["draft"]["image_urls"][1].endswith("/images/bus-table.png"))
+
+    def test_resource_import_preserves_image_urls(self):
+        source = [{
+            "title": "校车路线图",
+            "url": "https://www.lixin.edu.cn/bus-gallery.htm",
+            "category": "transportation",
+            "content": "校车路线图与时刻表。",
+            "image_urls": [
+                "https://www.lixin.edu.cn/images/route.jpg",
+                "https://www.lixin.edu.cn/images/time.png",
+            ],
+        }]
+        self.request("/admin/resources/import", "POST", {"items": source})
+        _, listing = self.request("/resources")
+        status, detail = self.request("/resources/" + listing["resources"][0]["id"])
+        self.assertEqual(status, 200)
+        self.assertEqual(len(detail["resource"]["image_urls"]), 2)
+
     def test_event_misclassified_as_safety_is_recategorized(self):
         source = [{
             "title": "校园主题发布会通知",

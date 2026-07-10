@@ -61,7 +61,17 @@
       var source = document.createElement("p"); source.className = "detail-source"; source.textContent = "来源：" + (resource.department || "学校官网");
       var body = document.createElement("div"); body.className = "detail-body"; body.textContent = resource.content;
       var link = document.createElement("a"); link.className = "original-link"; link.href = resource.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "查看学校官网原文";
-      box.append(top, title, source, body, link); detail.appendChild(box);
+      box.append(top, title, source);
+      if (Array.isArray(resource.image_urls) && resource.image_urls.length) {
+        var gallery = document.createElement("div"); gallery.className = "detail-gallery";
+        resource.image_urls.forEach(function (url, index) {
+          var imageLink = document.createElement("a"); imageLink.href = url; imageLink.target = "_blank"; imageLink.rel = "noopener noreferrer";
+          var image = document.createElement("img"); image.src = url; image.alt = resource.title + " 配图 " + (index + 1); image.loading = "lazy"; image.referrerPolicy = "no-referrer";
+          imageLink.appendChild(image); gallery.appendChild(imageLink);
+        });
+        box.appendChild(gallery);
+      }
+      box.append(body, link); detail.appendChild(box);
       document.querySelectorAll(".notice-card").forEach(function (item) { item.classList.remove("active"); }); if (card) card.classList.add("active");
     }).catch(function (error) {
       detail.innerHTML = '<div class="detail-empty"><span>暂时无法打开</span><p></p></div>';
