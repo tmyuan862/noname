@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import smtplib
 import threading
@@ -21,7 +22,9 @@ HOST = "127.0.0.1"
 PORT = int(os.environ.get("FEEDBACK_PORT", "8787"))
 DATA_DIR = Path(os.environ.get("FEEDBACK_DATA_DIR", "/var/lib/zero-share"))
 DATA_FILE = DATA_DIR / "feedback.jsonl"
+RESOURCE_FILE = DATA_DIR / "resources.json"
 MAX_BODY_BYTES = 4096
+MAX_RESOURCE_BODY_BYTES = 2 * 1024 * 1024
 MAX_MESSAGE_LENGTH = 1000
 MIN_MESSAGE_LENGTH = 5
 RATE_LIMIT = 5
@@ -30,8 +33,97 @@ ALLOWED_CATEGORIES = {"建议", "问题", "内容纠错", "想要的新功能", 
 ALLOWED_STATUSES = {"new", "processing", "done"}
 
 data_lock = threading.Lock()
+resource_lock = threading.Lock()
 rate_lock = threading.Lock()
 request_times: dict[str, deque[float]] = defaultdict(deque)
+
+
+def clean_resource_content(content: str) -> str:
+    content = content.replace("\r\n", "\n").replace("\r", "\n")
+    marker = "点击率："
+    if marker in content:
+        content = content.split(marker, 1)[1]
+    if "分享到：" in content:
+        content = content.split("分享到：", 1)[0]
+    lines = [line.strip() for line in content.splitlines()]
+    return "\n".join(line for line in lines if line).strip()
+
+
+def normalize_resource(item: dict) -> dict | None:
+    if not isinstance(item, dict):
+        return None
+    detail = item.get("detail") if isinstance(item.get("detail"), dict) else {}
+    title = str(item.get("title", "")).strip()[:300]
+    url = str(item.get("url", "")).strip()[:1000]
+    category = str(item.get("category", "other")).strip()[:80]
+    content = clean_resource_content(str(detail.get("content", "")))[:100000]
+    if not title or not content or not url.startswith(("https://", "http://")):
+        return None
+    return {
+        "id": hashlib.sha256(url.encode("utf-8")).hexdigest()[:20],
+        "title": title,
+        "url": url,
+        "category": category,
+        "content": content,
+        "summary": content[:180] + ("…" if len(content) > 180 else ""),
+        "publish_date": str(detail.get("publish_date", "")).strip()[:20],
+        "department": str(detail.get("department", "")).strip()[:120],
+        "crawl_time": str(item.get("crawl_time", detail.get("crawl_time", ""))).strip()[:40],
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def load_resources() -> list[dict]:
+    if not RESOURCE_FILE.exists():
+        return []
+    try:
+        payload = json.loads(RESOURCE_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    return payload if isinstance(payload, list) else []
+
+
+def write_resources(records: list[dict]) -> None:
+    DATA_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
+    temporary = RESOURCE_FILE.with_suffix(".tmp")
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            json.dump(records, handle, ensure_ascii=False, separators=(",", ":"))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, RESOURCE_FILE)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def import_resources(items: list) -> dict:
+    with resource_lock:
+        existing = {record["url"]: record for record in load_resources() if record.get("url")}
+        inserted = updated = skipped = 0
+        for item in items:
+            normalized = normalize_resource(item)
+            if normalized is None:
+                skipped += 1
+                continue
+            if normalized["url"] in existing:
+                updated += 1
+            else:
+                inserted += 1
+            existing[normalized["url"]] = normalized
+        records = sorted(existing.values(), key=lambda record: record.get("publish_date", ""), reverse=True)
+        write_resources(records)
+    return {"inserted": inserted, "updated": updated, "skipped": skipped, "total": len(records)}
+
+
+def delete_resource(record_id: str) -> bool:
+    with resource_lock:
+        records = load_resources()
+        remaining = [record for record in records if record.get("id") != record_id]
+        if len(records) == len(remaining):
+            return False
+        write_resources(remaining)
+        return True
 
 
 def client_key(handler: BaseHTTPRequestHandler) -> str:
@@ -161,18 +253,18 @@ class FeedbackHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def read_json(self) -> dict | None:
+    def read_json(self, max_bytes: int = MAX_BODY_BYTES) -> dict | list | None:
         try:
             length = int(self.headers.get("Content-Length", "0"))
         except ValueError:
             length = 0
-        if length <= 0 or length > MAX_BODY_BYTES:
+        if length <= 0 or length > max_bytes:
             return None
         try:
             payload = json.loads(self.rfile.read(length).decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError):
             return None
-        return payload if isinstance(payload, dict) else None
+        return payload if isinstance(payload, (dict, list)) else None
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
@@ -188,9 +280,49 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             records.sort(key=lambda item: item.get("created_at", ""), reverse=True)
             self.send_json(200, {"feedback": records, "count": len(records)})
             return
+        if parsed.path == "/resources":
+            query = parse_qs(parsed.query)
+            category = query.get("category", [""])[0].strip()
+            keyword = query.get("q", [""])[0].strip().casefold()[:100]
+            with resource_lock:
+                records = load_resources()
+            categories: dict[str, int] = {}
+            for record in records:
+                key = record.get("category", "other")
+                categories[key] = categories.get(key, 0) + 1
+            if category:
+                records = [record for record in records if record.get("category") == category]
+            if keyword:
+                records = [record for record in records if keyword in f"{record.get('title', '')} {record.get('summary', '')}".casefold()]
+            public_records = [{key: value for key, value in record.items() if key != "content"} for record in records]
+            self.send_json(200, {"resources": public_records, "count": len(public_records), "categories": categories})
+            return
+        resource_prefix = "/resources/"
+        if parsed.path.startswith(resource_prefix):
+            record_id = parsed.path[len(resource_prefix):]
+            with resource_lock:
+                record = next((item for item in load_resources() if item.get("id") == record_id), None)
+            if record is None:
+                self.send_json(404, {"error": "not_found"})
+                return
+            self.send_json(200, {"resource": record})
+            return
         self.send_json(404, {"error": "not_found"})
 
     def do_POST(self) -> None:
+        if self.path == "/admin/resources/import":
+            payload = self.read_json(MAX_RESOURCE_BODY_BYTES)
+            items = payload.get("items") if isinstance(payload, dict) else payload
+            if not isinstance(items, list) or len(items) > 500:
+                self.send_json(422, {"error": "invalid_resources", "message": "JSON 必须是资料数组，且不超过 500 条。"})
+                return
+            try:
+                result = import_resources(items)
+            except OSError:
+                self.send_json(500, {"error": "storage", "message": "资料暂时无法保存。"})
+                return
+            self.send_json(200, {"ok": True, **result})
+            return
         if self.path != "/feedback":
             self.send_json(404, {"error": "not_found"})
             return
@@ -198,7 +330,7 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             self.send_json(415, {"error": "content_type", "message": "请使用正确的提交格式。"})
             return
         payload = self.read_json()
-        if payload is None:
+        if not isinstance(payload, dict):
             self.send_json(400, {"error": "invalid_request", "message": "反馈格式不正确。"})
             return
         if payload.get("website"):
@@ -234,7 +366,7 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "not_found"})
             return
         payload = self.read_json()
-        status = payload.get("status") if payload else None
+        status = payload.get("status") if isinstance(payload, dict) else None
         if status not in ALLOWED_STATUSES:
             self.send_json(422, {"error": "status"})
             return
@@ -245,6 +377,13 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
     def do_DELETE(self) -> None:
         parsed = urlparse(self.path)
+        resource_prefix = "/admin/resources/"
+        if parsed.path.startswith(resource_prefix):
+            if not delete_resource(parsed.path[len(resource_prefix):]):
+                self.send_json(404, {"error": "not_found"})
+                return
+            self.send_json(200, {"ok": True})
+            return
         prefix = "/admin/feedback/"
         if not parsed.path.startswith(prefix) or not delete_feedback(parsed.path[len(prefix):]):
             self.send_json(404, {"error": "not_found"})

@@ -4,6 +4,7 @@ import threading
 import unittest
 import urllib.error
 import urllib.request
+from urllib.parse import quote
 from pathlib import Path
 
 import feedback_server as api
@@ -14,6 +15,7 @@ class FeedbackApiTests(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         api.DATA_DIR = Path(self.temp_dir.name)
         api.DATA_FILE = api.DATA_DIR / "feedback.jsonl"
+        api.RESOURCE_FILE = api.DATA_DIR / "resources.json"
         api.request_times.clear()
         self.server = api.ThreadingHTTPServer(("127.0.0.1", 0), api.FeedbackHandler)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
@@ -100,6 +102,38 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         _, empty = self.request("/admin/feedback")
         self.assertEqual(empty["count"], 0)
+
+    def test_resources_can_be_imported_searched_and_deleted(self):
+        source = [{
+            "title": "关于校车安排的通知",
+            "url": "https://www.lixin.edu.cn/example.htm",
+            "category": "transportation",
+            "detail": {
+                "content": "学校导航\n点击率：\n校车每天七点三十分发车。\n分享到：",
+                "publish_date": "2026-07-10",
+                "department": "后勤保障处",
+            },
+        }]
+        status, imported = self.request("/admin/resources/import", "POST", {"items": source})
+        self.assertEqual(status, 200)
+        self.assertEqual(imported["inserted"], 1)
+
+        _, listing = self.request("/resources?q=" + quote("校车"))
+        self.assertEqual(listing["count"], 1)
+        resource_id = listing["resources"][0]["id"]
+        self.assertNotIn("content", listing["resources"][0])
+
+        _, detail = self.request(f"/resources/{resource_id}")
+        self.assertEqual(detail["resource"]["content"], "校车每天七点三十分发车。")
+
+        status, _ = self.request(f"/admin/resources/{resource_id}", "DELETE")
+        self.assertEqual(status, 200)
+        _, empty = self.request("/resources")
+        self.assertEqual(empty["count"], 0)
+
+    def test_resource_import_rejects_non_array(self):
+        status, _ = self.request("/admin/resources/import", "POST", {"items": "not-a-list"})
+        self.assertEqual(status, 422)
 
 
 if __name__ == "__main__":

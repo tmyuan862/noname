@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>资料库管理 · 零号共享站</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/resources-admin.css" />
+  </head>
+  <body>
+    <header class="admin-header"><div><span class="admin-mark">0</span><strong>管理后台</strong></div><nav><a href="admin.html">反馈</a><a class="active" href="resources-admin.html">资料库</a><a href="resources.html">查看资料库</a></nav></header>
+    <main class="admin-shell">
+      <section class="admin-title"><div><p>CONTENT CONSOLE</p><h1>学生资料库</h1><span>上传 JSON 后按原文链接自动新增或覆盖</span></div><button type="button" data-refresh>刷新数据</button></section>
+      <section class="upload-panel">
+        <div><strong>导入资料</strong><p>支持原资料库中的 JSON 数组文件；单次最多 500 条、2MB。</p></div>
+        <label class="file-picker"><input type="file" accept="application/json,.json" multiple data-file-input /><span>选择 JSON 文件</span></label>
+        <button class="import-button" type="button" data-import disabled>开始导入</button>
+        <p class="upload-status" data-upload-status role="status" aria-live="polite">尚未选择文件</p>
+      </section>
+      <section class="resource-admin-section">
+        <div class="resource-admin-head"><strong>已发布资料</strong><span data-resource-count>0 条</span></div>
+        <div class="admin-resource-list" data-admin-resources><p class="loading-state">正在读取资料……</p></div>
+      </section>
+    </main>
+    <template id="admin-resource-template"><article class="admin-resource-item"><div><span data-category></span><time data-date></time></div><h2 data-title></h2><a data-source target="_blank" rel="noopener noreferrer">原文</a><button type="button" data-delete>删除</button></article></template>
+    <script src="js/resources-admin.js"></script>
+  </body>
+</html>
