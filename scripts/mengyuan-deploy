@@ -47,8 +47,14 @@ for module in "$REPO_DIR"/server/*.py; do
   install -m "$mode" "$module" "$release_dir/$(basename "$module")"
 done
 install -d -m 0755 "$release_dir/site"
-for page in index.html campus.html resources.html senior.html privacy.html; do
-  install -m 0644 "$REPO_DIR/$page" "$release_dir/site/$page"
+shopt -s nullglob
+for page in "$REPO_DIR"/*.html; do
+  install -m 0644 "$page" "$release_dir/site/$(basename "$page")"
+done
+for asset_dir in assets css data games js; do
+  if [[ -d "$REPO_DIR/$asset_dir" ]]; then
+    cp -a "$REPO_DIR/$asset_dir" "$release_dir/site/"
+  fi
 done
 
 ln -sfn "$release_dir" "$CURRENT_LINK"
