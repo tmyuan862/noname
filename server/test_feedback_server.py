@@ -65,6 +65,13 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(record["message"], "希望增加校园打印店的位置。")
         self.assertNotIn("ip", record)
 
+    def test_health_reports_platform_status(self):
+        status, health = self.request("/health")
+        self.assertEqual(status, 200)
+        self.assertEqual(health["app"], "梦缘资源站")
+        self.assertIn("resources", health["counts"])
+        self.assertFalse(health["email_enabled"])
+
     def test_invalid_category_is_rejected(self):
         status, _ = self.post({"category": "管理员", "message": "这是一条足够长的反馈", "website": ""})
         self.assertEqual(status, 422)

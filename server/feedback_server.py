@@ -17,10 +17,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from app_config import CONFIG
 
-HOST = "127.0.0.1"
-PORT = int(os.environ.get("FEEDBACK_PORT", "8787"))
-DATA_DIR = Path(os.environ.get("FEEDBACK_DATA_DIR", "/var/lib/zero-share"))
+
+HOST = CONFIG.host
+PORT = CONFIG.port
+DATA_DIR = CONFIG.data_dir
 DATA_FILE = DATA_DIR / "feedback.jsonl"
 RESOURCE_FILE = DATA_DIR / "resources.json"
 MAX_BODY_BYTES = 4096
@@ -217,10 +219,10 @@ def delete_feedback(record_id: str) -> bool:
 
 
 def send_notification(record: dict) -> None:
-    host = os.environ.get("SMTP_HOST", "").strip()
-    username = os.environ.get("SMTP_USERNAME", "").strip()
-    password = os.environ.get("SMTP_PASSWORD", "")
-    recipient = os.environ.get("SMTP_RECIPIENT", "").strip()
+    host = CONFIG.smtp_host
+    username = CONFIG.smtp_username
+    password = CONFIG.smtp_password
+    recipient = CONFIG.smtp_recipient
     if not all((host, username, password, recipient)):
         return
     try:
@@ -234,8 +236,7 @@ def send_notification(record: dict) -> None:
             f"反馈编号：{record['id']}\n\n"
             f"{record['message']}\n"
         )
-        port = int(os.environ.get("SMTP_PORT", "465"))
-        with smtplib.SMTP_SSL(host, port, timeout=10) as smtp:
+        with smtplib.SMTP_SSL(host, CONFIG.smtp_port, timeout=10) as smtp:
             smtp.login(username, password)
             smtp.send_message(message)
     except (OSError, smtplib.SMTPException, ValueError) as error:
@@ -271,7 +272,21 @@ class FeedbackHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/health":
-            self.send_json(200, {"status": "ok"})
+            with data_lock:
+                feedback_count = len(load_feedback())
+            with resource_lock:
+                resources = load_resources()
+            self.send_json(200, {
+                "status": "ok",
+                "app": CONFIG.app_name,
+                "version": CONFIG.version,
+                "email_enabled": CONFIG.email_enabled,
+                "counts": {
+                    "feedback": feedback_count,
+                    "resources": len(resources),
+                    "resource_categories": len({item.get("category") for item in resources}),
+                },
+            })
             return
         if parsed.path == "/admin/feedback":
             status_filter = parse_qs(parsed.query).get("status", [""])[0]
@@ -397,4 +412,5 @@ class FeedbackHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    print(f"{CONFIG.app_name} API {CONFIG.version} listening on {HOST}:{PORT}", flush=True)
     ThreadingHTTPServer((HOST, PORT), FeedbackHandler).serve_forever()
