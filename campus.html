@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="校园生存指南：校车、食堂、地图、选课评价和校内资讯。" />
+    <title>校园生存指南 · 零号共享站</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/campus.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="campus-header">
+      <a class="campus-brand" href="index.html" aria-label="返回零号共享站首页">
+        <span class="brand-mark" aria-hidden="true">0</span>
+        <span>零号共享站</span>
+      </a>
+      <nav aria-label="页面导航">
+        <a href="#life">校园生活</a>
+        <a href="#courses">选课评价</a>
+        <a href="#news">校内资讯</a>
+      </nav>
+      <a class="back-link" href="index.html"><i data-lucide="arrow-left" aria-hidden="true"></i> 返回首页</a>
+    </header>
+
+    <main id="main-content">
+      <section class="campus-hero">
+        <img src="assets/campus.jpg" alt="绿树环绕的大学校园建筑" />
+        <div class="hero-overlay" aria-hidden="true"></div>
+        <div class="hero-content">
+          <p class="eyebrow">由同学一起补全的校园说明书</p>
+          <h1>校园生存指南</h1>
+          <p>少走一点弯路，多知道一点校园里真正有用的事。</p>
+          <label class="campus-search">
+            <i data-lucide="search" aria-hidden="true"></i>
+            <span class="sr-only">搜索校园信息</span>
+            <input type="search" placeholder="搜索校车、食堂、老师或地点" />
+            <kbd>搜索</kbd>
+          </label>
+        </div>
+      </section>
+
+      <section class="quick-nav page-shell" aria-label="校园信息分类">
+        <a href="#bus"><span class="quick-icon green"><i data-lucide="bus-front" aria-hidden="true"></i></span><strong>校车时刻</strong><small>路线与发车时间</small></a>
+        <a href="#canteen"><span class="quick-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><strong>食堂指南</strong><small>位置与窗口推荐</small></a>
+        <a href="#map"><span class="quick-icon blue"><i data-lucide="map" aria-hidden="true"></i></span><strong>校园地图</strong><small>教学楼与生活设施</small></a>
+        <a href="#courses"><span class="quick-icon yellow"><i data-lucide="messages-square" aria-hidden="true"></i></span><strong>选课评价</strong><small>课程体验与建议</small></a>
+      </section>
+
+      <section class="page-section page-shell" id="life" aria-labelledby="life-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">Daily Campus</p><h2 id="life-title">在校园，先解决这些事</h2></div>
+          <span class="data-note"><i data-lucide="info" aria-hidden="true"></i> 内容等待真实校园资料补充</span>
+        </div>
+        <div class="life-grid">
+          <article class="info-card bus-card" id="bus">
+            <div class="card-top"><span class="card-icon"><i data-lucide="bus-front" aria-hidden="true"></i></span><span class="update-label">待更新</span></div>
+            <h3>校车时刻与路线</h3>
+            <p>按校区和方向整理发车时间、上车地点、节假日调整与末班车提醒。</p>
+            <div class="empty-data"><i data-lucide="clock-3" aria-hidden="true"></i><span>提供学校和校车信息后即可补全</span></div>
+          </article>
+          <article class="info-card" id="canteen">
+            <div class="card-top"><span class="card-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><span class="update-label">待更新</span></div>
+            <h3>今天去哪个食堂？</h3>
+            <p>食堂位置、营业时间、特色窗口、价格区间，以及同学们反复回购的菜品。</p>
+            <ul class="placeholder-list"><li><span>食堂位置与楼层</span><b>待补充</b></li><li><span>热门窗口推荐</span><b>待补充</b></li><li><span>夜宵开放时间</span><b>待补充</b></li></ul>
+          </article>
+          <article class="info-card map-card" id="map">
+            <div class="card-top"><span class="card-icon blue"><i data-lucide="map" aria-hidden="true"></i></span><span class="update-label">规划中</span></div>
+            <h3>一张真正好用的地图</h3>
+            <p>不只标教学楼，还会收录打印店、快递点、自习室、医务室和那些容易迷路的入口。</p>
+            <div class="map-placeholder" aria-hidden="true"><span></span><span></span><span></span><i data-lucide="map-pin"></i></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="course-section" id="courses" aria-labelledby="courses-title">
+        <div class="page-shell">
+          <div class="section-heading light-heading">
+            <div><p class="eyebrow">Course Radar</p><h2 id="courses-title">选课雷达</h2><p class="section-intro">关注教学方式、课程收获和考核体验，不做人身攻击，让每一条评价都真正帮到下一位同学。</p></div>
+            <button class="outline-button" type="button" disabled title="评价功能将在动态网站阶段开放"><i data-lucide="pen-line" aria-hidden="true"></i> 分享课程体验</button>
+          </div>
+          <div class="course-layout">
+            <article class="course-principles">
+              <span class="big-number">01</span>
+              <h3>评价什么？</h3>
+              <ul><li><i data-lucide="check" aria-hidden="true"></i> 教学是否清晰、有准备</li><li><i data-lucide="check" aria-hidden="true"></i> 课程内容与实际收获</li><li><i data-lucide="check" aria-hidden="true"></i> 作业、考勤与考核方式</li><li><i data-lucide="shield-check" aria-hidden="true"></i> 只谈课程体验，保护个人信息</li></ul>
+            </article>
+            <div class="course-preview">
+              <div class="preview-head"><span>课程评价示例结构</span><span>尚无真实数据</span></div>
+              <article class="teacher-row"><div class="avatar">课</div><div><h3>课程名称 · 教师姓名</h3><p>课程类型 · 开课学院</p></div><div class="rating"><strong>—</strong><span>综合评价</span></div></article>
+              <div class="rating-grid"><span><small>讲课清晰</small><strong>—</strong></span><span><small>课程收获</small><strong>—</strong></span><span><small>考核压力</small><strong>—</strong></span></div>
+              <p class="preview-note">收到学校、课程与老师信息后，这里会变成可浏览和筛选的真实评价列表。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section page-shell" id="news" aria-labelledby="news-title">
+        <div class="section-heading"><div><p class="eyebrow">Campus Feed</p><h2 id="news-title">校内资讯</h2></div></div>
+        <div class="news-grid">
+          <article><span>通知</span><h3>校历、放假与重要时间节点</h3><p>整理选课、考试、放假、返校等容易错过的时间信息。</p></article>
+          <article><span>生活</span><h3>校园服务变更</h3><p>食堂、图书馆、快递点和公共设施的临时调整。</p></article>
+          <article><span>活动</span><h3>讲座、比赛与社团活动</h3><p>把值得参加的校内活动放在一个地方，不再依赖群消息。</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="campus-footer"><div class="page-shell"><strong>校园生存指南</strong><span>信息来自同学，也服务于同学。</span><a href="index.html">零号共享站</a></div></footer>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>if (window.lucide) window.lucide.createIcons({ strokeWidth: 1.8 });</script>
+  </body>
+</html>
