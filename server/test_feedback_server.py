@@ -117,6 +117,17 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(public["count"], 1)
         self.assertEqual(public["posts"][0]["display_name"], "计算机学院学姐")
 
+    def test_admin_workspace_can_publish_with_dedicated_editor_identity(self):
+        status, result = self.request("/admin/senior/import", "POST", {
+            "title": "新生入学前需要准备什么",
+            "body": "根据公开校园资料整理，新生应提前确认报到时间、校区地址和需要携带的材料。",
+        })
+        self.assertEqual(status, 201)
+        self.assertEqual(result["post"]["display_name"], senior_voice.EDITOR_DISPLAY_NAME)
+        _, public = self.request("/senior/posts")
+        self.assertEqual(public["count"], 1)
+        self.assertEqual(public["posts"][0]["display_name"], "梦缘校园整理员")
+
     def test_health_reports_platform_status(self):
         status, health = self.request("/health")
         self.assertEqual(status, 200)

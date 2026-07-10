@@ -26,6 +26,7 @@
         <div class="paste-actions"><div class="analysis-mode" aria-label="分析方式"><button type="button" data-analysis-mode="local">本地</button><button class="active" type="button" data-analysis-mode="ai">AI 增强</button></div><button type="button" data-analyze>分析内容</button><p data-paste-status role="status" aria-live="polite">尚未分析</p></div>
         <form class="analysis-preview" data-analysis-preview hidden>
           <div class="preview-head"><strong>识别结果</strong><span>发布前请核对，带 * 的字段必须填写</span></div>
+          <label class="wide"><span>发布目标 *</span><select name="publish_target" required><option value="resources">校园资料库</option><option value="senior">学长学姐说 · 梦缘校园整理员</option></select></label>
           <label class="wide"><span>标题 *</span><input name="title" maxlength="300" required /></label>
           <label><span>分类 *</span><select name="category" required><option value="activity_competition">活动竞赛</option><option value="course_selection">选课通知</option><option value="exchange">交流交换</option><option value="fees">费用缴纳</option><option value="holiday">假期安排</option><option value="library">图书馆</option><option value="registration">报到注册</option><option value="safety">安全提示</option><option value="transportation">校园交通</option><option value="other">其他</option></select></label>
           <label><span>发布日期</span><input name="publish_date" type="date" /></label>

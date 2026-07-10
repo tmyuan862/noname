@@ -15,6 +15,8 @@ from app_config import CONFIG
 DB_FILE = CONFIG.data_dir / "senior_voice.sqlite3"
 POST_STATUSES = {"pending", "published", "hidden"}
 SESSION_HOURS = 24
+EDITOR_USERNAME = "campus_editor"
+EDITOR_DISPLAY_NAME = "梦缘校园整理员"
 
 
 def now_iso() -> str:
@@ -161,6 +163,32 @@ def create_post(author_id: int, title: object, body: object) -> tuple[dict | Non
         cursor = database.execute("INSERT INTO senior_posts(author_id,title,body,created_at,updated_at) VALUES(?,?,?,?,?)", (author_id, title, body, created, created))
         database.commit()
         return {"id": cursor.lastrowid, "title": title, "body": body, "status": "pending", "created_at": created}, ""
+
+
+def create_editor_post(title: object, body: object) -> tuple[dict | None, str]:
+    title = str(title or "").strip()[:120]
+    body = str(body or "").strip()[:10000]
+    if not 4 <= len(title) <= 120 or not 20 <= len(body) <= 10000:
+        return None, "标题需为 4—120 字，正文需为 20—10000 字。"
+    created = now_iso()
+    with closing(connect()) as database:
+        author = database.execute("SELECT id FROM senior_authors WHERE username=?", (EDITOR_USERNAME,)).fetchone()
+        if author is None:
+            password_hash, salt = hash_password(secrets.token_urlsafe(48))
+            cursor = database.execute(
+                "INSERT INTO senior_authors(username,display_name,password_hash,password_salt,must_change_password,active,created_at) VALUES(?,?,?,?,0,0,?)",
+                (EDITOR_USERNAME, EDITOR_DISPLAY_NAME, password_hash, salt, created),
+            )
+            author_id = cursor.lastrowid
+        else:
+            author_id = author["id"]
+            database.execute("UPDATE senior_authors SET display_name=?, active=0 WHERE id=?", (EDITOR_DISPLAY_NAME, author_id))
+        cursor = database.execute(
+            "INSERT INTO senior_posts(author_id,title,body,status,created_at,updated_at,published_at) VALUES(?,?,?,'published',?,?,?)",
+            (author_id, title, body, created, created, created),
+        )
+        database.commit()
+        return {"id": cursor.lastrowid, "title": title, "body": body, "status": "published", "display_name": EDITOR_DISPLAY_NAME}, ""
 
 
 def public_posts(page: int = 1, page_size: int = 8) -> dict:

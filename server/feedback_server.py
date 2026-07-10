@@ -604,6 +604,11 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             author, message = senior_voice.create_author(payload.get("username") if isinstance(payload, dict) else None, payload.get("display_name") if isinstance(payload, dict) else None, payload.get("password") if isinstance(payload, dict) else None)
             if author is None: self.send_json(422, {"error": "invalid_author", "message": message}); return
             self.send_json(201, {"ok": True, "author": author}); return
+        if self.path == "/admin/senior/import":
+            payload = self.read_json(16 * 1024)
+            post, message = senior_voice.create_editor_post(payload.get("title") if isinstance(payload, dict) else None, payload.get("body") if isinstance(payload, dict) else None)
+            if post is None: self.send_json(422, {"error": "invalid_post", "message": message}); return
+            self.send_json(201, {"ok": True, "post": post}); return
         if self.path == "/game/scores":
             payload = self.read_json()
             if not isinstance(payload, dict):

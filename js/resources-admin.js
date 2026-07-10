@@ -93,9 +93,13 @@
     var publishButton = preview.querySelector('[type="submit"]'); publishButton.disabled = true; setPasteStatus("正在发布……");
     var draft = {};
     ["title", "category", "publish_date", "department", "url", "content"].forEach(function (name) { draft[name] = preview.elements.namedItem(name).value.trim(); });
-    request("/api/admin/resources/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: [draft] }) }).then(function (result) {
-      if (!result.inserted && !result.updated) throw new Error("资料未通过校验，请检查标题、正文和官网链接。");
-      setPasteStatus(result.inserted ? "已发布一条新资料。" : "已更新相同信源的资料。", "success");
+    var target = preview.elements.namedItem("publish_target").value;
+    var publishRequest = target === "senior"
+      ? request("/api/admin/senior/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: draft.title, body: draft.content }) })
+      : request("/api/admin/resources/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: [draft] }) });
+    publishRequest.then(function (result) {
+      if (target === "resources" && !result.inserted && !result.updated) throw new Error("资料未通过校验，请检查标题、正文和官网链接。");
+      setPasteStatus(target === "senior" ? "已使用“梦缘校园整理员”发布到学长学姐说。" : (result.inserted ? "已发布一条新资料。" : "已更新相同信源的资料。"), "success");
       pasteText.value = ""; preview.reset(); preview.hidden = true; load();
     }).catch(function (error) { setPasteStatus(error.message || "发布失败。", "error"); })
       .finally(function () { publishButton.disabled = false; });
