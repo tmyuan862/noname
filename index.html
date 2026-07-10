@@ -3,68 +3,196 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zero to Tech · 个人主页</title>
+    <meta name="description" content="零号共享站：发现小游戏、学习资料和有意思的数字内容。" />
+    <title>零号共享站</title>
+    <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="css/reset.css" />
-    <link rel="stylesheet" href="css/variables.css" />
-    <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/hero.css" />
-    <link rel="stylesheet" href="css/nav.css" />
-    <link rel="stylesheet" href="css/cards.css" />
-    <link rel="stylesheet" href="css/lab.css" />
-    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/home.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <div class="page-shell">
-        <main class="page-content">
-          <section class="dashboard-grid">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
 
-            <!-- ↓↓↓ 顶部 hero：品牌 + 导航 + 大标题 + 副标题 ↓↓↓ -->
-            <!-- 这一整块在 text-lab.html 里几乎一字不差地又抄了一遍 -->
-            <article class="hero-stage panel-full">
-              <div class="hero-topline">
-                <p class="brand-eyebrow">zero to tech</p>
-                <nav class="inline-links hero-nav">
-                  <a class="nav-link" href="index.html">个人主页</a>
-                  <a class="nav-link" href="text-lab.html">文字实验室</a>
-                </nav>
-              </div>
-              <div class="hero-copy">
-                <h1 class="hero-display">关于我</h1>
-                <p class="hero-subtitle">项目，创意，灵感，心得，我的作品</p>
-              </div>
-            </article>
-            <!-- ↑↑↑ hero 结束 ↑↑↑ -->
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="index.html" aria-label="零号共享站首页">
+          <span class="brand-mark" aria-hidden="true">0</span>
+          <span>零号共享站</span>
+        </a>
 
-            <article class="panel panel-full featured-work-panel card">
-              <p class="section-kicker">作品</p>
-              <p class="featured-title">文字实验室</p>
-              <p class="featured-copy">拼音和情绪，挖掘中文里的细节</p>
-              <a class="featured-link" href="text-lab.html">
-                <span class="featured-link-label">打开作品</span>
-                <span class="arrow">›</span>
-              </a>
-            </article>
+        <nav class="desktop-nav" aria-label="主导航">
+          <a class="active" href="index.html">发现</a>
+          <a href="#games">小游戏</a>
+          <a href="#resources">学习资料</a>
+          <a href="#more">更多空间</a>
+        </nav>
 
-            <article class="panel panel-full identity-panel card">
-              <div class="identity-item">
-                <p class="section-kicker">座右铭</p>
-                <p class="identity-value identity-quote">已识乾坤大，尤怜草木青</p>
-              </div>
-              <div class="identity-item">
-                <p class="section-kicker">正在学习</p>
-                <p class="identity-value">零到全栈</p>
-              </div>
-            </article>
-
-          </section>
-        </main>
+        <button class="icon-button menu-button" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav">
+          <i data-lucide="menu" aria-hidden="true"></i>
+        </button>
       </div>
-    </div>
+      <nav class="mobile-nav" id="mobile-nav" aria-label="移动端导航" hidden>
+        <a href="index.html">发现</a>
+        <a href="#games">小游戏</a>
+        <a href="#resources">学习资料</a>
+        <a href="#more">更多空间</a>
+      </nav>
+    </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/animejs@4/lib/anime.iife.min.js"></script>
-    <script src="js/cards.js"></script>
-    <script src="js/score.js"></script>
-    <script src="js/nav.js"></script>
+    <main id="main-content">
+      <section class="hero section-shell" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">一个持续生长的分享空间</p>
+          <h1 id="hero-title">来玩一点，<br />也学一点。</h1>
+          <p class="hero-intro">这里收集好玩的小游戏、真正有用的学习资料，以及每一个值得分享的新发现。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#games">
+              <i data-lucide="gamepad-2" aria-hidden="true"></i>
+              开始探索
+            </a>
+            <a class="text-link" href="#resources">浏览学习资料 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </div>
+
+        <a class="hero-feature" href="text-lab.html" aria-label="打开本周推荐：文字实验室">
+          <img src="assets/game-room.jpg" alt="桌面上的游戏控制器和显示器" />
+          <span class="feature-shade" aria-hidden="true"></span>
+          <span class="feature-content">
+            <span class="feature-label">本周推荐</span>
+            <strong>文字实验室</strong>
+            <span>用文字做一次轻量的互动实验</span>
+          </span>
+          <span class="feature-action" aria-hidden="true"><i data-lucide="arrow-up-right"></i></span>
+        </a>
+      </section>
+
+      <section class="announcement" aria-label="站点公告">
+        <div class="section-shell announcement-inner">
+          <span class="status-dot" aria-hidden="true"></span>
+          <strong>共享站正在搭建中</strong>
+          <span>第一批小游戏和资料即将上线</span>
+        </div>
+      </section>
+
+      <section class="content-section section-shell" id="games" aria-labelledby="games-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Playground</p>
+            <h2 id="games-title">小游戏体验</h2>
+          </div>
+          <a class="text-link muted-link" href="text-lab.html">查看全部 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+        </div>
+
+        <div class="game-layout">
+          <article class="game-primary">
+            <div class="game-visual">
+              <span class="pixel pixel-one"></span>
+              <span class="pixel pixel-two"></span>
+              <span class="pixel pixel-three"></span>
+              <div class="game-score" aria-hidden="true">
+                <span>SCORE</span>
+                <strong>0086</strong>
+              </div>
+            </div>
+            <div class="game-copy">
+              <span class="content-tag">可体验</span>
+              <h3>文字实验室</h3>
+              <p>输入一句话，观察文字在不同规则下发生的变化。简单，但可能让你停留很久。</p>
+              <a class="button button-dark" href="text-lab.html">立即体验 <i data-lucide="play" aria-hidden="true"></i></a>
+            </div>
+          </article>
+
+          <article class="coming-card">
+            <span class="coming-icon"><i data-lucide="blocks" aria-hidden="true"></i></span>
+            <div>
+              <span class="content-tag neutral-tag">开发中</span>
+              <h3>下一个游戏</h3>
+              <p>新的玩法正在准备，给它留一个位置。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="resources-section" id="resources" aria-labelledby="resources-title">
+        <div class="section-shell">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Knowledge Base</p>
+              <h2 id="resources-title">学习资料</h2>
+            </div>
+            <button class="filter-button" type="button" aria-label="筛选学习资料">
+              <i data-lucide="sliders-horizontal" aria-hidden="true"></i>
+              筛选
+            </button>
+          </div>
+
+          <div class="resource-grid">
+            <article class="resource-featured">
+              <img src="assets/study-desk.jpg" alt="摆放着书籍的学习桌" />
+              <div class="resource-featured-copy">
+                <span class="content-tag light-tag">前端入门</span>
+                <h3>从零开始理解一个网页</h3>
+                <p>把 HTML、CSS 和 JavaScript 放回真实网页里理解，而不是只记住零散语法。</p>
+                <span class="resource-meta">6 个章节 · 入门</span>
+              </div>
+            </article>
+
+            <div class="resource-list">
+              <article class="resource-row">
+                <span class="resource-icon resource-icon-code"><i data-lucide="code-2" aria-hidden="true"></i></span>
+                <div>
+                  <span class="resource-type">开发笔记</span>
+                  <h3>Git 与 GitHub 基础操作</h3>
+                  <p>提交、分支、远程仓库和部署的核心概念。</p>
+                </div>
+                <i class="row-arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+              </article>
+              <article class="resource-row">
+                <span class="resource-icon resource-icon-book"><i data-lucide="book-open" aria-hidden="true"></i></span>
+                <div>
+                  <span class="resource-type">精选阅读</span>
+                  <h3>值得反复看的学习方法</h3>
+                  <p>如何建立自己的知识体系，并持续更新它。</p>
+                </div>
+                <i class="row-arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+              </article>
+              <article class="resource-row">
+                <span class="resource-icon resource-icon-tool"><i data-lucide="wrench" aria-hidden="true"></i></span>
+                <div>
+                  <span class="resource-type">工具箱</span>
+                  <h3>常用在线工具合集</h3>
+                  <p>开发、设计、写作中真正能提高效率的小工具。</p>
+                </div>
+                <i class="row-arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="more-section section-shell" id="more" aria-labelledby="more-title">
+        <div class="more-copy">
+          <p class="eyebrow">Next</p>
+          <h2 id="more-title">这里还会有更多。</h2>
+          <p>工具、作品、收藏、讨论，或者任何值得被认真分享的东西。先留一块空地，慢慢把它建起来。</p>
+        </div>
+        <div class="more-visual" aria-hidden="true">
+          <img src="assets/learning.jpg" alt="" />
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-shell footer-inner">
+        <a class="brand footer-brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">0</span>
+          <span>零号共享站</span>
+        </a>
+        <p>分享有趣，也分享有用。</p>
+        <span>© <span data-year></span></span>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="js/home.js"></script>
   </body>
 </html>
