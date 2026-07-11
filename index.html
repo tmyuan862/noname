@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="梦缘资源站：发现小游戏、学习资料和有意思的数字内容。" />
+    <meta
+      name="description"
+      content="梦缘资源站：整合校园资讯、学习资料、迎新信息与实用工具，帮助同学更快找到和自己相关的内容。"
+    />
     <title>梦缘资源站</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="css/reset.css" />
@@ -20,197 +23,280 @@
       <div class="header-inner">
         <a class="brand" href="index.html" aria-label="梦缘资源站首页">
           <span class="brand-mark" aria-hidden="true">梦</span>
-          <span>梦缘资源站</span>
+          <span class="brand-text">
+            <strong>梦缘资源站</strong>
+            <small>Campus Resource Hub</small>
+          </span>
         </a>
 
         <nav class="desktop-nav" aria-label="主导航">
-          <a class="active" href="index.html">发现</a>
-          <a href="#games">小游戏</a>
-          <a href="resources.html">学习资料</a>
-          <a href="campus.html">校园指南</a>
+          <a class="active" href="index.html">首页</a>
+          <a href="campus.html">校园生存指南</a>
+          <a href="resources.html">资料库</a>
           <a href="senior.html">学长学姐说</a>
-          <a href="#feedback">意见箱</a>
-          <a href="#more">更多空间</a>
+          <a href="games/snake/">小游戏</a>
+          <a href="#feedback">反馈</a>
         </nav>
 
-        <button class="icon-button menu-button" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav">
-          <i data-lucide="menu" aria-hidden="true"></i>
-        </button>
+        <div class="header-actions">
+          <button class="header-ai-button" type="button" data-open-site-chat>
+            <i data-lucide="sparkles" aria-hidden="true"></i>
+            <span>AI 问询</span>
+          </button>
+          <button
+            class="icon-button menu-button"
+            type="button"
+            aria-label="打开导航菜单"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+          >
+            <i data-lucide="menu" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
+
       <nav class="mobile-nav" id="mobile-nav" aria-label="移动端导航" hidden>
-        <a href="index.html">发现</a>
-        <a href="#games">小游戏</a>
-        <a href="resources.html">学习资料</a>
-        <a href="campus.html">校园指南</a>
+        <a href="index.html">首页</a>
+        <a href="campus.html">校园生存指南</a>
+        <a href="resources.html">资料库</a>
         <a href="senior.html">学长学姐说</a>
-        <a href="#feedback">意见箱</a>
-        <a href="#more">更多空间</a>
+        <a href="games/snake/">小游戏</a>
+        <a href="#feedback">反馈</a>
       </nav>
     </header>
 
     <main id="main-content">
-      <section class="welcome-hero" aria-labelledby="hero-title">
-        <img class="welcome-backdrop" src="assets/campus.jpg" alt="绿树环绕的大学校园建筑" />
-        <span class="welcome-shade" aria-hidden="true"></span>
-        <div class="section-shell welcome-layout">
-          <div class="welcome-copy">
-            <p class="welcome-label"><span aria-hidden="true"></span> 2026 迎新指南</p>
-            <h1 id="hero-title">新校园，<br />先从这里熟悉。</h1>
-            <p>把报到、交通、校园生活和常用资料整理到一处。每条信息都会标明适用对象与来源，重要事项请以学校官网通知为准。</p>
+      <section class="hero-board" aria-labelledby="hero-title">
+        <div class="section-shell hero-grid">
+          <div class="hero-main">
+            <div class="hero-status-row">
+              <span class="hero-status">校园信息整合站</span>
+              <span class="hero-status muted">以官网与公开信源为准</span>
+            </div>
+
+            <h1 id="hero-title">
+              科技媒体的信息秩序，
+              <br />
+              校园工具站的使用效率。
+            </h1>
+
+            <p class="hero-intro">
+              这里不是学校官网，而是一个把迎新、选课、校车、地图、资料和校园经验重新整理好的入口站。
+              你先快速判断“这条信息跟我有没有关系”，再决定要不要点进原文深看。
+            </p>
+
             <div class="hero-actions">
-              <a class="button welcome-primary" href="campus.html">进入迎新指南 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-              <button class="welcome-ai" type="button" data-open-site-chat><i data-lucide="message-square-text" aria-hidden="true"></i> 问问本站 AI</button>
+              <a class="button button-primary" href="campus.html">
+                先看迎新与校园指南
+                <i data-lucide="arrow-right" aria-hidden="true"></i>
+              </a>
+              <a class="button button-secondary" href="resources.html">
+                进入资料库
+                <i data-lucide="library-big" aria-hidden="true"></i>
+              </a>
             </div>
-          </div>
 
-          <nav class="welcome-tasks" aria-label="新生常用入口">
-            <a href="campus.html#academic"><span><i data-lucide="clipboard-check" aria-hidden="true"></i><b>报到准备</b></span><small>材料、流程与时间</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-            <a href="campus.html#bus"><span><i data-lucide="bus-front" aria-hidden="true"></i><b>到校交通</b></span><small>校车与出行路线</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-            <a href="resources.html?q=校园地图"><span><i data-lucide="map" aria-hidden="true"></i><b>校园地图</b></span><small>教学楼与生活设施</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-            <a href="campus.html#canteen"><span><i data-lucide="utensils" aria-hidden="true"></i><b>校园生活</b></span><small>食堂、快递与日常</small><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-          </nav>
-
-          <div class="cohort-switch" aria-label="按入学年份查看信息">
-            <span>按入学年份查看</span>
-            <div>
-              <a class="active" href="resources.html">通用</a>
-              <a href="resources.html?q=2026级">2026 级</a>
-              <a href="resources.html?q=2025级">2025 级</a>
-              <a href="resources.html?q=2024级">2024 级</a>
-              <a href="resources.html?q=2023级">2023 级</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="announcement" aria-label="站点公告">
-        <div class="section-shell announcement-inner">
-          <span class="status-dot" aria-hidden="true"></span>
-          <strong>本站为校园信息整理平台，并非学校官方网站</strong>
-          <span>请通过信息来源链接核对最新通知</span>
-        </div>
-      </section>
-
-      <section class="content-section section-shell" id="games" aria-labelledby="games-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Playground</p>
-            <h2 id="games-title">小游戏体验</h2>
-          </div>
-          <span class="section-status">第一款游戏筹备中</span>
-        </div>
-
-        <div class="game-layout">
-          <article class="game-primary">
-            <div class="game-visual">
-              <span class="pixel pixel-one"></span>
-              <span class="pixel pixel-two"></span>
-              <span class="pixel pixel-three"></span>
-              <div class="game-score" aria-hidden="true">
-                <span>SCORE</span>
-                <strong>0086</strong>
+            <div class="hero-cohorts" aria-label="按年级分流">
+              <span>按年级直达</span>
+              <div class="hero-chip-list">
+                <a class="active" href="resources.html">通用</a>
+                <a href="resources.html?q=2026级">2026 级新生</a>
+                <a href="resources.html?q=2025级">大二 / 2025 级</a>
+                <a href="resources.html?q=2024级">大三 / 2024 级</a>
+                <a href="resources.html?q=2023级">大四 / 2023 级</a>
               </div>
             </div>
-            <div class="game-copy">
-              <span class="content-tag">现已开放</span>
-              <h3>贪吃蛇 Plus</h3>
-              <p>经典贪吃蛇加入肉鸽升级、敌蛇、Boss、天气、皮肤与全站排行榜，支持电脑和手机操作。</p>
-              <a class="button button-dark" href="games/snake/">立即开始 <i data-lucide="play" aria-hidden="true"></i></a>
-            </div>
-          </article>
+          </div>
 
-          <article class="coming-card">
-            <span class="coming-icon"><i data-lucide="blocks" aria-hidden="true"></i></span>
-            <div>
-              <span class="content-tag neutral-tag">开发中</span>
-              <h3>下一个游戏</h3>
-              <p>新的玩法正在准备，给它留一个位置。</p>
-            </div>
-          </article>
+          <aside class="hero-side" aria-label="首页重点看板">
+            <article class="signal-card signal-card-primary">
+              <div class="signal-card-head">
+                <span>迎新优先</span>
+                <i data-lucide="rocket" aria-hidden="true"></i>
+              </div>
+              <h2>先把最常找的信息放到第一屏</h2>
+              <p>报到、交通、地图、食堂、宿舍、常用办事入口，都应该比“介绍文案”更早出现。</p>
+              <a href="campus.html">打开迎新模块</a>
+            </article>
+
+            <article class="signal-card">
+              <div class="signal-card-head">
+                <span>本周高频</span>
+                <i data-lucide="trending-up" aria-hidden="true"></i>
+              </div>
+              <ul class="signal-list">
+                <li><a href="campus.html#bus">校车与通勤路线</a></li>
+                <li><a href="resources.html?q=校园地图">校园地图与楼宇位置</a></li>
+                <li><a href="campus.html#canteen">食堂、快递、生活点位</a></li>
+                <li><a href="senior.html">学长学姐经验建议</a></li>
+              </ul>
+            </article>
+          </aside>
         </div>
       </section>
 
-      <section class="resources-section" id="resources" aria-labelledby="resources-title">
+      <section class="topbar-strip" aria-label="站点说明">
+        <div class="section-shell topbar-strip-inner">
+          <div>
+            <strong>梦缘资源站</strong>
+            <span>帮助同学更快找到信息，不替代学校官方通知</span>
+          </div>
+          <a href="privacy.html">查看隐私与使用声明</a>
+        </div>
+      </section>
+
+      <section class="quick-section section-shell" aria-labelledby="quick-title">
+        <div class="section-title-row">
+          <div>
+            <p class="section-kicker">Fast Entry</p>
+            <h2 id="quick-title">先解决“我现在要做什么”</h2>
+          </div>
+          <p class="section-summary">首页先给任务入口，不让同学进来后自己翻半天。</p>
+        </div>
+
+        <div class="quick-grid">
+          <a class="quick-card quick-card-featured" href="campus.html#academic">
+            <span class="quick-card-tag">迎新任务</span>
+            <h3>报到准备</h3>
+            <p>材料、流程、适用对象与下一步操作。</p>
+            <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+          </a>
+
+          <a class="quick-card" href="campus.html#bus">
+            <span class="quick-card-icon"><i data-lucide="bus-front" aria-hidden="true"></i></span>
+            <h3>校车与交通</h3>
+            <p>去校区怎么走，校车什么时候发。</p>
+          </a>
+
+          <a class="quick-card" href="resources.html?q=校园地图">
+            <span class="quick-card-icon"><i data-lucide="map" aria-hidden="true"></i></span>
+            <h3>校园地图</h3>
+            <p>楼宇、办事点、生活设施快速定位。</p>
+          </a>
+
+          <a class="quick-card" href="campus.html#canteen">
+            <span class="quick-card-icon"><i data-lucide="utensils" aria-hidden="true"></i></span>
+            <h3>食堂与生活</h3>
+            <p>吃饭、快递、打印、日常服务都在这里。</p>
+          </a>
+
+          <a class="quick-card" href="resources.html?q=选课">
+            <span class="quick-card-icon"><i data-lucide="book-open-check" aria-hidden="true"></i></span>
+            <h3>选课与学习</h3>
+            <p>课程资料、经验整理与高频问题汇总。</p>
+          </a>
+
+          <a class="quick-card" href="senior.html">
+            <span class="quick-card-icon"><i data-lucide="messages-square" aria-hidden="true"></i></span>
+            <h3>学长学姐说</h3>
+            <p>仅授权账号可投稿，保留校园经验的可信度。</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="focus-section" aria-labelledby="focus-title">
         <div class="section-shell">
-          <div class="section-heading">
+          <div class="section-title-row">
             <div>
-              <p class="eyebrow">Knowledge Base</p>
-              <h2 id="resources-title">学习资料</h2>
+              <p class="section-kicker">Core Modules</p>
+              <h2 id="focus-title">把内容做成能扫描的模块</h2>
             </div>
-            <a class="filter-button" href="resources.html"><i data-lucide="library-big" aria-hidden="true"></i>进入资料库</a>
+            <a class="section-link" href="resources.html">查看全部资料 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
 
-          <div class="resource-grid">
-            <article class="resource-featured">
-              <img src="assets/study-desk.jpg" alt="摆放着书籍的学习桌" />
-              <div class="resource-featured-copy">
-                <span class="content-tag light-tag">前端入门</span>
-                <h3>从零开始理解一个网页</h3>
-                <p>把 HTML、CSS 和 JavaScript 放回真实网页里理解，而不是只记住零散语法。</p>
-                <span class="resource-meta">6 个章节 · 入门</span>
+          <div class="focus-grid">
+            <article class="media-card media-card-large">
+              <img src="assets/campus.jpg" alt="校园建筑与树荫步道" />
+              <div class="media-card-copy">
+                <span class="media-card-tag">校园生存指南</span>
+                <h3>把校车、地图、食堂、办事路径集中到一个地方</h3>
+                <p>适合新生快速熟悉校园，也适合老生查找“我忘了但一定会再用到”的信息。</p>
+                <a href="campus.html">进入校园指南</a>
               </div>
             </article>
 
-            <div class="resource-list">
-              <article class="resource-row">
-                <span class="resource-icon resource-icon-code"><i data-lucide="code-2" aria-hidden="true"></i></span>
-                <div>
-                  <span class="resource-type">开发笔记</span>
-                  <h3>Git 与 GitHub 基础操作</h3>
-                  <p>提交、分支、远程仓库和部署的核心概念。</p>
+            <div class="stack-card-group">
+              <article class="stack-card">
+                <div class="stack-card-head">
+                  <span>资料库</span>
+                  <i data-lucide="files" aria-hidden="true"></i>
                 </div>
-                <i class="row-arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+                <h3>按主题、年级、来源整理资料</h3>
+                <p>每条内容都应该能追到原始出处，并提醒同学优先查阅官网原文。</p>
+                <a href="resources.html">打开资料库</a>
               </article>
-              <article class="resource-row">
-                <span class="resource-icon resource-icon-book"><i data-lucide="book-open" aria-hidden="true"></i></span>
-                <div>
-                  <span class="resource-type">精选阅读</span>
-                  <h3>值得反复看的学习方法</h3>
-                  <p>如何建立自己的知识体系，并持续更新它。</p>
+
+              <article class="stack-card">
+                <div class="stack-card-head">
+                  <span>AI 问询</span>
+                  <i data-lucide="bot" aria-hidden="true"></i>
                 </div>
-                <i class="row-arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+                <h3>先告诉你信息在哪，再给摘要回答</h3>
+                <p>AI 只基于站内已整理内容回答，优先给出来源位置，避免“答得像真的但找不到出处”。</p>
+                <button class="stack-action-button" type="button" data-open-site-chat>现在提问</button>
               </article>
-              <article class="resource-row">
-                <span class="resource-icon resource-icon-tool"><i data-lucide="wrench" aria-hidden="true"></i></span>
-                <div>
-                  <span class="resource-type">工具箱</span>
-                  <h3>常用在线工具合集</h3>
-                  <p>开发、设计、写作中真正能提高效率的小工具。</p>
+
+              <article class="stack-card">
+                <div class="stack-card-head">
+                  <span>小游戏体验</span>
+                  <i data-lucide="gamepad-2" aria-hidden="true"></i>
                 </div>
-                <i class="row-arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+                <h3>休息一下，再回来继续找信息</h3>
+                <p>贪吃蛇 Plus 已接入全站排行榜，后续还能继续扩展成校园互动区。</p>
+                <a href="games/snake/">进入小游戏</a>
               </article>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="campus-promo" aria-labelledby="campus-promo-title">
-        <div class="section-shell campus-promo-inner">
-          <div class="campus-promo-copy">
-            <p class="eyebrow">Campus Guide</p>
-            <h2 id="campus-promo-title">校园生存指南</h2>
-            <p>校车几点来、食堂怎么走、哪位老师的课值得选——把只有在校生才知道的信息，整理成一份随时可查的校园说明书。</p>
-            <a class="button button-primary" href="campus.html">进入校园指南 <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+      <section class="advantage-section section-shell" aria-labelledby="advantage-title">
+        <div class="section-title-row">
+          <div>
+            <p class="section-kicker">Why Use This</p>
+            <h2 id="advantage-title">为什么不直接只看公众号或官网</h2>
           </div>
-          <div class="campus-promo-links" aria-label="校园指南内容预览">
-            <span><i data-lucide="bus-front" aria-hidden="true"></i> 校车时刻</span>
-            <span><i data-lucide="utensils" aria-hidden="true"></i> 食堂指南</span>
-            <span><i data-lucide="map" aria-hidden="true"></i> 校园地图</span>
-            <span><i data-lucide="messages-square" aria-hidden="true"></i> 选课评价</span>
-          </div>
+        </div>
+
+        <div class="advantage-grid">
+          <article class="advantage-card">
+            <span>01</span>
+            <h3>先分流，再阅读</h3>
+            <p>把“适用年级、适用校区、适用场景”提前标出来，不让所有通知混在一起。</p>
+          </article>
+          <article class="advantage-card">
+            <span>02</span>
+            <h3>信息整合更快</h3>
+            <p>把官网、公众号、群消息和校园经验放进统一分类里，减少来回切换和重复搜索。</p>
+          </article>
+          <article class="advantage-card">
+            <span>03</span>
+            <h3>可追溯，不冒充官方</h3>
+            <p>每条内容都强调信源与原文链接，更推荐大家在关键事项上回到官网确认。</p>
+          </article>
         </div>
       </section>
 
       <section class="feedback-section" id="feedback" aria-labelledby="feedback-title">
         <div class="section-shell feedback-layout">
           <div class="feedback-intro">
-            <p class="eyebrow">Open Feedback</p>
-            <h2 id="feedback-title">这里应该变得<br />更好用。</h2>
-            <p>缺了什么、哪里难用、想增加什么内容，都可以直接写下来。每一条反馈都会保存在服务器上。</p>
+            <p class="section-kicker">Open Feedback</p>
+            <h2 id="feedback-title">这里应该继续变得更好用</h2>
+            <p>
+              你觉得哪里不好找、哪里需要补充、哪些流程可以再清楚一点，都可以直接写进来。
+              反馈会保存到服务器，站长可以在后台处理和回复。
+            </p>
+
             <div class="wechat-card">
               <span class="wechat-icon"><i data-lucide="message-circle-more" aria-hidden="true"></i></span>
-              <div><small>也可以直接加微信</small><strong>Mty080602</strong></div>
-              <button class="copy-button" type="button" data-copy-wechat aria-label="复制微信号 Mty080602"><i data-lucide="copy" aria-hidden="true"></i><span>复制</span></button>
+              <div>
+                <small>若想作为学长学姐投稿，请联系微信开设账号</small>
+                <strong>Mty080602</strong>
+              </div>
+              <button class="copy-button" type="button" data-copy-wechat aria-label="复制微信号 Mty080602">
+                <i data-lucide="copy" aria-hidden="true"></i>
+                <span>复制</span>
+              </button>
             </div>
           </div>
 
@@ -226,32 +312,53 @@
               </select>
             </div>
             <div class="field-group">
-              <div class="label-row"><label for="feedback-message">具体内容</label><span><b data-character-count>0</b> / 1000</span></div>
-              <textarea id="feedback-message" name="message" minlength="5" maxlength="1000" required placeholder="例如：希望校园地图里增加打印店和快递点的位置……"></textarea>
+              <div class="label-row">
+                <label for="feedback-message">具体内容</label>
+                <span><b data-character-count>0</b> / 1000</span>
+              </div>
+              <textarea
+                id="feedback-message"
+                name="message"
+                minlength="5"
+                maxlength="1000"
+                required
+                placeholder="例如：希望校园地图里增加打印店、快递点和食堂营业时间。"
+              ></textarea>
             </div>
-            <div class="honeypot" aria-hidden="true"><label for="feedback-website">网站</label><input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
-            <button class="submit-button" type="submit"><span>提交反馈</span><i data-lucide="send" aria-hidden="true"></i></button>
-            <p class="form-status" data-form-status role="status" aria-live="polite">不用登录。请勿填写个人隐私，反馈内容和站长回复会公开展示。</p>
-            <section class="feedback-inbox" data-feedback-inbox hidden><div><strong>我的反馈与回信</strong><button type="button" data-refresh-replies>刷新</button></div><div data-reply-list></div></section>
+            <div class="honeypot" aria-hidden="true">
+              <label for="feedback-website">网站</label>
+              <input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+            <button class="submit-button" type="submit">
+              <span>提交反馈</span>
+              <i data-lucide="send" aria-hidden="true"></i>
+            </button>
+            <p class="form-status" data-form-status role="status" aria-live="polite">
+              不用注册。请不要填写个人隐私信息，反馈内容和站长回复会公开展示。
+            </p>
+            <section class="feedback-inbox" data-feedback-inbox hidden>
+              <div>
+                <strong>我的反馈与回信</strong>
+                <button type="button" data-refresh-replies>刷新</button>
+              </div>
+              <div data-reply-list></div>
+            </section>
           </form>
         </div>
       </section>
 
       <section class="public-feedback-section section-shell" aria-labelledby="public-feedback-title">
-        <div class="section-heading"><div><p class="eyebrow">Public Feedback</p><h2 id="public-feedback-title">公开反馈历史</h2></div><span data-public-feedback-count></span></div>
-        <div class="public-feedback-list" data-public-feedback-list aria-live="polite"><p>正在读取反馈……</p></div>
+        <div class="section-title-row section-title-row-compact">
+          <div>
+            <p class="section-kicker">Public Feedback</p>
+            <h2 id="public-feedback-title">公开反馈历史</h2>
+          </div>
+          <span class="section-summary" data-public-feedback-count></span>
+        </div>
+        <div class="public-feedback-list" data-public-feedback-list aria-live="polite">
+          <p>正在读取反馈…</p>
+        </div>
         <button class="public-feedback-more" type="button" data-public-feedback-more hidden>查看更多</button>
-      </section>
-
-      <section class="more-section section-shell" id="more" aria-labelledby="more-title">
-        <div class="more-copy">
-          <p class="eyebrow">Next</p>
-          <h2 id="more-title">这里还会有更多。</h2>
-          <p>工具、作品、收藏、讨论，或者任何值得被认真分享的东西。先留一块空地，慢慢把它建起来。</p>
-        </div>
-        <div class="more-visual" aria-hidden="true">
-          <img src="assets/learning.jpg" alt="" />
-        </div>
       </section>
     </main>
 
@@ -259,18 +366,44 @@
       <div class="section-shell footer-inner">
         <a class="brand footer-brand" href="index.html">
           <span class="brand-mark" aria-hidden="true">梦</span>
-          <span>梦缘资源站</span>
+          <span class="brand-text">
+            <strong>梦缘资源站</strong>
+            <small>资源整合 · 可溯源 · 快速查找</small>
+          </span>
         </a>
-        <p>分享有趣，也分享有用。 <a href="privacy.html">隐私与使用声明</a></p>
+        <p>
+          本网站不涉及个人隐私采集，不开放用户注册，仅用于整合校园内公开信息与经验内容。
+          <a href="privacy.html">查看声明</a>
+        </p>
         <span>© <span data-year></span></span>
       </div>
     </footer>
 
-    <button class="site-chat-trigger" type="button" data-chat-trigger aria-label="打开 AI 站内问询"><i data-lucide="message-square-text" aria-hidden="true"></i></button>
+    <button class="site-chat-trigger" type="button" data-chat-trigger aria-label="打开 AI 站内问询">
+      <i data-lucide="message-square-text" aria-hidden="true"></i>
+    </button>
+
     <section class="site-chat-panel" data-chat-panel hidden aria-label="AI 站内问询">
-      <header><div><span>AI</span><strong>问问本站</strong></div><button type="button" data-chat-close aria-label="关闭问询">×</button></header>
-      <div class="site-chat-result" data-chat-result aria-live="polite"><p>可以问校车、选课、报到、校园生活或站内资料。</p></div>
-      <form data-chat-form><label for="site-chat-question">问题</label><textarea id="site-chat-question" maxlength="500" required placeholder="例如：浦东校区的校车几点发车？"></textarea><button type="submit">发送</button></form>
+      <header>
+        <div>
+          <span>AI</span>
+          <strong>站内问询</strong>
+        </div>
+        <button type="button" data-chat-close aria-label="关闭问询">×</button>
+      </header>
+      <div class="site-chat-result" data-chat-result aria-live="polite">
+        <p>可以直接问校车、选课、报到、校园生活或站内资料。</p>
+      </div>
+      <form data-chat-form>
+        <label for="site-chat-question">问题</label>
+        <textarea
+          id="site-chat-question"
+          maxlength="500"
+          required
+          placeholder="例如：浦东校区的校车怎么坐？资料库里有没有新生报到相关内容？"
+        ></textarea>
+        <button type="submit">发送</button>
+      </form>
     </section>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>

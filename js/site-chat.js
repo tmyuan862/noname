@@ -1,1 +1,84 @@
-(function(){var trigger=document.querySelector('[data-chat-trigger]'),panel=document.querySelector('[data-chat-panel]'),close=document.querySelector('[data-chat-close]'),form=document.querySelector('[data-chat-form]'),result=document.querySelector('[data-chat-result]'),question=form.querySelector('textarea');function open(){panel.hidden=false;question.focus()}trigger.addEventListener('click',open);document.querySelectorAll('[data-open-site-chat]').forEach(function(button){button.addEventListener('click',open)});close.addEventListener('click',function(){panel.hidden=true;trigger.focus()});form.addEventListener('submit',function(event){event.preventDefault();if(!form.reportValidity())return;var submit=form.querySelector('button');submit.disabled=true;result.textContent='正在检索站内资料并整理回答……';fetch('/api/site-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:question.value.trim()})}).then(function(response){return response.json().catch(function(){return{}}).then(function(data){if(!response.ok)throw new Error(data.message||'暂时无法回答');return data})}).then(function(data){result.textContent='';if(data.sources&&data.sources.length){var sources=document.createElement('div');sources.className='chat-sources';var heading=document.createElement('strong');heading.textContent='信息来源';sources.appendChild(heading);data.sources.forEach(function(source){var link=document.createElement('a');link.href=source.url;var title=document.createTextNode(source.title);var kind=document.createElement('span');kind.textContent=source.kind;link.append(title,kind);sources.appendChild(link)});result.appendChild(sources)}var answer=document.createElement('div');answer.className='chat-answer';answer.textContent=data.answer;result.appendChild(answer)}).catch(function(error){result.textContent=error.message||'暂时无法回答，请稍后再试。'}).finally(function(){submit.disabled=false})})}());
+(function () {
+  var trigger = document.querySelector("[data-chat-trigger]");
+  var panel = document.querySelector("[data-chat-panel]");
+  var close = document.querySelector("[data-chat-close]");
+  var form = document.querySelector("[data-chat-form]");
+  var result = document.querySelector("[data-chat-result]");
+
+  if (!trigger || !panel || !close || !form || !result) return;
+
+  var question = form.querySelector("textarea");
+
+  function open() {
+    panel.hidden = false;
+    question.focus();
+  }
+
+  trigger.addEventListener("click", open);
+  document.querySelectorAll("[data-open-site-chat]").forEach(function (button) {
+    button.addEventListener("click", open);
+  });
+
+  close.addEventListener("click", function () {
+    panel.hidden = true;
+    trigger.focus();
+  });
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+
+    var submit = form.querySelector("button");
+    submit.disabled = true;
+    result.textContent = "正在检索站内资料并整理回答…";
+
+    fetch("/api/site-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: question.value.trim() }),
+    })
+      .then(function (response) {
+        return response.json().catch(function () {
+          return {};
+        }).then(function (data) {
+          if (!response.ok) throw new Error(data.message || "暂时无法回答");
+          return data;
+        });
+      })
+      .then(function (data) {
+        result.textContent = "";
+
+        if (data.sources && data.sources.length) {
+          var sources = document.createElement("div");
+          sources.className = "chat-sources";
+
+          var heading = document.createElement("strong");
+          heading.textContent = "信息来源";
+          sources.appendChild(heading);
+
+          data.sources.forEach(function (source) {
+            var link = document.createElement("a");
+            link.href = source.url;
+            var title = document.createTextNode(source.title);
+            var kind = document.createElement("span");
+            kind.textContent = source.kind;
+            link.append(title, kind);
+            sources.appendChild(link);
+          });
+
+          result.appendChild(sources);
+        }
+
+        var answer = document.createElement("div");
+        answer.className = "chat-answer";
+        answer.textContent = data.answer;
+        result.appendChild(answer);
+      })
+      .catch(function (error) {
+        result.textContent = error.message || "暂时无法回答，请稍后再试。";
+      })
+      .finally(function () {
+        submit.disabled = false;
+      });
+  });
+})();
