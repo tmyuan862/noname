@@ -367,6 +367,7 @@ input:focus-visible {
 }
 
 .quick-grid-section,
+.tutorial-section,
 .campus-info-section,
 .news-section {
   padding-top: 88px;
@@ -420,7 +421,14 @@ input:focus-visible {
   gap: 16px;
 }
 
+.tutorial-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .quick-card,
+.tutorial-card,
 .info-card,
 .timeline-card,
 .process-card,
@@ -437,6 +445,50 @@ input:focus-visible {
   position: relative;
   min-height: 188px;
   padding: 22px;
+}
+
+.tutorial-card {
+  min-height: 220px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tutorial-card span,
+.tutorial-tag {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tutorial-card h3 {
+  margin-top: 14px;
+  font-size: 22px;
+  line-height: 1.24;
+}
+
+.tutorial-card p {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.tutorial-card a,
+.tutorial-card[href] {
+  color: inherit;
+}
+
+.tutorial-card-primary {
+  background:
+    radial-gradient(circle at top right, rgba(29, 78, 216, 0.16), transparent 28%),
+    linear-gradient(135deg, #ffffff, #f2f7ff);
+}
+
+.tutorial-card-primary a {
+  display: inline-flex;
+  margin-top: auto;
+  color: var(--brand);
+  font-weight: 800;
 }
 
 .quick-card-featured {
@@ -795,6 +847,7 @@ input:focus-visible {
   .hero-layout,
   .timeline-layout,
   .info-grid,
+  .tutorial-grid,
   .course-grid,
   .news-grid {
     grid-template-columns: 1fr;
@@ -869,6 +922,7 @@ input:focus-visible {
   }
 
   .quick-grid-section,
+  .tutorial-section,
   .campus-info-section,
   .news-section,
   .map-section,

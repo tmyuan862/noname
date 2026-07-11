@@ -166,6 +166,7 @@ def normalize_resource(item: dict) -> dict | None:
 
 
 RESOURCE_CATEGORY_KEYWORDS = {
+    "newcomer_tutorial": ("教程", "指南", "如何", "怎么", "vpn", "VPN", "电费", "校园网", "充值", "绑定"),
     "transportation": ("校车", "班车", "发车", "乘车", "交通"),
     "course_selection": ("选课", "课程", "教务", "补选", "退课"),
     "fees": ("缴费", "学费", "费用", "收费"),

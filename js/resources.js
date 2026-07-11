@@ -1,5 +1,5 @@
 (function () {
-  var labels = { activity_competition: "活动竞赛", course_selection: "选课通知", exchange: "交流交换", fees: "费用缴纳", holiday: "假期安排", library: "图书馆", registration: "报到注册", safety: "安全提示", transportation: "校园交通", other: "其他" };
+  var labels = { newcomer_tutorial: "新生教程", activity_competition: "活动竞赛", course_selection: "选课通知", exchange: "交流交换", fees: "费用缴纳", holiday: "假期安排", library: "图书馆", registration: "报到注册", safety: "安全提示", transportation: "校园交通", other: "其他" };
   var list = document.querySelector("[data-resource-list]");
   var detail = document.querySelector("[data-resource-detail]");
   var categories = document.querySelector("[data-categories]");

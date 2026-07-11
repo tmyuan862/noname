@@ -1,5 +1,6 @@
 (function () {
   var labels = {
+    newcomer_tutorial: "新生教程",
     activity_competition: "活动竞赛",
     course_selection: "选课通知",
     exchange: "交流交换",
