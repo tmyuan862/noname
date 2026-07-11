@@ -5,6 +5,8 @@ REPO_DIR="${MENGYUAN_REPO_DIR:-/home/ubuntu/noname}"
 RELEASE_ROOT="/opt/zero-share/releases"
 CURRENT_LINK="/opt/zero-share/current"
 LOCK_FILE="/run/lock/mengyuan-deploy.lock"
+ADMIN_HTPASSWD_FILE="/etc/nginx/.mengyuan-admin.htpasswd"
+ADMIN_CREDENTIAL_FILE="/etc/zero-share-admin-credentials"
 
 exec 9>"$LOCK_FILE"
 flock -n 9 || exit 0
@@ -63,6 +65,26 @@ chmod 0644 /etc/zero-share-release.env
 install -m 0644 "$REPO_DIR/server/zero-share-feedback.service" /etc/systemd/system/zero-share-feedback.service
 install -m 0644 "$REPO_DIR/server/nginx-default.conf" /etc/nginx/sites-available/default
 install -m 0755 "$REPO_DIR/scripts/mengyuan-deploy" /usr/local/sbin/mengyuan-deploy
+
+if [[ ! -f "$ADMIN_HTPASSWD_FILE" ]]; then
+  admin_user="admin"
+  admin_password="$(python3 - <<'PY'
+import secrets
+alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789"
+print("MY-" + "".join(secrets.choice(alphabet) for _ in range(14)))
+PY
+)"
+  admin_hash="$(openssl passwd -apr1 "$admin_password")"
+  printf '%s:%s\n' "$admin_user" "$admin_hash" > "$ADMIN_HTPASSWD_FILE"
+  chmod 0640 "$ADMIN_HTPASSWD_FILE"
+  chown root:www-data "$ADMIN_HTPASSWD_FILE"
+  {
+    printf 'ADMIN_URL=http://124.223.181.116/resources-admin.html\n'
+    printf 'ADMIN_USERNAME=%s\n' "$admin_user"
+    printf 'ADMIN_PASSWORD=%s\n' "$admin_password"
+  } > "$ADMIN_CREDENTIAL_FILE"
+  chmod 0600 "$ADMIN_CREDENTIAL_FILE"
+fi
 
 systemctl daemon-reload
 nginx -t
