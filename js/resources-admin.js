@@ -20,6 +20,11 @@
         if (!response.ok) throw new Error(data.message || "请求失败");
         return data;
       });
+    }).catch(function (error) {
+      if (error && error.name === "TypeError") {
+        throw new Error("当前页面没有连上本地后台服务，请先启动后端或改用线上后台地址。");
+      }
+      throw error;
     });
   }
 

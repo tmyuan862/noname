@@ -319,6 +319,9 @@ def fetch_notice_webpage(url: object) -> tuple[dict | None, str]:
     if not final_parsed.hostname or is_private_hostname(final_parsed.hostname):
         return None, "网页跳转到了受限地址，已停止抓取。"
     if len(raw) > MAX_WEBPAGE_FETCH_BYTES:
+        host = (final_parsed.hostname or parsed.hostname or "").lower()
+        if "mp.weixin.qq.com" in host:
+            return None, "微信公众号文章通常较长且带有额外脚本，当前不适合直接抓取；建议改用“粘贴文字”模式，复制正文后再整理发布。"
         return None, "网页内容过大，暂时无法自动分析。"
 
     charset_match = re.search(r"charset=([\w-]+)", content_type, re.IGNORECASE)
