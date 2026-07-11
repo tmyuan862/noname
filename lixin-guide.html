@@ -1,0 +1,3578 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="???????????????????????????????????????????????">
+<title>????????? ? ?????</title>
+<link rel="stylesheet" href="css/reset.css" />
+<style>
+
+:root {
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #94a3b8;
+  --sidebar-active: #38bdf8;
+  --sidebar-hover: #1e293b;
+  --content-bg: #f1f5f9;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent: #0ea5e9;
+  --accent-light: #e0f2fe;
+  --border: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--content-bg);color:var(--text-primary);line-height:1.7;font-size:15px}
+
+.app{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:270px;background:var(--sidebar-bg);color:var(--sidebar-text);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;transition:transform .3s}
+.sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sidebar-logo{font-size:19px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px}
+.sidebar-logo span{font-size:24px}
+.sidebar-subtitle{font-size:11px;color:var(--sidebar-text);margin-top:4px;opacity:.6}
+
+.search-box{padding:12px 16px;position:relative}
+.search-box input{width:100%;padding:10px 14px 10px 36px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);color:#fff;font-size:13px;outline:none;transition:all .2s}
+.search-box input::placeholder{color:rgba(255,255,255,0.3)}
+.search-box input:focus{background:rgba(255,255,255,0.1);border-color:var(--sidebar-active)}
+.search-box::before{content:"🔍";position:absolute;left:26px;top:50%;transform:translateY(-50%);font-size:13px;opacity:.4}
+.search-count{font-size:11px;padding:2px 16px 8px;color:var(--sidebar-active);min-height:20px}
+
+.nav-menu{flex:1;overflow-y:auto;padding:4px 0}
+.nav-item{display:block;padding:9px 18px;color:var(--sidebar-text);text-decoration:none;font-size:13px;border-left:3px solid transparent;transition:all .15s;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-item:hover{background:var(--sidebar-hover);color:#fff}
+.nav-item.active{background:rgba(56,189,248,0.1);color:var(--sidebar-active);border-left-color:var(--sidebar-active);font-weight:600}
+.nav-item.hidden{display:none}
+
+.sidebar-footer{padding:10px 16px;font-size:10px;color:rgba(255,255,255,0.25);border-top:1px solid rgba(255,255,255,0.04)}
+
+/* Mobile */
+.mobile-toggle{display:none;position:fixed;top:14px;left:14px;z-index:200;width:40px;height:40px;background:var(--sidebar-bg);color:#fff;border:none;border-radius:var(--radius-sm);font-size:18px;cursor:pointer;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99}
+
+/* Content */
+.content{margin-left:270px;flex:1;min-height:100vh}
+.content-header{background:var(--card-bg);padding:18px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(8px);background:rgba(255,255,255,0.95)}
+.content-header h1{font-size:17px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+.header-meta{font-size:12px;color:var(--text-secondary);background:var(--accent-light);padding:4px 10px;border-radius:20px}
+
+.content-body{max-width:880px;margin:0 auto;padding:32px}
+
+/* Typography */
+.content-body h1{font-size:30px;font-weight:800;margin-bottom:12px;color:var(--text-primary);letter-spacing:-0.5px}
+.content-body > p:first-of-type{font-size:14px;color:var(--text-secondary);margin-bottom:24px}
+.content-body h2{font-size:20px;font-weight:700;margin:36px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--accent);color:var(--text-primary);scroll-margin-top:76px}
+.content-body h3{font-size:16px;font-weight:700;margin:24px 0 10px;color:var(--text-primary)}
+.content-body h4{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px}
+.content-body p{margin-bottom:12px}
+.content-body blockquote{background:linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);border-left:4px solid var(--accent);padding:14px 18px;margin:16px 0;border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-size:14px}
+.content-body blockquote p{margin:0}
+.content-body blockquote p + p{margin-top:8px}
+
+/* Tables */
+.content-body table{width:100%;border-collapse:separate;border-spacing:0;margin:16px 0;background:var(--card-bg);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow);font-size:13.5px;border:1px solid var(--border)}
+.content-body th{background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);padding:12px 16px;text-align:left;font-weight:700;color:var(--text-primary);border-bottom:2px solid var(--border);font-size:13px}
+.content-body td{padding:10px 16px;border-bottom:1px solid var(--border);color:var(--text-primary)}
+.content-body tr:last-child td{border-bottom:none}
+.content-body tbody tr:hover td{background:#f8fafc}
+.content-body tbody tr{transition:background .15s}
+
+/* Lists */
+.content-body ul,.content-body ol{margin:12px 0 12px 24px}
+.content-body li{margin:5px 0}
+.content-body li::marker{color:var(--accent)}
+
+/* Code */
+.content-body code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-family:"SF Mono",Monaco,"Cascadia Code",monospace;font-size:13px;color:#be123c}
+.content-body pre{background:#0f172a;color:#e2e8f0;padding:18px;border-radius:var(--radius-sm);overflow-x:auto;margin:16px 0;font-size:13px;line-height:1.7}
+.content-body pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+/* Links */
+.content-body a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:all .2s}
+.content-body a:hover{border-bottom-color:var(--accent)}
+
+/* HR */
+.content-body hr{border:none;border-top:1px solid var(--border);margin:28px 0}
+
+/* Search highlight */
+.highlight{background:#fde047;padding:1px 3px;border-radius:3px;font-weight:700;color:#713f12}
+
+/* Back to top */
+.back-to-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;background:var(--card-bg);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);opacity:0;visibility:hidden;transition:all .3s;font-size:18px;z-index:90;color:var(--text-secondary)}
+.back-to-top.visible{opacity:1;visibility:visible}
+.back-to-top:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateY(-2px)}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:3px}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.content-body > *{animation:fadeIn .35s ease both}
+.content-body > *:nth-child(1){animation-delay:0s}
+.content-body > *:nth-child(2){animation-delay:.03s}
+.content-body > *:nth-child(3){animation-delay:.06s}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .content{margin-left:0}
+  .mobile-toggle{display:flex}
+  .overlay.show{display:block}
+  .content-header{padding:14px 18px}
+  .content-header h1{font-size:15px}
+  .content-body{padding:20px}
+  .content-body h2{font-size:17px}
+  .content-body table{font-size:12px}
+  .content-body th,.content-body td{padding:8px 10px}
+}
+
+body{background:#eef3f8;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'PingFang SC','Microsoft YaHei',sans-serif;}
+a{text-decoration:none}
+.topbar{position:sticky;top:0;z-index:300;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 24px;border-bottom:1px solid #dbe4ef;background:rgba(255,255,255,.92);backdrop-filter:blur(14px)}
+.topbar-brand{display:flex;align-items:center;gap:12px;color:#0f172a;font-weight:800;font-size:18px}
+.topbar-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#0f172a);color:#fff}
+.topbar-nav{display:flex;flex-wrap:wrap;gap:18px}
+.topbar-nav a,.topbar-back{color:#475569;font-size:14px;font-weight:700}
+.topbar-nav a:hover,.topbar-back:hover{color:#0f172a}
+.notice-band{padding:18px 24px;border-bottom:1px solid #dbe4ef;background:linear-gradient(180deg,#f8fbff,#f1f5f9)}
+.notice-band-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.notice-band strong{display:block;font-size:15px;margin-bottom:6px}
+.notice-band p{max-width:820px;color:#475569;line-height:1.75;font-size:14px}
+.notice-band a{color:#2563eb;font-weight:700}
+.app{min-height:calc(100vh - 132px)}
+.content-header{top:72px}
+@media(max-width:768px){
+  .topbar{padding:14px 16px;gap:12px}
+  .topbar-nav{display:none}
+  .notice-band{padding:16px}
+  .notice-band-inner{flex-direction:column}
+  .content-header{top:68px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="topbar-brand" href="index.html"><span class="topbar-mark">?</span><span>?????</span></a>
+  <nav class="topbar-nav" aria-label="????">
+    <a href="campus.html#tutorials">????</a>
+    <a href="campus.html#maps">????</a>
+    <a href="resources.html">???</a>
+    <a href="senior.html">?????</a>
+  </nav>
+  <a class="topbar-back" href="campus.html">??????</a>
+</header>
+<section class="notice-band">
+  <div class="notice-band-inner">
+    <div>
+      <strong>?????????????????</strong>
+      <p>????????????????????????????????????????????????????????????????????????????????</p>
+    </div>
+    <a href="campus.html#tutorials">????????</a>
+  </div>
+</section>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><span>📚</span>立信资料库</div>
+      <div class="sidebar-subtitle">上海立信会计金融学院</div>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="搜索任何内容... (Ctrl+K)" oninput="handleSearch()">
+    </div>
+    <div class="search-count" id="searchCount"></div>
+    <nav class="nav-menu" id="navMenu">
+<a class="nav-item" data-target="资料分类索引" onclick="goSection(&quot;资料分类索引&quot;)">资料分类索引</a>
+<a class="nav-item" data-target="校区指南" onclick="goSection(&quot;校区指南&quot;)">校区指南</a>
+<a class="nav-item" data-target="宿舍住宿" onclick="goSection(&quot;宿舍住宿&quot;)">宿舍住宿</a>
+<a class="nav-item" data-target="教师评价" onclick="goSection(&quot;教师评价&quot;)">教师评价</a>
+<a class="nav-item" data-target="选课攻略" onclick="goSection(&quot;选课攻略&quot;)">选课攻略</a>
+<a class="nav-item" data-target="考试与成绩" onclick="goSection(&quot;考试与成绩&quot;)">考试与成绩</a>
+<a class="nav-item" data-target="奖助学金" onclick="goSection(&quot;奖助学金&quot;)">奖助学金</a>
+<a class="nav-item" data-target="学费缴费" onclick="goSection(&quot;学费缴费&quot;)">学费缴费</a>
+<a class="nav-item" data-target="报到注册" onclick="goSection(&quot;报到注册&quot;)">报到注册</a>
+<a class="nav-item" data-target="食堂餐饮" onclick="goSection(&quot;食堂餐饮&quot;)">食堂餐饮</a>
+<a class="nav-item" data-target="校车交通" onclick="goSection(&quot;校车交通&quot;)">校车交通</a>
+<a class="nav-item" data-target="图书馆" onclick="goSection(&quot;图书馆&quot;)">图书馆</a>
+<a class="nav-item" data-target="假期安排" onclick="goSection(&quot;假期安排&quot;)">假期安排</a>
+<a class="nav-item" data-target="实习就业" onclick="goSection(&quot;实习就业&quot;)">实习就业</a>
+<a class="nav-item" data-target="访学交流" onclick="goSection(&quot;访学交流&quot;)">访学交流</a>
+<a class="nav-item" data-target="活动竞赛" onclick="goSection(&quot;活动竞赛&quot;)">活动竞赛</a>
+<a class="nav-item" data-target="安全提示" onclick="goSection(&quot;安全提示&quot;)">安全提示</a>
+<a class="nav-item" data-target="德育分与综测" onclick="goSection(&quot;德育分与综测&quot;)">德育分与综测</a>
+<a class="nav-item" data-target="志愿时长" onclick="goSection(&quot;志愿时长&quot;)">志愿时长</a>
+<a class="nav-item" data-target="转专业" onclick="goSection(&quot;转专业&quot;)">转专业</a>
+<a class="nav-item" data-target="插班生" onclick="goSection(&quot;插班生&quot;)">插班生</a>
+<a class="nav-item" data-target="其他通知" onclick="goSection(&quot;其他通知&quot;)">其他通知</a>
+<a class="nav-item" data-target="常用联系方式速查" onclick="goSection(&quot;常用联系方式速查&quot;)">常用联系方式速查</a>
+<a class="nav-item" data-target="资料来源汇总" onclick="goSection(&quot;资料来源汇总&quot;)">资料来源汇总</a>
+    </nav>
+    <div class="sidebar-footer">24 个模块 · 实时搜索</div>
+  </aside>
+
+  <main class="content">
+    <div class="content-header">
+      <h1>📚 上海立信会计金融学院 · 学生信息资料库</h1>
+      <div class="header-meta">Ctrl+K 搜索</div>
+    </div>
+    <div class="content-body" id="contentBody">
+<h1 id="_1">📚 上海立信会计金融学院 · 学生信息资料库</h1>
+<blockquote>
+<p>📅 <strong>资料库创建时间</strong>: 2026-07-10<br />
+🔄 <strong>最后更新</strong>: 2026-07-10 19:01<br />
+⚠️ <strong>声明</strong>: 本资料库内容来自学生自发收集整理，仅供参考，重要事项请以学校官方发布为准。</p>
+</blockquote>
+<hr />
+<h2 id="资料分类索引">📑 资料分类索引</h2>
+<ul>
+<li><a href="#校区指南">📌 校区指南</a></li>
+<li><a href="#宿舍住宿">📌 宿舍住宿</a></li>
+<li><a href="#教师评价">📌 教师评价</a></li>
+<li><a href="#选课攻略">📌 选课攻略</a></li>
+<li><a href="#考试与成绩">📌 考试与成绩</a></li>
+<li><a href="#奖助学金">📌 奖助学金</a></li>
+<li><a href="#学费缴费">📌 学费缴费</a></li>
+<li><a href="#报到注册">📌 报到注册</a></li>
+<li><a href="#食堂餐饮">📌 食堂餐饮</a></li>
+<li><a href="#校车交通">📌 校车交通</a></li>
+<li><a href="#图书馆">📌 图书馆</a></li>
+<li><a href="#假期安排">📌 假期安排</a></li>
+<li><a href="#实习就业">📌 实习就业</a></li>
+<li><a href="#访学交流">📌 访学交流</a></li>
+<li><a href="#活动竞赛">📌 活动竞赛</a></li>
+<li><a href="#安全提示">📌 安全提示</a></li>
+<li><a href="#德育分与综测">📌 德育分与综测</a></li>
+<li><a href="#志愿时长">📌 志愿时长</a></li>
+<li><a href="#插班生">📌 插班生</a></li>
+<li><a href="#其他通知">📌 其他通知</a></li>
+<li><a href="#志愿时长">📌 志愿时长</a></li>
+<li><a href="#其他通知">📌 其他通知</a></li>
+<li><a href="#其他通知">📌 其他通知</a></li>
+</ul>
+<hr />
+<h2 id="校区指南">📌 校区指南</h2>
+<blockquote>
+<p>收录各校区专业分布、地理位置、交通方式、校园地图等信息</p>
+<p>📊 <strong>补充资料</strong>: 松江校区新生生活指南（来源：学长学姐分享）</p>
+</blockquote>
+<h3 id="_4">专业校区分布速查</h3>
+<h3 id="_5">专业校区分布速查</h3>
+<blockquote>
+<p>💡 <strong>一句话记忆</strong>：<strong>金融在浦东，会计在松江</strong></p>
+</blockquote>
+<h4 id="_6">🏙️ 浦东校区（上川路校区）</h4>
+<table>
+<thead>
+<tr>
+<th>专业类别</th>
+<th>具体专业</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>金融与投资类</td>
+<td>金融学、金融工程、金融科技、投资学、保险学、精算学、信用管理、金融数学</td>
+</tr>
+<tr>
+<td>法学与社工类</td>
+<td>法学、社会工作</td>
+</tr>
+<tr>
+<td>人文类</td>
+<td>汉语言文学</td>
+</tr>
+<tr>
+<td>专科专业</td>
+<td>大数据技术(中日合作)</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>少数民族预科生</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>地址</strong>: 浦东新区上川路995号</li>
+<li><strong>地铁</strong>: 9号线顾唐路站</li>
+<li><strong>优势</strong>: 离市区近，实习通勤方便（陆家嘴、张江高科）</li>
+</ul>
+<h4 id="_7">🏫 松江校区（文翔路校区）</h4>
+<table>
+<thead>
+<tr>
+<th>专业类别</th>
+<th>具体专业</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>会计与审计类</td>
+<td>会计学、审计学、财务管理、资产评估</td>
+</tr>
+<tr>
+<td>工商管理类</td>
+<td>工商管理、人力资源管理、市场营销、物流管理、行政管理</td>
+</tr>
+<tr>
+<td>信息与计算机类</td>
+<td>计算机科学与技术、数据科学与大数据技术、电子商务、智能科学与技术</td>
+</tr>
+<tr>
+<td>外语类</td>
+<td>商务英语、英语、日语</td>
+</tr>
+<tr>
+<td>经济与贸易类</td>
+<td>经济学、国际经济与贸易、国际商务、数字经济</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>地址</strong>: 松江区文翔路2800号</li>
+<li><strong>地铁</strong>: 9号线松江大学城站</li>
+<li><strong>优势</strong>: 松江大学城内，学术氛围浓，美食多，附近有欢乐谷</li>
+</ul>
+<h3 id="_8">松江校区教学楼分布</h3>
+<p>教学核心区主要集中在<strong>1-6号教学楼</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>楼号</th>
+<th>用途</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1-6号楼</strong></td>
+<td>通识课、跨学院专业基础课、公共选修课</td>
+<td>大部分课程在此进行</td>
+</tr>
+<tr>
+<td><strong>2号楼（学验楼）</strong></td>
+<td>计算机房、各类专业实验室、英语听读课堂</td>
+<td>实验课主要地点</td>
+</tr>
+<tr>
+<td><strong>3号楼</strong></td>
+<td>教室最多，平面设计较复杂</td>
+<td>教育超市在<strong>一层</strong>，可用校园卡</td>
+</tr>
+<tr>
+<td><strong>5号楼</strong></td>
+<td>很多工管专业课教室</td>
+<td>工商管理类专业常用</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📌 <strong>教室命名规则</strong>: 第一位数字代表楼号，第二位"d"代表多媒体，第三位"L/M/S"代表大中小教室，第四位数字代表楼层，第五位数字代表该层第几间教室。</p>
+<p>例：<code>3dL201</code> = 3号楼，多媒体，大型教室，2楼，第1间</p>
+</blockquote>
+<h3 id="_9">松江校区快递与外卖</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>详情</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>快递地址格式</strong></td>
+<td>上海市松江区广富林街道文汇路1000弄四期学生公寓某号楼</td>
+</tr>
+<tr>
+<td><strong>快递站</strong></td>
+<td>4个：①宿舍1号楼后面 ②吃货天地2层妈妈驿站 ③想飞天地1层菜鸟驿站 ④文汇新天地一层韵达超市</td>
+</tr>
+<tr>
+<td><strong>外卖</strong></td>
+<td>送到学生公寓门口外卖柜，或校园送至宿舍楼下架子</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_10">校园地图</h3>
+<blockquote>
+<p>📎 校区地图文件：
+- <a href="campus_map_songjiang.png">松江校区地图</a>
+- <a href="campus_map_pudong.png">浦东校区地图</a></p>
+</blockquote>
+<hr />
+<h2 id="宿舍住宿">📌 宿舍住宿</h2>
+<blockquote>
+<p>收录宿舍类型、配置、注意事项、生活指南等信息</p>
+<p>📊 <strong>补充资料</strong>: 松江校区新生生活指南（来源：学长学姐分享）+ 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_12">浦东校区（上川路）</h3>
+<table>
+<thead>
+<tr>
+<th>宿舍楼</th>
+<th>类型</th>
+<th>配置</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新苑1-3号楼</td>
+<td>六人寝</td>
+<td>空间相对紧凑</td>
+<td>—</td>
+</tr>
+<tr>
+<td>新苑4-6号楼</td>
+<td>四人寝</td>
+<td>上床下桌，空间宽敞</td>
+<td>✅ 有电梯！搬行李、拿快递方便</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>快递地址：上海市浦东新区曹路镇上川路995号</li>
+</ul>
+<h3 id="_13">松江校区（文翔路）</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>配置</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>四人寝</td>
+<td>上床下桌</td>
+<td>空间略小，桌子和床两边对称（左右不同）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_14">松江校区宿舍生活详情</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>详情</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>床尺寸</strong></td>
+<td>1.9m × 0.9m（据此买床垫、床帘）</td>
+</tr>
+<tr>
+<td><strong>书架</strong></td>
+<td>桌子上方<strong>没有书架</strong>，需自己购买（报到时有很多二手）</td>
+</tr>
+<tr>
+<td><strong>桌垫</strong></td>
+<td>建议购买桌垫，桌子有点脏</td>
+</tr>
+<tr>
+<td><strong>空调</strong></td>
+<td>靠近2、3号床位，阳台门上方；需到园区<strong>租赁</strong>（含遥控板）</td>
+</tr>
+<tr>
+<td><strong>饮水机</strong></td>
+<td>每个寝室配<strong>免费饮水机</strong>，桶装水向宿管购买（自选）</td>
+</tr>
+<tr>
+<td><strong>功率限制</strong></td>
+<td>寝室<strong>最大功率500W</strong>，原则上不能用电吹风</td>
+</tr>
+<tr>
+<td><strong>电吹风</strong></td>
+<td>需自备，在一楼澡堂对面有<strong>吹风室</strong>（内有微波炉）</td>
+</tr>
+<tr>
+<td><strong>洗衣机</strong></td>
+<td>每层楼盥洗室有洗衣机，用<strong>U净app</strong>付费使用</td>
+</tr>
+<tr>
+<td><strong>开水机</strong></td>
+<td>每层楼盥洗室有开水机</td>
+</tr>
+<tr>
+<td><strong>晾衣杆</strong></td>
+<td>建议寝室合买长晾衣杆（晾衣杆较高）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_15">宿舍作息时间</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开门时间</td>
+<td>早上 6:30</td>
+</tr>
+<tr>
+<td>关门时间</td>
+<td>晚上 23:00</td>
+</tr>
+<tr>
+<td>周日-周四熄灯</td>
+<td>23:00</td>
+</tr>
+<tr>
+<td>周五-周六熄灯</td>
+<td>24:00</td>
+</tr>
+<tr>
+<td>断电情况</td>
+<td><strong>不断电！</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 如需早出或晚归，需向<strong>导员报备</strong>并告知宿管阿姨。</p>
+</blockquote>
+<h4 id="_16">洗澡指南</h4>
+<ol>
+<li>下载 <strong>U净app</strong>，充值余额</li>
+<li>宿舍楼墙上有使用指南</li>
+<li>设置并记住<strong>激活码</strong></li>
+<li>洗澡前在机器上输入激活码<strong>激活</strong></li>
+<li><strong>每次洗澡前都要重新激活</strong></li>
+</ol>
+<h4 id="_17">宽带网络</h4>
+<table>
+<thead>
+<tr>
+<th>运营商</th>
+<th>推荐度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>电信</strong></td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>最推荐</td>
+</tr>
+<tr>
+<td>移动</td>
+<td>⭐⭐⭐⭐</td>
+<td>次之</td>
+</tr>
+<tr>
+<td>联通</td>
+<td>⭐⭐⭐</td>
+<td>一般</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>一般<strong>一年一办</strong>，可一个宿舍合办共享</li>
+<li>流量够的话可以不办，自行商量</li>
+<li>路由器可订宽带时一起买，也可网上买便宜的</li>
+</ul>
+<h4 id="_18">快递与外卖</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>详情</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>快递地址</strong></td>
+<td>上海市松江区广富林街道文汇路1000弄四期学生公寓某号楼</td>
+</tr>
+<tr>
+<td><strong>4个快递站</strong></td>
+<td>①宿舍1号楼后面 ②吃货天地2层妈妈驿站 ③想飞天地1层菜鸟驿站 ④文汇新天地一层韵达超市</td>
+</tr>
+<tr>
+<td><strong>外卖</strong></td>
+<td>送到学生公寓门口外卖柜，或校园送至宿舍楼下架子</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_19">学生公寓管理办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生公寓管理办法》（立信会计金融后〔2017〕5号）</p>
+</blockquote>
+<p><strong>适用对象</strong>: 在学生公寓入住的全校学生</p>
+<p><strong>住宿管理</strong>:
+- 除新生报到外，申请入住必须按流程履行<strong>报批手续</strong>
+- 入住学生须签署<strong>《住宿承诺书》</strong>
+- 床位资源属于学校公共资源，须按<strong>指定寝室和床位</strong>入住，<strong>不得私自转租、转借</strong>
+- 因特殊原因需变更寝室或床位者，须履行<strong>报批手续</strong>
+- 入住学生须按规定及时、足额<strong>缴纳住宿费</strong>
+- 凡因出国、参军、休学、退学等需退宿者，须履行报批手续</p>
+<p><strong>安全与卫生</strong>:
+- 禁止使用<strong>明火、违章电器</strong>
+- 禁止<strong>私拉乱接电线</strong>
+- 禁止<strong>饲养宠物</strong>
+- 自觉维护公寓卫生</p>
+<h3 id="_20">学生住宿管理细则（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生住宿管理细则（暂行）》</p>
+</blockquote>
+<p><strong>入住</strong>:
+- 新生住宿由学校<strong>统一安排</strong>
+- 因复学等原因申请住宿的，需填写<strong>《申请表》</strong>，经家长签字同意、辅导员与公寓管理部门协调后办理
+- 住宿费原则上按<strong>学年</strong>收取
+- 新生入住、老生续住的住宿费由学校通过<strong>集中扣款</strong>方式统一收取</p>
+<p><strong>调宿</strong>:
+- 学生须按<strong>指定房间和床位</strong>入住，入住后不得擅自变更
+- 如因特殊原因需变更的，需填写<strong>《申请表》</strong>办理调宿手续
+- 学校工作安排需进行宿舍调整时，入住学生须<strong>积极配合</strong></p>
+<p><strong>退宿</strong>:
+- 毕业生应在<strong>规定时间内</strong>办理退宿手续
+- 延期毕业的学生可继续入住，但应服从宿管部门<strong>统一安排</strong></p>
+<p><strong>安全与文明</strong>:
+- 严禁在宿舍内使用<strong>明火、违章电器、私拉电线</strong>
+- 严禁在宿舍内<strong>留宿他人、出租床位</strong>
+- 严禁在宿舍内从事<strong>经商</strong>等活动
+- 自觉维护宿舍卫生，创建<strong>文明宿舍</strong></p>
+<h3 id="_21">共同配置</h3>
+<ul>
+<li>✅ 所有宿舍都配有<strong>空调</strong>（需付租赁费）</li>
+<li>❌ <strong>公共卫浴</strong>，没有独立卫浴</li>
+<li>📝 浦东有隔间分开，松江则是公共大浴室</li>
+</ul>
+<h3 id="_22">开学必备清单</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>物品</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>床上</strong></td>
+<td>四件套、床帘（深色遮光）</td>
+<td>军训可装床帘，不建议到校买（质量差）</td>
+</tr>
+<tr>
+<td><strong>电器</strong></td>
+<td>台灯、电吹风（功率小或去吹风室）</td>
+<td>寝室限500W</td>
+</tr>
+<tr>
+<td><strong>日用</strong></td>
+<td>桌垫、书架、晾衣杆、扫帚</td>
+<td>桌垫建议买，桌子较脏</td>
+</tr>
+<tr>
+<td><strong>证件</strong></td>
+<td>团员证、团员档案、照片（红蓝白底1寸2寸）</td>
+<td>有户口迁移意向的带户口本</td>
+</tr>
+<tr>
+<td><strong>其他</strong></td>
+<td>生活用品尽量带齐，不够就寄到学校</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>床帘推荐</strong>: 半弦月等品牌，最好选<strong>深色</strong>，浅色容易透光。</p>
+</blockquote>
+<h2 id="教师评价">📌 教师评价</h2>
+<blockquote>
+<p>收录各学院老师的授课风格、给分情况、作业量等评价信息</p>
+<p>📊 <strong>数据来源</strong>: 学生自发填写的金山文档《立信选课推荐及避坑》
+📅 <strong>数据时间</strong>: 2026年7月
+📂 <strong>完整数据</strong>: <a href="teacher_reviews_full.json">teacher_reviews_full.json</a>（共335位老师）</p>
+</blockquote>
+<h3 id="_24">🏷️ 标签说明</h3>
+<table>
+<thead>
+<tr>
+<th>标签</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅给分高</td>
+<td>多数学生反馈给分 generous，容易满绩</td>
+</tr>
+<tr>
+<td>❌给分低</td>
+<td>多数学生反馈给分严格，容易拉低绩点</td>
+</tr>
+<tr>
+<td>💧较水</td>
+<td>课堂管理松，可以摸鱼/划水</td>
+</tr>
+<tr>
+<td>⚠️较严</td>
+<td>点名签到多、作业多、管得严</td>
+</tr>
+<tr>
+<td>👍教得好</td>
+<td>讲课认真、细致、幽默、有耐心</td>
+</tr>
+<tr>
+<td>👎讲得差</td>
+<td>有口音、照本宣科、听不懂</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="_25">⭐ 强烈推荐（给分高 + 教得好）</h3>
+<h4 id="_26">钱丽丽 微积分</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 12条</li>
+<li><strong>学生评价</strong>:</li>
+<li>非常好 只不过会让写笔记 但是查的少</li>
+<li>讲课也挺好的，可以听懂的那种</li>
+<li>高数的神</li>
+</ul>
+<hr />
+<h4 id="_27">江金彦（新诗欣赏）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 11条</li>
+<li><strong>学生评价</strong>:</li>
+<li>水 说话温柔 分高</li>
+<li>人很好，快期末时候每节课都得手写一篇新诗赏析</li>
+<li>给分超级超级高</li>
+</ul>
+<hr />
+<h4 id="_28">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👍教得好</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>学生评价</strong>:</li>
+<li>上课需要跳操，只要认真，给分特别高</li>
+<li>蛮会阴阳人的不过她上课经常自己跑出去 所以学生也可以划水 这学期给分还没出</li>
+<li>很好，分高</li>
+</ul>
+<hr />
+<h4 id="_29">郭湖斌（国际物流学）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严 👍教得好 👎讲得差</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>学生评价</strong>:</li>
+<li>人很好，讲课听不懂，给分特别高</li>
+<li>给分超级高，满绩</li>
+<li>老师人非常真诚！问我们一点小问题就一直说谢谢！给分也很好！冲就完事了！选修课期末也很水！平时有点名但不多＂</li>
+</ul>
+<hr />
+<h4 id="_30">王建红（微积分）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>学生评价</strong>:</li>
+<li>讲课中规中矩</li>
+<li>作业很多，超级多，还要收作业，老是测试，要开摄像头，平时分还不高，别选！！！！</li>
+<li>扫码签到，事不多，就是对病假要求比较严格</li>
+</ul>
+<hr />
+<h4 id="_31">张修梅（微积分）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好 👎讲得差</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>学生评价</strong>:</li>
+<li>感觉卷面50左右，最后2.5过了,最好预习，她也会很耐心的答疑</li>
+<li>修梅讲的超级好，好好听课就考的好！</li>
+<li>上课管的严，考试不能抄，上课节奏比较快</li>
+</ul>
+<hr />
+<h4 id="_32">聂峰</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>学生评价</strong>:</li>
+<li>选上了就偷着乐吧 很有人味的一个老师！！！很可爱的老顽固</li>
+<li>（形策）水水的 上课会讲一些危险内容 人挺幽默的</li>
+<li>上他两次课次次满绩，偷着乐吧，朋友圈还有乐子看，幽默</li>
+</ul>
+<hr />
+<h4 id="_33">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生评价</strong>:</li>
+<li>很好!海底捞！脾气好</li>
+<li>最爱的数学老师 海底捞 讲课很有意思 无脑选</li>
+<li>无敌了 脾气特别特别好 而且非常有耐心</li>
+</ul>
+<hr />
+<h4 id="_34">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严 👍教得好 👎讲得差</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生评价</strong>:</li>
+<li>教的挺认真的 但最好别选</li>
+<li>需要自学巩固，考多少是多少</li>
+<li>考试可以搜，不管（搜不了一点啊，考试还是严的，有点压迫感的）</li>
+</ul>
+<hr />
+<h4 id="_35">梅义（会计学原理）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生评价</strong>:</li>
+<li>考多少是多少，讲课挺好</li>
+<li>特别温柔，讲得好👍</li>
+<li>梅老师特别好 选她！</li>
+</ul>
+<hr />
+<h4 id="_36">郭龙峰（网球）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👍教得好</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生评价</strong>:</li>
+<li>分高事少</li>
+<li>好</li>
+<li>特别好 事少</li>
+</ul>
+<hr />
+<h4 id="_37">姜仁凤</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生评价</strong>:</li>
+<li>很好的老师</li>
+<li>给分高！不怎么点名！老师脾气好温柔</li>
+<li>让人想认真上课的老师，很耐心</li>
+</ul>
+<hr />
+<h4 id="_38">宋玉坚（房地产估价概论）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>学生评价</strong>:</li>
+<li>老师非常好，上课很有趣也不怎么管</li>
+<li>已经很久没去上课了</li>
+<li>平时作业简单给分高，基本都100</li>
+</ul>
+<hr />
+<h4 id="_39">毕伟（恋爱、婚姻与家庭社会学</h4>
+<p>）
+- <strong>标签</strong>: ✅给分高 💧较水 👍教得好
+- <strong>评价数</strong>: 5条
+- <strong>学生评价</strong>:
+  - 学长说很好；超级超级好这个老师，很水
+  - 上课有趣 给分
+  - 特别好啊，都去选，给分高，上课也蛮有趣的</p>
+<hr />
+<h4 id="_40">鲁荻（女子手球）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👍教得好</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生评价</strong>:</li>
+<li>黑龙江富婆 刀子嘴豆腐心</li>
+<li>给分高</li>
+<li>人好</li>
+</ul>
+<hr />
+<h4 id="_41">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👍教得好</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生评价</strong>:</li>
+<li>以前是是西南财经政法大学马院的建院元老，上课会玩沉浸式案例</li>
+<li>特别特别特别认真的老头</li>
+<li>特别特别好的老师，考勤和课上讨论都参与，包满绩，而且还会额外给你加分</li>
+</ul>
+<hr />
+<h4 id="_42">李晓</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生评价</strong>:</li>
+<li>金牌王中王 
+那简直是把饭喂到嘴里了
+给分高</li>
+<li>讲的特别好，复习很仔细</li>
+<li>好</li>
+</ul>
+<hr />
+<h4 id="_43">陈丽萍</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生评价</strong>:</li>
+<li>老师很好，教得很认真，很想教会我们，给分可以</li>
+<li>很负责，问问题都会认真讲解，上课好，给分也不错，好老师，选！</li>
+<li>好老师！认真</li>
+</ul>
+<hr />
+<h4 id="_44">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>学生评价</strong>:</li>
+<li>海底捞，讲课认真，内容难</li>
+<li>讲课很好，就是每周都有小测试，但是线上</li>
+<li>是好老师，但是教的不好</li>
+</ul>
+<hr />
+<h4 id="_45">张乐川</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👍教得好 👎讲得差</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>学生评价</strong>:</li>
+<li>水滴很啊，很有趣很话痨的一个老师，捞人海底捞</li>
+<li>水</li>
+<li>水 事少 分不高</li>
+</ul>
+<hr />
+<h4 id="_46">汤越</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>学生评价</strong>:</li>
+<li>暴雷 学号靠后的全挂了 补考基本都是他这个班的 别选</li>
+<li>还行，会发很多资料</li>
+<li>挺好的，能给得分基本全拉满，喜欢给资料拓展，也挺幽默</li>
+</ul>
+<hr />
+<h4 id="_47">周丽珍</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>学生评价</strong>:</li>
+<li>老师很好，给分贼高，考勤严</li>
+<li>老师人超级好，上课会累一点，给分高</li>
+<li>事情比较多，比赛需要认真对待，很累</li>
+</ul>
+<hr />
+<h4 id="_48">吴华玲</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>学生评价</strong>:</li>
+<li>管得松，答疑耐心</li>
+<li>分高 选</li>
+<li>非常好的老师 很温柔 考试很松 闭眼选</li>
+</ul>
+<hr />
+<h4 id="_49">顾晓凤</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>学生评价</strong>:</li>
+<li>老师特别好特别温柔！给分也挺高的，推荐！</li>
+<li>各种签到来一遍，要做2幅拼贴画，要求有点多，给分可以</li>
+<li>女人中的女人妈妈中的妈妈。特别特别好。上课不管，作业简单，考试可以用ai，给分高。女神我爱你呀</li>
+</ul>
+<hr />
+<h4 id="_50">干薇</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>学生评价</strong>:</li>
+<li>老师真的好温柔🥹</li>
+<li>人很好很好，有在认真讲课</li>
+<li>女神来了。期末的捞王言论几乎让我落泪，我将不会再对她说任何重话…致敬传奇海底捞王🥰</li>
+</ul>
+<hr />
+<h4 id="_51">徐媛媛（会计学原理）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 2条</li>
+<li><strong>学生评价</strong>:</li>
+<li>人好的一比，很负责</li>
+<li>给分高，短学段，认真</li>
+</ul>
+<hr />
+<h4 id="_52">李玲（微积分）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👍教得好</li>
+<li><strong>评价数</strong>: 2条</li>
+<li><strong>学生评价</strong>:</li>
+<li>捞，大捞特捞，非常好！！！</li>
+<li>海底捞！！人很温柔！！</li>
+</ul>
+<hr />
+<h4 id="_53">金鹏</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 1条</li>
+<li><strong>学生评价</strong>:</li>
+<li>绝世好老师，上课有趣，给分高，管的还不严，要签到会提前说</li>
+</ul>
+<hr />
+<h3 id="-">✅ 推荐-给分高</h3>
+<h4 id="_54">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严 👎讲得差</li>
+<li><strong>评价数</strong>: 13条</li>
+<li><strong>代表评价</strong>: 烂...</li>
+</ul>
+<hr />
+<h4 id="_55">陈亚芹（国际商法）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>代表评价</strong>: 上课会提问，但是给分很高！老师人非常好，讲课很精彩...</li>
+</ul>
+<hr />
+<h4 id="_56">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👎讲得差</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 会捞 给分好...</li>
+</ul>
+<hr />
+<h4 id="_57">潘瑞姣</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 上课有点严格 但是人很好...</li>
+</ul>
+<hr />
+<h4 id="_58">杨海儒（管理学）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 事多，有的时候回答问题答不上来扣你平时分...</li>
+</ul>
+<hr />
+<h4 id="_59">曹楠（篮球）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 给分高，...</li>
+</ul>
+<hr />
+<h4 id="_60">胡华峰</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>代表评价</strong>: stata老师人可以。但是后面几个星期每节课都有作业！而且豆包都不会…作业分数不会高，据说最后可以刷分...</li>
+</ul>
+<hr />
+<h4 id="_61">李朝辉（网球）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 老师很特别好！！很好说话！！课不算严格但是也说不上水，但是分很高...</li>
+</ul>
+<hr />
+<h4 id="access">李远杰（access）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 👎讲得差</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 签个到就行，水，但是考试实验要会做...</li>
+</ul>
+<hr />
+<h4 id="python">李柯林（python）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 闭眼入...</li>
+</ul>
+<hr />
+<h4 id="_62">翟鲁波（乒乓）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 看考勤，不水，随便混混给分高...</li>
+</ul>
+<hr />
+<h4 id="_63">胡华锋</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: stata老师人可以。但是后面几个星期每节课都有作业！而且豆包都不会…作业分数不会高，据说最后可以刷分...</li>
+</ul>
+<hr />
+<h4 id="_64">张宝慧（英语）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 给分高，人很好...</li>
+</ul>
+<hr />
+<h4 id="_65">那丽春（数据处理技术）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 网课，给分很高97，都可以搜，讲的很好...</li>
+</ul>
+<hr />
+<h4 id="_66">郭璇（人格心理学）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 很好的，给分超级高，90+...</li>
+</ul>
+<hr />
+<h4 id="_67">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 老师特别好，事少分高，选她！平时就一个小作业，期末一篇论文...</li>
+</ul>
+<hr />
+<h4 id="_68">沈迪君</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 金牌王中王 
+那简直是把饭喂到嘴里了
+给分高...</li>
+</ul>
+<hr />
+<h4 id="_69">孙继圣</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 偶尔扫码签到...</li>
+</ul>
+<hr />
+<h4 id="_70">郭怡萱（管理心理</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 很水可选，无小组作业，期末纸质试卷有题库直接抄，给分非常非常非常高...</li>
+</ul>
+<hr />
+<h4 id="_71">汪猛</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 事多分高，不让玩手机...</li>
+</ul>
+<hr />
+<h4 id="_72">邵宁（当代大学生财经素养）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 事儿多的要命，每周都有记账作业，几乎每节课都会点十几个人回答问题，但是给分高（划重点）...</li>
+</ul>
+<hr />
+<h4 id="_73">赵鹏（国际商法 全英语）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 👎讲得差</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 虽然课程听不懂，考试也是全英但捞人，而且能查到...</li>
+</ul>
+<hr />
+<h4 id="_74">赵晓红（大学生情感教育）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 超级无敌好的老师 特别水 给分高 签到直接点一下就行 老师不会数人数 期中就是讲一下爱情故事啥的 很简单...</li>
+</ul>
+<hr />
+<h4 id="_75">马万超</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ⚠️较严</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 会点名，也喜欢点人起来回答问题，但整体也还好...</li>
+</ul>
+<hr />
+<h4 id="_76">邱静文（中西方音乐）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 💧较水</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 汪...</li>
+</ul>
+<hr />
+<h3 id="-_1">💧 推荐-较水（适合想轻松过的同学）</h3>
+<h4 id="_77">张春萍</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 14条</li>
+<li><strong>代表评价</strong>: 不划重点...</li>
+</ul>
+<hr />
+<h4 id="_78">李森</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 12条</li>
+<li><strong>代表评价</strong>: 森哥人很好...</li>
+</ul>
+<hr />
+<h4 id="_79">杨瑜（微积分）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 11条</li>
+<li><strong>代表评价</strong>: 上课不让看手机 玩手机要上黑板回答问题（但他心软的🥲）...</li>
+</ul>
+<hr />
+<h4 id="_80">李丹（跆拳道）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>代表评价</strong>: 给分特别好，能学东西，每...</li>
+</ul>
+<hr />
+<h4 id="_81">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>代表评价</strong>: 好，有测验但很水...</li>
+</ul>
+<hr />
+<h4 id="_82">李硕彩虹</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>代表评价</strong>: 人挺好！！...</li>
+</ul>
+<hr />
+<h4 id="_83">张德崴</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 依托...</li>
+</ul>
+<hr />
+<h4 id="_84">陆治玮（合唱艺术）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 很水 随机考勤...</li>
+</ul>
+<hr />
+<h4 id="_85">李海洁（英语）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>代表评价</strong>: 很好...</li>
+</ul>
+<hr />
+<h4 id="_86">霍佳佳</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 👎讲得差</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>代表评价</strong>: 。。。...</li>
+</ul>
+<hr />
+<h4 id="_87">王官杰</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 笑笑，嘻嘻，挂挂，不怎么管事，但是容易挂科...</li>
+</ul>
+<hr />
+<h4 id="_88">畅秀平（管理学，中文教学）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 水！！！！！给分很高！！！！！！...</li>
+</ul>
+<hr />
+<h4 id="_89">王旭（商法）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 很慵懒的小老头儿 给分挺好 偶尔点名...</li>
+</ul>
+<hr />
+<h4 id="_90">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 蹲！没人吗，上过这个老师的中国近代史纲要，老师人讲课超级认真，细心细致，人美声音洪亮，期中测验可以搜，基本平时分拉满。人好，我觉得其他课应该也不错...</li>
+</ul>
+<hr />
+<h4 id="_91">夏慧勤</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 上课巨阴阳怪气，喜欢批评过去的学生，鸡蛋里挑骨头，严格，上课还慢没有重点，我的评价是一坨...</li>
+</ul>
+<hr />
+<h4 id="_92">陈芳</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 👎讲得差</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 上课水，讲的很一般...</li>
+</ul>
+<hr />
+<h4 id="_93">黄黎明（思想道德与法治）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 无敌水，可以玩任何设备，看到也不会说你，偶尔会点名签到...</li>
+</ul>
+<hr />
+<h4 id="_94">孙艳（跨文化商务交际）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 超级无敌好的老师！超爱...</li>
+</ul>
+<hr />
+<h4 id="_95">施继元</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 上课都要提问的，突然提问的那种，上课还不能在他面前写作业，但是能玩手机，老师属于有点大病的那种...</li>
+</ul>
+<hr />
+<h4 id="_96">李瀚琰（民法）</h4>
+<ul>
+<li><strong>标签</strong>: 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 人巨好 课水 内容不水很有趣很好听 期末随便过 偶尔点名...</li>
+</ul>
+<hr />
+<h3 id="_97">⚠️ 谨慎选择（较严或给分一般）</h3>
+<h4 id="_98">马楠（高尔夫）＇</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>代表评价</strong>: 捞人但给分巨低...</li>
+</ul>
+<hr />
+<h4 id="_99">张光润（中国思想文化传统概论）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>代表评价</strong>: 讲课挺好的，人很好，一般不点名用扫码签到，可能有一两节课会抽一两个同学回答问题...</li>
+</ul>
+<hr />
+<h4 id="_100">金慧华（经济法基础）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>代表评价</strong>: 一般 不捞...</li>
+</ul>
+<hr />
+<h4 id="_101">刘睿洁</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>代表评价</strong>: 。。。...</li>
+</ul>
+<hr />
+<h4 id="_102">王佳鸣（英语思辨阅读）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>代表评价</strong>: 老师很好，很温柔，但是英语正课作业可能多了点，给分感觉也还挺好...</li>
+</ul>
+<hr />
+<h4 id="_103">杨鲁（财务会计）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 这个老师会每节课给你说考研就业什么的，事还很多...</li>
+</ul>
+<hr />
+<h4 id="_104">英美</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严 👎讲得差</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 讲课懂得都懂，作业巨多，别选就完了...</li>
+</ul>
+<hr />
+<h4 id="_105">胡睿（初级日语（一））</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 避雷...</li>
+</ul>
+<hr />
+<h4 id="_106">吴远</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 讲的好，人也美...</li>
+</ul>
+<hr />
+<h4 id="_107">陆雷（高数、线代）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>代表评价</strong>: 教的又好又帅...</li>
+</ul>
+<hr />
+<h4 id="_108">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 讲得很好，人很亲切...</li>
+</ul>
+<hr />
+<h4 id="_109">方媛(会计学原理)</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 老师人好好🥹上财博士🥹讲课超级认真啊🥹选到有福啦！...</li>
+</ul>
+<hr />
+<h4 id="_110">金晓梅（国际税收）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 避雷就完事了...</li>
+</ul>
+<hr />
+<h4 id="_111">仇贤根</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 给分不高...</li>
+</ul>
+<hr />
+<h4 id="_112">曹锋（计算机）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 课程极其枯燥，讲的不好...</li>
+</ul>
+<hr />
+<h4 id="_113">吴元波（中国金融史选修课）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 作业多事多，每节课宁愿不上都要一个一个点名...</li>
+</ul>
+<hr />
+<h4 id="_114">王云娟（微积分）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>代表评价</strong>: 超级负责，讲的很清楚，平时作业会批改，期末划重点，会有重点的给复习视频...</li>
+</ul>
+<hr />
+<h4 id="python_1">陈乃激（Python）</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 非常非常好，给分特别高...</li>
+</ul>
+<hr />
+<h4 id="_115">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ⚠️较严</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 没人？...</li>
+</ul>
+<hr />
+<h4 id="_116">尹晓红</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低</li>
+<li><strong>评价数</strong>: 3条</li>
+<li><strong>代表评价</strong>: 上课比较好，考试不知道...</li>
+</ul>
+<hr />
+<h3 id="_117">❌ 避雷（给分低 / 事多 / 讲得差）</h3>
+<blockquote>
+<p>⚠️ 以下老师根据学生反馈，存在给分低、要求过多、或教学效果差等问题，选课请谨慎！</p>
+</blockquote>
+<h4 id="_118">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 13条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>人很好，就是对于晨跑要求比较严，然后期末考的展示也比较公平，有十几个八十多分的</li>
+<li>很好很好，课程不难，认真学全班大多数都是九十多分</li>
+<li>不错的 上课只要该干的都干了</li>
+</ul>
+<hr />
+<h4 id="_119">孙</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 11条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>壁垒就完事了</li>
+<li>给分低 不理解</li>
+<li>上课很累 给分还低</li>
+</ul>
+<hr />
+<h4 id="_120">占龙俊</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 ⚠️较严 👍教得好 👎讲得差</li>
+<li><strong>评价数</strong>: 11条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>唐人 讲的依托</li>
+<li>事多，爱点名</li>
+<li>选了这辈子有了</li>
+</ul>
+<hr />
+<h4 id="_121">颜元杰（排球）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 10条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>老师人超好，给分高，上课讲几句话然后自由活动，可以玩手机🤳，非常推荐</li>
+<li>很水，给分高（点名表扬👍</li>
+<li>避雷😡，如果排球不好的同学不要选，他直接按考试成绩给的，容易拿低分（甚至不及格，水是真的水</li>
+</ul>
+<hr />
+<h4 id="_122">张炜炜</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>meanmean的会卡绩点</li>
+<li>屁事真的很多，时不时点名，呵呵</li>
+<li>事儿很多</li>
+</ul>
+<hr />
+<h4 id="_123">熊威（阅读与写作）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 9条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>事情多给分低</li>
+<li>纯sb jian的没边</li>
+<li>事很多，平时分说均分六十给的太高了，很奇葩一个人，让交手写作业，遇上的有福了</li>
+</ul>
+<hr />
+<h4 id="_124">陶绮骋（艺术创意与表达）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 💧较水 ⚠️较严 👍教得好</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>挺好的，人很温和；老师人巨好！！！！</li>
+<li>考勤抓的严，上课要提问，每节课都要阶测，很认真的老师，但是想水的建议别选，真的想学的就选</li>
+<li>节节课签到，有课堂测试，最后要做ppt汇报，期末考试开卷不能看手机但给范围，最后给分很高</li>
+</ul>
+<hr />
+<h4 id="_125">李峰（国际金融中心建设动态）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>听过这个老师的一两节课，老师很年轻，挺漂亮，感觉讲的也很好，要求好像也比较高</li>
+<li>很烦 会要求不认识的10个人一组小组作业+做完上去让她挑刺 让你改完期末给分还是奇低无比</li>
+<li>给分高。。。</li>
+</ul>
+<hr />
+<h4 id="_126">陈晓英（美术鉴赏）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 8条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>挺好的，给分高</li>
+<li>事多</li>
+<li>事多 给分低</li>
+</ul>
+<hr />
+<h4 id="_127">吴志宏</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严 👎讲得差</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>上课不让玩手机，一点没有水课的觉悟，作业多，很多还搜不到，还说什么作业做的非常好不缺勤，可以上八十，但水课给个八十不是很基本吗</li>
+<li>很水很水啊啊啊</li>
+<li>很水 但是平时作业有点小多 期末拍视频</li>
+</ul>
+<hr />
+<h4 id="_128">王剑</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 👎讲得差</li>
+<li><strong>评价数</strong>: 7条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>避雷 作为女生听他上课有种生理不适</li>
+<li>同意前面的</li>
+<li>同意前面的</li>
+</ul>
+<hr />
+<h4 id="_129">林典(人类行为与社会环境)</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>上他的社会学概论，事多，作业多，还搜不到还卡绩点</li>
+<li>上他的社会学概论，每节课结束时候扫码签到＋线上课堂讨论，给分巨巨巨低我靠，一个选修课给分贼低气死了</li>
+<li>社会学概论给了我91，期末论文2000＋期中读后感1000+签到+学习通讨论</li>
+</ul>
+<hr />
+<h4 id="_130">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>脾气特别好 所有人都在玩手机 但她说是我们是她带过最好的一班 给分也很好   除了会让每个人做ppt汇报演讲  其他都好  给分很高  请假两次还是满绩点</li>
+<li>不知道做了多少次汇报…最后还卡我绩点，老师人倒是蛮不错的，上课氛围也好，但我们小组做的很好而且每次都是我汇报讲的也很好，但她卡绩点这</li>
+<li>绩点给的不是很高，一般，而且要汇报很多次</li>
+</ul>
+<hr />
+<h4 id="_131">董可馨（乒乓）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>办事没效率 容易急 雷！   超级壁垒，完全靠自己技术，要求忒别高，把学生当孙颖莎培养，我没开玩笑！！！</li>
+<li>上过她的乒乓球 特别严格…没满绩</li>
+<li>避雷避雷避雷！！！</li>
+</ul>
+<hr />
+<h4 id="_132">翟森竞</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 ⚠️较严 👎讲得差</li>
+<li><strong>评价数</strong>: 6条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>论文，小组讨论一个不落，上课随机点名＋提问，下课随机抽取幸运同学做ppt演讲。</li>
+<li>纯..给的超级低，很迷惑，课讲的也让人听不懂，经常上课迟到，点名，避雷！</li>
+<li>感觉很mean</li>
+</ul>
+<hr />
+<h4 id="_133">崔蓓（“一带一路”国际经济合作专题）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>偶尔纸质签到，水，干嘛都不管，但是上课坐前排回答回题依然分超级超级低，破防</li>
+<li>给分低</li>
+<li>给分低 特别的一般 不要选 还会提问</li>
+</ul>
+<hr />
+<h4 id="excel">李冬冬（excel与数据处理）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 💧较水 👎讲得差</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>朋友上过，感觉这课对以后蛮有帮助的</li>
+<li>避雷避雷，给分一点都不好，讲的也不好基本上听不懂，还不如自己听网课</li>
+<li>在松江上过他的sql 平常上课满水的 需要做几个实验很简单 最后给分不错</li>
+</ul>
+<hr />
+<h4 id="_134">徐寅生（军事理论）</h4>
+<ul>
+<li><strong>标签</strong>: ✅给分高 ❌给分低 💧较水 ⚠️较严</li>
+<li><strong>评价数</strong>: 5条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>大大的水课，想干啥都行，但是要签到</li>
+<li>东北的老师，水课要啥自行车</li>
+<li>卡绩点89...</li>
+</ul>
+<hr />
+<h4 id="_135">周晓静</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>烦，避雷避雷大雷！上课阴阳包上挂挂件的男生是娘炮，说追星喜欢外国文化是不爱国等等。 （还是华为激烈拥护者</li>
+<li>老师人挺好的，就是每节课都要签到</li>
+<li>上课纸上签到一次，第二节上完手机扫码签到一次，还说什么五百块一个月生活费能不能用完，严重脱离尘世了感觉，很逆天</li>
+</ul>
+<hr />
+<h4 id="_136">崔蓓（国防经济学概论）</h4>
+<ul>
+<li><strong>标签</strong>: ❌给分低 ⚠️较严</li>
+<li><strong>评价数</strong>: 4条</li>
+<li><strong>学生吐槽</strong>:</li>
+<li>有一次课堂作业（要演讲的那种）期末是论文 有时候会签到</li>
+<li>压绩点，上次89</li>
+<li>给分低</li>
+</ul>
+<hr />
+<h2 id="选课攻略">📌 选课攻略</h2>
+<blockquote>
+<p>收录选课时间、规则、攻略等信息</p>
+<p>📊 <strong>数据来源</strong>: 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_138">选课时间节点（参考）</h3>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>时间</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一轮（预选）</td>
+<td>学期末/开学前</td>
+<td>不限容量，意愿征集</td>
+</tr>
+<tr>
+<td>第二轮（正选）</td>
+<td>开学初</td>
+<td>先到先得，满员即止</td>
+</tr>
+<tr>
+<td>第三轮（补退选）</td>
+<td>开学第1-2周</td>
+<td>可退可补，微调课表</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_139">学生选课管理办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生选课管理办法》（立信会计金融教〔2023〕18号）</p>
+</blockquote>
+<p><strong>选课范围</strong>:
+- 选修课程
+- 体育必修课程
+- 重新学习课程
+- 其他因特殊需要选修的必修课程</p>
+<p><strong>选课要求</strong>:
+- 选课前应认真研读<strong>专业人才培养方案</strong>，全面了解本专业应选读的各类课程及学分要求
+- 登录教务系统查看个人培养计划的完成情况
+- 通过咨询<strong>全程导师</strong>制定选课计划
+- 学生每学期修读学分原则上<strong>不得超过33学分</strong>
+- 选课是获得课程修读和参与考核资格的<strong>前提</strong>
+- 任何模块重复修读课程代码和课程名称均相同的课程，一律视作<strong>重新学习</strong></p>
+<p><strong>选课流程</strong>:
+- 预选 → 正选 → 补退选（具体时间安排以教务处通知为准）</p>
+<h3 id="_140">体育公共课选课（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《体育公共课实施方案（2025）》</p>
+</blockquote>
+<p><strong>课程构成</strong>:
+- <strong>体育必修课</strong>: 4学分（体育一至体育四，1-4学期修读，每学期1学分）
+- <strong>体育类限定选修课</strong>: 1学分（3-8学期修读）</p>
+<p><strong>体育必修课项目</strong>（每学期可选）:
+- 击剑、跆拳道、足球、篮球、排球、羽毛球、乒乓球、网球
+- 健美操、瑜伽、艺术体操、空手道、排舞、武术、器械健身
+- 高尔夫、体育舞蹈、游泳、旱地冰球、龙舟、橄榄球、啦啦操、键球、匹克球</p>
+<p><strong>体育限定选修课项目</strong>:
+- 运动损伤预防与处理、健身课程、太极拳、女子塑形瘦身操
+- 休闲轮滑、女子防身术与体适能、体育欣赏、五人制足球
+- 快易网球、体育拓展、运动营养学基础、极限飞盘、舞韵瑜伽等</p>
+<p><strong>体育保健课</strong>: 适用于因各种原因无法从事剧烈运动的学生</p>
+<h3 id="_141">选课规则速查</h3>
+<ul>
+<li>培养方案课程优先</li>
+<li>注意<strong>先修课程</strong>要求</li>
+<li>关注教学班容量</li>
+<li>低于15人可能停开</li>
+<li>每学期修读学分原则上<strong>不得超过33学分</strong></li>
+<li>重复修读相同课程一律视作<strong>重新学习</strong></li>
+</ul>
+<h3 id="_142">选课小技巧</h3>
+<p>（待补充：学长学姐的经验）</p>
+<hr />
+<h2 id="考试与成绩">📌 考试与成绩</h2>
+<blockquote>
+<p>收录考试安排、成绩查询、补考缓考、课程考核、考试违规处理等信息</p>
+<p>📊 <strong>数据来源</strong>: 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_144">重要考试安排</h3>
+<table>
+<thead>
+<tr>
+<th>考试</th>
+<th>时间</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大学英语四六级</td>
+<td>6月、12月</td>
+<td>全国统考</td>
+</tr>
+<tr>
+<td>普通话水平测试</td>
+<td>春季学期</td>
+<td>部分年级免费</td>
+</tr>
+<tr>
+<td>计算机等级考试</td>
+<td>3月、9月</td>
+<td>可选考</td>
+</tr>
+<tr>
+<td>期末考试</td>
+<td>学期末（1月/7月）</td>
+<td>按课表执行</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_145">课程考核管理办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《课程考核管理办法》（立信会计金融教〔2023〕21号）</p>
+</blockquote>
+<p><strong>考核原则</strong>:
+- 过程性平时考核 + 总结性期终考核相结合
+- 公平、公正、诚信、严谨</p>
+<p><strong>考核类型</strong>:
+- 期中考核
+- 期终考核
+- <strong>补考</strong>: 学期课程总评成绩不及格者，可在下一学期开学初参加补考
+- <strong>缓考</strong>: 因故不能参加期终考核者，可申请缓考（缓考考试时间安排在下一个学期开学补考期间）</p>
+<p><strong>重要规定</strong>:
+- 缓考不及格者或缓考缺考者，<strong>不再安排补考</strong>
+- 凡参加考核<strong>不交试卷</strong>的学生，以<strong>零分</strong>记载学期课程总评成绩
+- 无正当理由缺席课程期终考核的学生，学期课程总评成绩标注为<strong>"缺考"</strong>
+- 专科起点本科学生应当取得相应专业教学计划表规定课程的学分，原则上不再修读一、二年级课程</p>
+<h3 id="_146">学生课堂考勤管理规定（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生课堂考勤管理规定（修订）》（立信会计金融教〔2018〕21号）</p>
+</blockquote>
+<p><strong>考勤内容</strong>: 迟到、早退、请假、旷课</p>
+<p><strong>教师职责</strong>:
+- 对无故缺课时数达到<strong>4学时</strong>的学生，教师应及时向学院或辅导员反馈
+- 对缺课时数累计达到或超过该门课程总学时<strong>1/3</strong>的学生，任课教师应<strong>取消该生该门课程的考核资格</strong>
+- 教师应在每学期期末考试前<strong>四周</strong>，上报取消考核资格的学生名单</p>
+<p><strong>学生要求</strong>:
+- 学生上课时应遵守课堂纪律，认真听讲，不迟到、不早退、不无故缺课
+- 未经任课教师同意，上课期间不得擅自离开教室</p>
+<h3 id="_147">学生考试违规行为认定与处理办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生考试违规行为认定与处理办法》（立信会计金融教〔2024〕7号）
+⚠️ <strong>后果</strong>: 考试违纪/作弊将被取消该课程成绩，并视情节给予处分！</p>
+</blockquote>
+<p><strong>考试违纪行为</strong>（取消成绩，视情节给予警告及以上处分）:
+- 携带规定以外的物品进入考场或未放在指定位置
+- 未在规定的座位参加考试
+- 考试开始信号发出前答题，或考试结束信号发出后继续答题
+- 考试过程中旁窥、交头接耳、互打暗号或手势
+- 在考场周围喧哗、吸烟或影响考场秩序
+- 未经监考人员同意擅自离开考场
+- 将试卷、答卷、草稿纸等考试用纸带出考场
+- 用规定以外的笔或纸答题，或在试卷规定以外的地方书写姓名、考号</p>
+<p><strong>考试作弊行为</strong>（取消成绩，视情节给予记过及以上处分）:
+- 代替他人或由他人代替自己参加考试
+- 组织作弊、使用通讯设备或其他器材作弊
+- 向他人出售考试试题或答案谋取利益
+- 携带与考试内容相关的材料参加考试
+- 抄袭或协助他人抄袭试题答案或与考试内容相关的资料
+- 抢夺、窃取他人试卷、答卷或胁迫他人为自己抄袭提供方便
+- 故意销毁试卷、答卷或考试材料
+- 传、接物品或交换试卷、答卷、草稿纸
+- 其他以不正当手段获得或试图获得试题答案、考试成绩的行为</p>
+<h3 id="_148">学籍管理相关规定（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《全日制本专科学生学分制学籍管理规定》（立信会计金融办〔2021〕29号）</p>
+</blockquote>
+<p><strong>学制与最长学习年限</strong>:
+- 本科标准学制<strong>4年</strong>，最长学习年限<strong>6年</strong>（含休学）
+- 专科标准学制<strong>3年</strong>，最长学习年限<strong>5年</strong>（含休学）</p>
+<p><strong>学业预警</strong>:
+- 每学期开学初，对上一学期未取得学分达到一定比例的学生进行学业预警
+- 分为<strong>黄色预警</strong>、<strong>橙色预警</strong>、<strong>红色预警</strong>三级</p>
+<p><strong>退学情形</strong>:
+- 学业成绩未达到学校要求，或在最长学习年限内未完成学业
+- 休学、保留学籍期满，逾期两周未办理复学手续
+- 未经批准连续两周未参加学校规定的教学活动
+- 超过学校规定期限未注册而又未履行暂缓注册手续
+- 经学校指定医院诊断，患有疾病或意外伤残不能继续在校学习
+- 本人申请退学</p>
+<h3 id="_149">成绩与绩点</h3>
+<ul>
+<li>绩点计算：不同分数对应不同绩点（待补充具体换算表）</li>
+<li>挂科处理：补考 → 补考仍不及格须重新学习该课程</li>
+<li>学分预警：每学期最低学分要求</li>
+</ul>
+<p>（待补充：具体绩点换算表）</p>
+<hr />
+<h2 id="奖助学金">📌 奖助学金</h2>
+<blockquote>
+<p>收录奖学金、助学金、助学贷款、勤工助学等信息</p>
+<p>📊 <strong>数据来源</strong>: 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_151">奖学金类型</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>金额</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>国家奖学金</strong></td>
+<td>8000元/年</td>
+<td>全校评选，每学年一次（秋季学期）</td>
+</tr>
+<tr>
+<td><strong>国家励志奖学金</strong></td>
+<td>5000元/年</td>
+<td>奖励品学兼优的家庭经济困难学生</td>
+</tr>
+<tr>
+<td><strong>上海市奖学金</strong></td>
+<td>8000元/年</td>
+<td>上海市政府设立</td>
+</tr>
+<tr>
+<td><strong>校级优秀学生奖学金</strong></td>
+<td>一等2000/二等1200/三等600元/年</td>
+<td>一等≤5%，二等≤10%，三等≤15%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_152">优秀学生奖学金评审细则（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《优秀学生奖学金评审细则》（立信会计金融学〔2025〕26号）</p>
+</blockquote>
+<p><strong>适用对象</strong>: 学校在籍满一学年以上的全日制本专科学生</p>
+<p><strong>申请基本条件</strong>:
+- 具有中华人民共和国国籍，热爱祖国，拥护党的领导
+- 遵守国家法律法规和学校规章制度
+- 每学年至少参加<strong>两次</strong>大学生人文讲坛等相关讲座
+- 按学校规定时间完成注册缴费</p>
+<p><strong>不具备参评资格的情况</strong>:
+- 德育成绩低于<strong>80分</strong>
+- 任一课程<strong>初试成绩不合格</strong>
+- 《国家学生体质健康标准》测试<strong>不及格</strong>（特殊情况除外）
+- 违反校纪校规受到处理或处分</p>
+<p><strong>奖学金比例与金额</strong>:
+- 一等奖学金：不超过参评人数的<strong>5%</strong>，<strong>2000元/年</strong>
+- 二等奖学金：不超过参评人数的<strong>10%</strong>，<strong>1200元/年</strong>
+- 三等奖学金：不超过参评人数的<strong>15%</strong>，<strong>600元/年</strong></p>
+<h3 id="_153">国家助学金（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《国家助学金评比实施办法》（立信会计金融学〔2016〕22号）</p>
+</blockquote>
+<p><strong>参评对象</strong>: 在籍在册全日制本专科在校生中的家庭经济困难学生</p>
+<p><strong>资助标准</strong>（分2档）:
+- <strong>一般困难</strong>: <strong>2500元/年</strong>
+- <strong>特别困难</strong>: <strong>3500元/年</strong></p>
+<p><strong>申请条件</strong>:
+- 热爱社会主义祖国，拥护中国共产党的领导
+- 遵守宪法和法律，遵守学校规章制度
+- 诚实守信，道德品质优良
+- 勤奋学习，积极上进
+- 家庭经济贫困，生活俭朴，无吸烟、酗酒、频繁出入网吧等铺张浪费现象
+- 经过当年度家庭经济困难认定
+- 积极参加勤工助学等社会公益活动</p>
+<p><strong>评审时间</strong>: 每学年评审一次（每年<strong>9-10月</strong>）</p>
+<h3 id="_154">勤工助学（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生勤工助学管理实施办法》（立信会计金融学〔2016〕8号）</p>
+</blockquote>
+<p><strong>定义</strong>: 学生在学校的组织下利用课余时间，通过劳动取得合法报酬，用于改善学习和生活条件的社会实践活动</p>
+<p><strong>原则</strong>: 立足校园、服务社会、兼顾专业、重在育人</p>
+<p><strong>组织管理</strong>: 学生处是学校勤工助学活动的直接主管部门</p>
+<blockquote>
+<p>⚠️ <strong>注意</strong>: 任何单位或个人未经学生处同意，不得聘用在校学生打工。学生私自在校外打工的行为，不在本办法规定之列。</p>
+</blockquote>
+<h3 id="_155">家庭经济困难学生认定（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《家庭经济困难学生管理办法》（立信会计金融学〔2019〕26号）</p>
+</blockquote>
+<p><strong>认定等级</strong>:
+- <strong>一般困难学生</strong>: 家庭人均月收入在上海市政府规定的当年最低生活保障标准的<strong>1.5倍以下</strong>，且家庭直系亲属有特殊困难
+- <strong>特别困难学生</strong>: 家庭人均月收入在上海市政府规定的当年最低生活保障标准以下、特困供养人员等
+- <strong>特殊情况</strong>: 军烈属子女、孤儿等可认定为特别困难；家庭遭遇突发事件致使家庭经济陷入困境的，可根据实际情况认定</p>
+<h3 id="_156">其他资助渠道</h3>
+<ul>
+<li>助学贷款（生源地/校园地）</li>
+<li>临时困难补助</li>
+<li>学生帮困补助</li>
+<li>学生医疗帮困补助</li>
+<li>学生学费减免（符合条件的家庭经济困难学生）</li>
+</ul>
+<hr />
+<h2 id="学费缴费">📌 学费缴费</h2>
+<blockquote>
+<p>收录学费缴纳、费用清算等信息</p>
+</blockquote>
+<h3 id="_158">缴费项目</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>金额范围</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学费</td>
+<td>按专业不同</td>
+<td>一般5000-15000元/年</td>
+</tr>
+<tr>
+<td>住宿费</td>
+<td>待补充</td>
+<td>按宿舍类型</td>
+</tr>
+<tr>
+<td>教材费</td>
+<td>待补充</td>
+<td>多退少补</td>
+</tr>
+<tr>
+<td>保险费</td>
+<td>待补充</td>
+<td>城乡居民医保</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_159">缴费方式</h3>
+<ul>
+<li>学校统一缴费平台</li>
+<li>银行代扣</li>
+<li>线上支付（微信/支付宝）</li>
+</ul>
+<p>（待补充：具体缴费时间、欠费处理、退费流程）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="报到注册">📌 报到注册</h2>
+<blockquote>
+<p>收录新学期报到注册安排、开学准备等信息</p>
+<p>📊 <strong>补充资料</strong>: 松江校区新生生活指南（来源：学长学姐分享）+ 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_161">必关注公众号</h3>
+<table>
+<thead>
+<tr>
+<th>公众号</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>立信图书馆</strong></td>
+<td>图书馆预约</td>
+</tr>
+<tr>
+<td><strong>立信学工</strong></td>
+<td>查学号</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_162">报到流程</h3>
+<ol>
+<li>网上预报到（提前完成）</li>
+<li>缴纳学费</li>
+<li>到校现场确认</li>
+<li>领取校园卡/钥匙（校园卡在<strong>新生大礼包</strong>里面）</li>
+<li>购买教材</li>
+</ol>
+<h3 id="_163">学生注册工作实施细则（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《全日制本专科学生注册工作实施细则（试行）》（立信会计金融教〔2023〕3号）</p>
+</blockquote>
+<p><strong>注册类型</strong>:
+- <strong>新生入学注册</strong>: 按国家招生规定对入学资格初步审查合格后的新生进行学籍登记
+- <strong>学年学期注册</strong>: 在籍学生按学校注册有关要求和规定进行学期登记、延续学籍</p>
+<p><strong>注册要求</strong>:
+- 负责教学管理的职能部门确认学生的学籍状态和修读课程学分等情况
+- 负责学生事务的职能部门确认学生贷款和住宿等情况
+- 负责财务事务的职能部门负责学费（含住宿费等）收缴
+- <strong>符合学校注册规定并办理注册手续的学生，方可获得学籍</strong></p>
+<p><strong>未注册处理</strong>:
+- 超过学校规定期限未注册而又无正当事由的学生，按<strong>自动退学</strong>处理
+- 未注册学生不得参加学校的各项教育教学活动，不得使用学校的教育教学资源</p>
+<p><strong>报到注册要求</strong>:
+- 按时到校注册
+- 未注册可能影响选课
+- 请假需提前办理手续</p>
+<h3 id="_164">大一上学期选课</h3>
+<ul>
+<li><strong>大一上只选一个体育课</strong>，其他课由学校统一安排</li>
+<li>具体选课通知请关注班级群和教务处通知</li>
+</ul>
+<h3 id="_165">开学携带材料</h3>
+<table>
+<thead>
+<tr>
+<th>材料</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>团员证</td>
+<td>团员必须携带</td>
+</tr>
+<tr>
+<td>团员档案</td>
+<td>转团组织关系用</td>
+</tr>
+<tr>
+<td>照片</td>
+<td>1寸、2寸，红蓝白底全备好</td>
+</tr>
+<tr>
+<td>户口本</td>
+<td>有意向办理户口迁移的同学携带</td>
+</tr>
+</tbody>
+</table>
+<p>（待补充：具体报到时间、地点）</p>
+<hr />
+<h2 id="食堂餐饮">📌 食堂餐饮</h2>
+<blockquote>
+<p>收录各校区食堂信息、供餐时间、暑假安排等</p>
+</blockquote>
+<h3 id="_167">浦东校区（上川路）</h3>
+<table>
+<thead>
+<tr>
+<th>食堂</th>
+<th>位置</th>
+<th>特色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一食堂</td>
+<td>待补充</td>
+<td>待补充</td>
+</tr>
+<tr>
+<td>第二食堂</td>
+<td>待补充</td>
+<td>待补充</td>
+</tr>
+<tr>
+<td>新苑食堂</td>
+<td>宿舍区</td>
+<td>待补充</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_168">松江校区（文翔路）</h3>
+<table>
+<thead>
+<tr>
+<th>食堂</th>
+<th>位置</th>
+<th>特色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学子食堂</td>
+<td>待补充</td>
+<td>待补充</td>
+</tr>
+<tr>
+<td>师苑餐厅</td>
+<td>待补充</td>
+<td>待补充</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_169">供餐时间</h3>
+<table>
+<thead>
+<tr>
+<th>餐次</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>早餐</td>
+<td>约 6:30-9:00</td>
+</tr>
+<tr>
+<td>午餐</td>
+<td>约 10:30-13:00</td>
+</tr>
+<tr>
+<td>晚餐</td>
+<td>约 16:30-19:00</td>
+</tr>
+</tbody>
+</table>
+<p>（待补充：各食堂具体营业时间、特色窗口、外卖政策）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="校车交通">📌 校车交通</h2>
+<blockquote>
+<p>收录校车时刻表、线路、后勤保障信息</p>
+</blockquote>
+<h3 id="_171">常规学期校车（待补充）</h3>
+<blockquote>
+<p>学校跨浦东、松江、徐汇三区办学，班车是教职工主要通勤方式。学生可在有余座时乘坐。</p>
+</blockquote>
+<h3 id="_172">值班校车（寒暑假）</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>线路</th>
+<th>发车时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每周三</td>
+<td>中山西路→龙阳路→顾唐路→上川路</td>
+<td>7:30发车</td>
+</tr>
+<tr>
+<td>每周三</td>
+<td>文翔路→松江新城→顾唐路→上川路</td>
+<td>7:30发车</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>返回时间：15:15 从上川路校区发车</li>
+</ul>
+<h3 id="_173">联系方式</h3>
+<ul>
+<li>后勤保障处（王老师）：18021099142</li>
+</ul>
+<p>（待补充：学期中常规时刻表、具体站点）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="图书馆">📌 图书馆</h2>
+<blockquote>
+<p>收录图书馆开放时间、修缮通知、借阅规则等</p>
+</blockquote>
+<h3 id="_175">图书馆信息</h3>
+<table>
+<thead>
+<tr>
+<th>校区</th>
+<th>馆名</th>
+<th>位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浦东</td>
+<td>赵朱木兰图书馆</td>
+<td>待补充</td>
+</tr>
+<tr>
+<td>松江</td>
+<td>图书馆</td>
+<td>待补充</td>
+</tr>
+<tr>
+<td>徐汇</td>
+<td>待补充</td>
+<td>待补充</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_176">开放时间（参考）</h3>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>阅览室</td>
+<td>约 8:00-22:00</td>
+</tr>
+<tr>
+<td>自习室</td>
+<td>约 7:00-23:00</td>
+</tr>
+<tr>
+<td>电子资源</td>
+<td>24小时在线</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_177">借阅规则</h3>
+<ul>
+<li>借阅册数：待补充</li>
+<li>借阅期限：待补充</li>
+<li>续借方式：待补充</li>
+</ul>
+<p>（待补充：具体开放时间、借阅限额、研修室预约）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="假期安排">📌 假期安排</h2>
+<blockquote>
+<p>收录寒暑假、节假日放假通知</p>
+</blockquote>
+<h3 id="_179">校历安排（参考）</h3>
+<table>
+<thead>
+<tr>
+<th>假期</th>
+<th>大致时间</th>
+<th>天数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>寒假</td>
+<td>1月中下旬-2月中下旬</td>
+<td>约4-5周</td>
+</tr>
+<tr>
+<td>暑假</td>
+<td>7月上旬-9月初</td>
+<td>约8周</td>
+</tr>
+<tr>
+<td>国庆节</td>
+<td>10月1日-7日</td>
+<td>7天</td>
+</tr>
+<tr>
+<td>春节</td>
+<td>按国家法定</td>
+<td>待补充</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_180">注意事项</h3>
+<ul>
+<li>放假前关注离校/留校登记通知</li>
+<li>假期宿舍封楼/开放安排</li>
+<li>返校注册截止时间</li>
+</ul>
+<p>（待补充：具体校历、调课安排）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="实习就业">📌 实习就业</h2>
+<blockquote>
+<p>收录招聘信息、宣讲会、双选会、实习推荐等</p>
+</blockquote>
+<h3 id="_182">校园招聘渠道</h3>
+<table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学校就业网</td>
+<td>官方招聘平台</td>
+</tr>
+<tr>
+<td>学院推送</td>
+<td>专业对口岗位</td>
+</tr>
+<tr>
+<td>校园宣讲会</td>
+<td>企业进校招聘</td>
+</tr>
+<tr>
+<td>双选会</td>
+<td>大型招聘会</td>
+</tr>
+<tr>
+<td>校友推荐</td>
+<td>内部推荐机会</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_183">实习相关信息</h3>
+<ul>
+<li>暑期实习申请时间</li>
+<li>毕业实习要求</li>
+<li>实习证明开具</li>
+</ul>
+<p>（待补充：就业指导中心联系方式、招聘高峰期时间）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="访学交流">📌 访学交流</h2>
+<blockquote>
+<p>收录出国访学、留学项目、交流交换信息</p>
+</blockquote>
+<h3 id="_185">学校合作项目（待补充）</h3>
+<table>
+<thead>
+<tr>
+<th>项目类型</th>
+<th>合作院校/国家</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>交换生</td>
+<td>待补充</td>
+<td>一学期/一学年</td>
+</tr>
+<tr>
+<td>双学位</td>
+<td>待补充</td>
+<td>联合培养</td>
+</tr>
+<tr>
+<td>暑期访学</td>
+<td>待补充</td>
+<td>短期项目</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_186">常见留学目的地</h3>
+<ul>
+<li>英国（一年制硕士热门）</li>
+<li>澳大利亚</li>
+<li>美国</li>
+<li>香港/新加坡</li>
+</ul>
+<h3 id="_187">相关信息</h3>
+<ul>
+<li>出国交流奖学金</li>
+<li>学分转换政策</li>
+<li>语言要求（雅思/托福）</li>
+</ul>
+<p>（待补充：国际交流处联系方式、项目申请时间）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="活动竞赛">📌 活动竞赛</h2>
+<blockquote>
+<p>收录学科竞赛、创新创业大赛、校园活动报名信息</p>
+<p>📊 <strong>数据来源</strong>: 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_189">高含金量竞赛</h3>
+<table>
+<thead>
+<tr>
+<th>竞赛名称</th>
+<th>时间</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>互联网+创新创业大赛</td>
+<td>4-10月</td>
+<td>创新创业</td>
+</tr>
+<tr>
+<td>挑战杯</td>
+<td>奇数年</td>
+<td>学术科技</td>
+</tr>
+<tr>
+<td>全国大学生数学建模</td>
+<td>9月</td>
+<td>学科竞赛</td>
+</tr>
+<tr>
+<td>全国大学生英语竞赛</td>
+<td>4月</td>
+<td>学科竞赛</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_190">创新创业实践学分认定办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《创新创业实践学分认定办法》（立信会计金融教〔2023〕12号）</p>
+</blockquote>
+<p><strong>适用对象</strong>: 全日制普通本科生</p>
+<p><strong>学分要求</strong>:
+- 在校学习期间须完成所修读专业本科培养方案中<strong>《创新创业实践》课程2个学分</strong>
+- 学生用于认定《创新创业实践》课程的模块成果所获得学分，<strong>不可再拆分转换</strong>为通识选修课、专业选修课或跨学科跨专业选修课学分
+- 其他模块成果所获得学分，可以申请转换为通识选修课、专业选修课或跨学科跨专业选修课学分
+- 学生申请认定和转换的学分总计<strong>不得超过8学分</strong>
+- <strong>专升本学生</strong>最多认定4学分</p>
+<p><strong>认定模块</strong>:
+- 学科竞赛
+- 科研训练
+- 创新创业训练计划
+- 创业实践
+- 社会实践与志愿服务
+- 专利发明
+- 论文发表
+- 资格证书等</p>
+<p><strong>学分转换</strong>:
+- 其他模块成果按照本办法所获得学分，除学校人才培养方案特定类别有明确说明以外，可以申请转换为通识选修课、专业选修课或跨学科跨专业选修课学分</p>
+<h3 id="_191">校园活动</h3>
+<ul>
+<li>社团招新（百团大战）</li>
+<li>校园文化节</li>
+<li>运动会</li>
+<li>各类晚会</li>
+</ul>
+<p>（待补充：教务处/团委发布的竞赛清单、加分政策）</p>
+<hr />
+<h2 id="安全提示">📌 安全提示</h2>
+<blockquote>
+<p>收录消防安全、反诈防骗、违纪处分、考试违规、学术不端、假期安全等提示</p>
+<p>📊 <strong>数据来源</strong>: 2025级学生手册（OCR识别）
+📄 完整官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_193">校园安全</h3>
+<ul>
+<li>宿舍禁用大功率电器</li>
+<li>禁止电动车电池进楼</li>
+<li>外出锁门，保管贵重物品</li>
+</ul>
+<h3 id="_194">学生违纪处分管理规定（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《本专科生违纪处分管理规定》（立信会计金融学〔2025〕9号）
+⚠️ 2025年第12次校长办公会会议第三次修订</p>
+</blockquote>
+<p><strong>处分种类与期限</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>处分</th>
+<th>期限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>警告</td>
+<td>6个月</td>
+</tr>
+<tr>
+<td>严重警告</td>
+<td>8个月</td>
+</tr>
+<tr>
+<td>记过</td>
+<td>10个月</td>
+</tr>
+<tr>
+<td>留校察看</td>
+<td>12个月</td>
+</tr>
+<tr>
+<td>开除学籍</td>
+<td>永久</td>
+</tr>
+</tbody>
+</table>
+<p><strong>处分期限规则</strong>:
+- 毕业班学生处分期限可结合在校时间酌情调整
+- 学生在处分期限内再次受到处分的，处分期限从前一处分解除之日起计算
+- 保留学籍期间不计入处分期限</p>
+<p><strong>处分期内限制</strong>:
+- 不得参加奖学金、荣誉称号评选
+- 不得担任学生干部
+- 不得推荐为入党积极分子或发展对象</p>
+<h3 id="_195">学生考试违规行为认定与处理办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生考试违规行为认定与处理办法》（立信会计金融教〔2024〕7号）
+⚠️ 考试违纪/作弊将被取消该课程成绩，并视情节给予处分！</p>
+</blockquote>
+<p><strong>考试违纪</strong>（取消成绩，视情节给予警告及以上处分）:
+- 携带规定以外的物品进入考场或未放在指定位置
+- 未在规定的座位参加考试
+- 考试开始信号发出前答题，或考试结束信号发出后继续答题
+- 考试过程中旁窥、交头接耳、互打暗号或手势
+- 在考场周围喧哗、吸烟或影响考场秩序
+- 未经监考人员同意擅自离开考场
+- 将试卷、答卷、草稿纸等考试用纸带出考场
+- 用规定以外的笔或纸答题，或在试卷规定以外的地方书写姓名、考号</p>
+<p><strong>考试作弊</strong>（取消成绩，视情节给予记过及以上处分）:
+- 代替他人或由他人代替自己参加考试
+- 组织作弊、使用通讯设备或其他器材作弊
+- 向他人出售考试试题或答案谋取利益
+- 携带与考试内容相关的材料参加考试
+- 抄袭或协助他人抄袭试题答案或与考试内容相关的资料
+- 抢夺、窃取他人试卷、答卷或胁迫他人为自己抄袭提供方便
+- 故意销毁试卷、答卷或考试材料
+- 传、接物品或交换试卷、答卷、草稿纸</p>
+<h3 id="_196">学术规范与学术不端行为处理办法（官方）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学术规范与学术不端行为处理办法（试行）》（立信会计金融科〔2022〕13号）</p>
+</blockquote>
+<p><strong>学术不端行为包括</strong>:
+- 抄袭、剽窃、侵吞他人学术成果
+- 伪造或篡改数据、文献，捏造事实
+- 伪造注释
+- 未参加创作而在他人学术成果上署名
+- 未经他人许可而使用他人署名
+- 由他人代写论文或代他人写论文
+- 将本质上相同的研究成果改头换面多次发表</p>
+<blockquote>
+<p>⚠️ 学生学术不端行为处理参照《学生违纪处分管理规定》执行</p>
+</blockquote>
+<h3 id="_197">反诈防骗</h3>
+<ul>
+<li>警惕兼职刷单诈骗</li>
+<li>警惕冒充老师/同学借钱</li>
+<li>警惕虚假中奖信息</li>
+<li>下载国家反诈中心APP</li>
+</ul>
+<h3 id="_198">健康安全</h3>
+<ul>
+<li>校医院就医流程</li>
+<li>心理咨询中心预约</li>
+<li>医保报销政策</li>
+</ul>
+<p>（待补充：保卫处电话、校医院联系方式）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="德育分与综测">📌 德育分与综测</h2>
+<blockquote>
+<p>收录德育分、综合素质测评、奖学金评定相关规则等信息</p>
+<p>📊 <strong>数据来源</strong>: 立信学生事务中心官方公众号 + <strong>2025级学生手册（OCR识别）</strong>
+🔗 公众号原文: https://mp.weixin.qq.com/s/SmCwfWJ81BT8u81IZLXCvw
+📄 完整手册官方文件: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<h3 id="_200">什么是德育分？</h3>
+<p>学校为引导学生在德智体美劳等多方面全面协调发展，特制定<strong>学生德育测评</strong>，德育测评所得分数即为德育分。</p>
+<h3 id="_201">德育分有什么作用？</h3>
+<p><strong>1. 奖学金评定的基本依据</strong></p>
+<p>德育分为评定各类奖学金的基本依据，并根据实际情况对德育测评成绩提出<strong>最低要求</strong>。</p>
+<p>以<strong>优秀学生奖学金</strong>的评选为例：</p>
+<pre><code>总成绩 = 德育成绩（20%）+ 智育成绩（70%）+ 体育（10%）
+</code></pre>
+<blockquote>
+<p>⚠️ <strong>硬性门槛</strong>: 各类奖学金申报的基本条件为评定学年德育成绩达到 <strong>80分及以上</strong>。如某同学智育成绩班级第三但德育成绩78分，则无法参与各类奖学金评定。</p>
+</blockquote>
+<p><strong>2. 荣誉称号评选的基本依据</strong></p>
+<p>德育分为评选以下荣誉称号的基本依据：
+- 优秀学生（要求德育测评成绩 <strong>85分及以上</strong>）
+- 优秀党员
+- 优秀团员
+- 优秀学生干部
+- 优秀毕业生</p>
+<h3 id="_202">德育测评分数构成</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>基本分</strong></td>
+<td>70分</td>
+</tr>
+<tr>
+<td><strong>加分项</strong></td>
+<td>各类活动、荣誉、学生工作等（加至本项目满分为止）</td>
+</tr>
+<tr>
+<td><strong>减分项</strong></td>
+<td>违纪、旷课等（减至本项目零分为止）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📝 <strong>重要规则</strong>:
+- 减分原则上<strong>不重复计算</strong>（如因旷课受处分和旷课节数的扣分不重复）
+- 参加各类活动所得德育分<strong>加分具有上限</strong>，上限分数由各班依据情况而定（如班级规定上限10分，即使参加活动得18分，最终有效分仍为10分）</p>
+</blockquote>
+<h3 id="2025">学生手册官方规定（2025版）</h3>
+<blockquote>
+<p><strong>文件</strong>: 《学生德育测评实施办法》（立信会计金融学〔2020〕13号）
+📄 完整版: <a href="student_info/handbook_key_chapters.md">student_info/handbook_key_chapters.md</a></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>官方规定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>测评频率</strong></td>
+<td>每学年1次</td>
+</tr>
+<tr>
+<td><strong>起评分</strong></td>
+<td>70分</td>
+</tr>
+<tr>
+<td><strong>及格分</strong></td>
+<td>60分</td>
+</tr>
+<tr>
+<td><strong>满分</strong></td>
+<td>100分</td>
+</tr>
+<tr>
+<td><strong>八个观测点</strong></td>
+<td>政治理论素养、诚信品行、社会公德、遵纪守法、集体观念、劳动卫生、能力素养、社会实践</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_203">德育分评定时间</h3>
+<ul>
+<li><strong>频率</strong>: 每学年一次</li>
+<li><strong>开始时间</strong>: 春季学期第15周</li>
+</ul>
+<h3 id="_204">德育分评定流程</h3>
+<pre><code>1. 下发自评表 → 2. 学生自评+附德育分证明 → 3. 班级评议小组审核 
+→ 4. 班级公示3天 → 5. 无异议后提交学工系统
+</code></pre>
+<p><strong>班级评议小组</strong>: 由辅导员主持，通过民主选举产生包括辅导员在内的 <strong>5-7人（单数）</strong>。</p>
+<h3 id="_205">德育分证明获取渠道</h3>
+<table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>活动类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学生事务中心百科活动</td>
+<td>岁馀寄暖、暑假生活企划案等</td>
+</tr>
+<tr>
+<td>学院团委活动</td>
+<td>团日活动、志愿服务</td>
+</tr>
+<tr>
+<td>班级活动</td>
+<td>主题班会、集体活动</td>
+</tr>
+<tr>
+<td>社团活动</td>
+<td>社团组织的各类活动</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>提示</strong>: 参加活动后记得保留德育分证明，评定时需要提交！</p>
+<p>⚠️ <strong>注意</strong>: 以下为高校常见制度说明，<strong>立信具体规则请以学校官方文件为准</strong>。如有学校的具体通知，欢迎补充！</p>
+</blockquote>
+<h3 id="_206">什么是德育分？</h3>
+<p><strong>德育分</strong>（又称思想品德分、素质分）是中国高校学生综合评价体系的一部分，通常与<strong>智育分</strong>（学习成绩）、<strong>体育分</strong>一起构成学生的综合素质测评（综测）。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定义</strong></td>
+<td>对学生思想政治表现、道德品质、行为规范等方面的量化评分</td>
+</tr>
+<tr>
+<td><strong>用途</strong></td>
+<td>奖学金评定、评优评先、保研推荐、毕业鉴定等</td>
+</tr>
+<tr>
+<td><strong>评分主体</strong></td>
+<td>辅导员、班级评议小组、学生本人自评</td>
+</tr>
+<tr>
+<td><strong>常见构成</strong></td>
+<td>基础分（60-70分）+ 加分项 - 扣分项</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_207">德育分常见加分项</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>具体内容</th>
+<th>参考分值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学生工作</td>
+<td>班委、学生会、社团干部</td>
+<td>2-10分</td>
+</tr>
+<tr>
+<td>荣誉获奖</td>
+<td>三好学生、优秀团员、优秀学生干部</td>
+<td>5-20分</td>
+</tr>
+<tr>
+<td>竞赛活动</td>
+<td>学科竞赛、文体比赛获奖</td>
+<td>3-15分</td>
+</tr>
+<tr>
+<td>社会实践</td>
+<td>暑期社会实践、志愿服务</td>
+<td>2-10分</td>
+</tr>
+<tr>
+<td>创新创业</td>
+<td>大创项目、互联网+、挑战杯</td>
+<td>5-20分</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>献血、见义勇为、好人好事</td>
+<td>酌情加分</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_208">德育分常见扣分项</h3>
+<table>
+<thead>
+<tr>
+<th>行为</th>
+<th>扣分情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>旷课</td>
+<td>每次1-3分</td>
+</tr>
+<tr>
+<td>违纪处分</td>
+<td>警告10分、严重警告20分、记过30分、留校察看50分</td>
+</tr>
+<tr>
+<td>宿舍违纪</td>
+<td>使用违禁电器、夜不归宿等 5-10分</td>
+</tr>
+<tr>
+<td>失信行为</td>
+<td>考试作弊、学术不端等 一票否决</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_209">综测计算公式（通用参考）</h3>
+<pre><code>综测总分 = 智育分 × 70% + 德育分 × 20% + 体育分 × 10%
+</code></pre>
+<blockquote>
+<p>📝 <strong>注意</strong>: 各学校比例不同，立信具体比例请查看《学生手册》或咨询辅导员。</p>
+</blockquote>
+<hr />
+<h2 id="志愿时长">📌 志愿时长</h2>
+<blockquote>
+<p>收录志愿服务时长认定、义工活动、第二课堂学分等信息</p>
+</blockquote>
+<h3 id="_211">什么是志愿时长？</h3>
+<p><strong>志愿时长</strong>（又称志愿服务时长、义工时长）是记录学生参与志愿服务、公益活动的时间累积，通常以<strong>小时</strong>为单位。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定义</strong></td>
+<td>学生参与校内外志愿服务活动实际服务的时间</td>
+</tr>
+<tr>
+<td><strong>认定方式</strong></td>
+<td>通过"志愿汇"APP、学校青年志愿者协会、学院团委等渠道记录</td>
+</tr>
+<tr>
+<td><strong>用途</strong></td>
+<td>评优评先、入党推优、毕业要求、第二课堂学分</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_212">志愿时长常见获取渠道</h3>
+<table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>学校青志协</strong></td>
+<td>校青年志愿者协会组织的定期活动（地铁站引导、图书馆整理等）</td>
+</tr>
+<tr>
+<td><strong>学院团委</strong></td>
+<td>各学院组织的特色志愿服务项目</td>
+</tr>
+<tr>
+<td><strong>班级团支部</strong></td>
+<td>团日活动中的志愿服务环节</td>
+</tr>
+<tr>
+<td><strong>校外机构</strong></td>
+<td>红十字会、社区服务中心、公益组织等</td>
+</tr>
+<tr>
+<td><strong>大型赛会</strong></td>
+<td>马拉松、进博会、展会等志愿者招募</td>
+</tr>
+<tr>
+<td><strong>暑期支教</strong></td>
+<td>学校组织或自发组织的支教活动</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_213">志愿时长常见问题</h3>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>解答</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>毕业有硬性要求吗？</td>
+<td>部分学校要求本科期间累计一定时长（如40小时），立信具体要求请查学生手册</td>
+</tr>
+<tr>
+<td>志愿汇APP必须下载吗？</td>
+<td>大多数高校使用"志愿汇"作为官方记录平台，建议提前注册</td>
+</tr>
+<tr>
+<td>校外义工算吗？</td>
+<td>需提前向学院团委报备，经审核后计入</td>
+</tr>
+<tr>
+<td>时长不够怎么办？</td>
+<td>关注班级群、学院公众号的志愿活动招募，学期末通常会有集中补录</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_214">第二课堂学分（通用参考）</h3>
+<p>部分高校将志愿时长与<strong>第二课堂学分</strong>挂钩：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>思想政治</td>
+<td>党团活动、主题班会</td>
+</tr>
+<tr>
+<td>社会实践</td>
+<td>志愿服务、社会调研、实习</td>
+</tr>
+<tr>
+<td>创新创业</td>
+<td>学科竞赛、科研项目、创业实践</td>
+</tr>
+<tr>
+<td>文体活动</td>
+<td>运动会、文艺汇演、社团活动</td>
+</tr>
+<tr>
+<td>技能特长</td>
+<td>考证、培训、讲座</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="转专业">📌 转专业</h2>
+<blockquote>
+<p>收录转专业政策、申请流程、时间安排等信息</p>
+<p>📊 <strong>数据来源</strong>: 立信教务处官方通知（2026年4月发布）
+🔗 原文: https://mp.weixin.qq.com/s/Ed4OMiXGgcBMPMiOmVGC5g</p>
+</blockquote>
+<h3 id="20252026">2025级转专业工作安排（2026年）</h3>
+<h4 id="_216">报名对象</h4>
+<ul>
+<li>我校<strong>2025级全日制本科学生</strong>（不含专升本）</li>
+<li>须符合学校《本科学生转专业实施办法》及接收学院转专业工作方案的要求</li>
+</ul>
+<h4 id="_217">报名时间</h4>
+<p><strong>2026年4月29日13:00 — 5月7日16:00</strong></p>
+<blockquote>
+<p>⚠️ 逾期不再接受报名！</p>
+</blockquote>
+<h4 id="_218">报名方式</h4>
+<p><strong>教务系统在线报名</strong>：</p>
+<p>学校网站主页 → 教务系统 → 我的学籍 → 转专业申请</p>
+<blockquote>
+<p>⚠️ 未在教务系统中报名的同学，无法获得转专业报名资格！</p>
+</blockquote>
+<h4 id="_219">重要注意事项</h4>
+<table>
+<thead>
+<tr>
+<th>事项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>限报数量</strong></td>
+<td>每位学生限报 <strong>1个专业</strong>，多于1个视为报名无效，无调剂录取</td>
+</tr>
+<tr>
+<td><strong>撤回申请</strong></td>
+<td>需在转入学院考核前，以书面形式告知教务处</td>
+</tr>
+<tr>
+<td><strong>录取后</strong></td>
+<td>被转入学院录取后，<strong>不能再退回原专业</strong>，申请前需慎重考虑</td>
+</tr>
+<tr>
+<td><strong>就读方式</strong></td>
+<td>原则上转专业后均采取<strong>插班就读</strong>方式</td>
+</tr>
+<tr>
+<td><strong>资格审查</strong></td>
+<td>报名结束后学院进行资格审查，不符合要求的学生即使系统报名成功也不能进入考核环节</td>
+</tr>
+<tr>
+<td><strong>关注考核</strong></td>
+<td>二级学院通过部门网站公布考核时间、地点、方式及预录取结果，请密切关注</td>
+</tr>
+<tr>
+<td><strong>艺术团/运动队</strong></td>
+<td>转专业工作由校团委或相关学院另行通知</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_220">转入后的学业安排</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>转入年级</strong></td>
+<td>由转入学院根据学生实际情况确定</td>
+</tr>
+<tr>
+<td><strong>培养方案</strong></td>
+<td>必须按照转入年级专业培养方案修读学分方可毕业</td>
+</tr>
+<tr>
+<td><strong>学费结算</strong></td>
+<td>毕业时按学生修读的所有选课学分计算，含转专业前原专业选课修读学分</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_221">成绩单自助下载方式</h4>
+<ol>
+<li>打开学校官网首页，登录进入数字校园</li>
+<li>点击"数字化校园门户网址"</li>
+<li>在"新版认证"下点击进入"学业证明材料自助办理系统"</li>
+<li>进入左侧"自助下载"菜单</li>
+<li>右侧选择可下载文档（已加盖电子章），下载后如需纸质版可彩印</li>
+</ol>
+<p>（待补充：历年转专业成功率、各学院接收名额）</p>
+<hr />
+<h2 id="插班生">📌 插班生</h2>
+<blockquote>
+<p>收录上海市插班生考试政策、报考条件、招生院校、备考信息</p>
+<p>⚠️ <strong>声明</strong>: 插班生政策每年可能有调整，以下内容仅供参考，请以当年上海市教委及各高校发布的官方文件为准。</p>
+</blockquote>
+<h3 id="_223">什么是插班生？</h3>
+<p><strong>上海市插班生考试</strong>是上海独有的本科转校制度，允许在沪本科大一学生通过考试转入更好的高校继续就读，<strong>俗称"零风险二次高考"</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>适用对象</strong></td>
+<td>上海市普通本科高校大一本科新生（一年级）</td>
+</tr>
+<tr>
+<td><strong>报考时间</strong></td>
+<td>每年5月报名，5月底考试（大一第二学期末）</td>
+</tr>
+<tr>
+<td><strong>录取结果</strong></td>
+<td>通过考试后，大二起转入新学校就读</td>
+</tr>
+<tr>
+<td><strong>学籍处理</strong></td>
+<td>通过者学籍转入新校，未通过者留在原校继续就读</td>
+</tr>
+<tr>
+<td><strong>学历学位</strong></td>
+<td>毕业后拿新校的毕业证和学位证</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2025_1">2025年招生院校（参考）</h3>
+<table>
+<thead>
+<tr>
+<th>院校</th>
+<th>招生专业方向</th>
+<th>考试科目</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>复旦大学</strong></td>
+<td>文科/理科试验班</td>
+<td>文科：文史哲+英语；理科：高数+英语</td>
+</tr>
+<tr>
+<td><strong>上海交通大学</strong></td>
+<td>理工/文科</td>
+<td>高数+英语+面试</td>
+</tr>
+<tr>
+<td><strong>同济大学</strong></td>
+<td>工科/理科</td>
+<td>高数+英语+物理/化学</td>
+</tr>
+<tr>
+<td><strong>华东师范大学</strong></td>
+<td>师范/非师范</td>
+<td>大学语文+英语 或 高数+英语</td>
+</tr>
+<tr>
+<td><strong>华东理工大学</strong></td>
+<td>化工/材料等</td>
+<td>高数+英语+物理/化学</td>
+</tr>
+<tr>
+<td><strong>东华大学</strong></td>
+<td>纺织/材料/计算机</td>
+<td>高数+英语</td>
+</tr>
+<tr>
+<td><strong>上海大学</strong></td>
+<td>法学/档案/微电子等</td>
+<td>法律/档案学/高数+英语</td>
+</tr>
+<tr>
+<td><strong>华东政法大学</strong></td>
+<td>法学</td>
+<td>法律+英语+语文</td>
+</tr>
+<tr>
+<td><strong>上海理工大学</strong></td>
+<td>工科</td>
+<td>高数+英语</td>
+</tr>
+<tr>
+<td><strong>上海海事大学</strong></td>
+<td>航运/物流</td>
+<td>高数+英语</td>
+</tr>
+<tr>
+<td><strong>上海海洋大学</strong></td>
+<td>水产/食品</td>
+<td>高数+英语/化学</td>
+</tr>
+<tr>
+<td><strong>上海政法学院</strong></td>
+<td>法学</td>
+<td>法律+英语</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📝 每年招生院校和专业会有调整，请关注当年各校发布的插班生招生简章。</p>
+</blockquote>
+<h3 id="_224">报考条件</h3>
+<ol>
+<li><strong>学籍要求</strong>: 上海市普通本科高校在读一年级本科学生（含民办）</li>
+<li><strong>成绩要求</strong>: 大一第一学期<strong>绩点/成绩合格</strong>，无挂科记录（部分院校要求绩点排名前一定比例）</li>
+<li><strong>户籍要求</strong>: <strong>不限上海户籍</strong>，在沪就读本科即可报考</li>
+<li><strong>其他</strong>: 品学兼优，身体健康，符合转入专业的体检要求</li>
+</ol>
+<h3 id="_225">立信学生常见去向</h3>
+<p>立信学生插班生报考的热门目标院校：</p>
+<table>
+<thead>
+<tr>
+<th>目标院校</th>
+<th>适合专业</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上海大学</td>
+<td>法学、档案学</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>华东政法大学</td>
+<td>法学</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>上海理工大学</td>
+<td>工科类</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>上海海事大学</td>
+<td>航运、物流</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>上海政法学院</td>
+<td>法学</td>
+<td>⭐⭐⭐</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_226">备考建议</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>时间</th>
+<th>任务</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>了解阶段</strong></td>
+<td>大一上学期</td>
+<td>了解政策、确定目标院校、收集历年真题</td>
+</tr>
+<tr>
+<td><strong>基础阶段</strong></td>
+<td>大一寒假</td>
+<td>系统复习高数/英语基础，梳理知识框架</td>
+</tr>
+<tr>
+<td><strong>强化阶段</strong></td>
+<td>大一下学期（3-4月）</td>
+<td>刷题、做模拟卷、查漏补缺</td>
+</tr>
+<tr>
+<td><strong>冲刺阶段</strong></td>
+<td>5月</td>
+<td>做历年真题、调整状态、报名考试</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_227">重要提醒</h3>
+<ul>
+<li>⏰ 插班生考试<strong>只能在大一报考一次</strong>，错过无机会</li>
+<li>📚 备考插班生<strong>不能影响原校课程成绩</strong>，否则失去报考资格</li>
+<li>🎯 建议<strong>尽早确定目标院校</strong>，不同学校考试科目差异大</li>
+<li>💰 插班生考试<strong>免费报名</strong>，零成本尝试</li>
+<li>📖 历年真题和考纲是备考核心资料</li>
+</ul>
+<p>（待补充：历年录取分数线、具体报录比、成功上岸学长学姐经验）</p>
+<blockquote>
+<p>⚠️ <strong>注意</strong>: 以下为高校常见制度说明，<strong>立信具体规则请以学校官方文件为准</strong>。如有学校的具体通知，欢迎补充！</p>
+</blockquote>
+<h3 id="_228">什么是志愿时长？</h3>
+<p><strong>志愿时长</strong>（又称志愿服务时长、义工时长）是记录学生参与志愿服务、公益活动的时间累积，通常以<strong>小时</strong>为单位。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定义</strong></td>
+<td>学生参与校内外志愿服务活动实际服务的时间</td>
+</tr>
+<tr>
+<td><strong>认定方式</strong></td>
+<td>通过"志愿汇"APP、学校青年志愿者协会、学院团委等渠道记录</td>
+</tr>
+<tr>
+<td><strong>用途</strong></td>
+<td>评优评先、入党推优、毕业要求、第二课堂学分</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_229">志愿时长常见获取渠道</h3>
+<table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>学校青志协</strong></td>
+<td>校青年志愿者协会组织的定期活动（地铁站引导、图书馆整理等）</td>
+</tr>
+<tr>
+<td><strong>学院团委</strong></td>
+<td>各学院组织的特色志愿服务项目</td>
+</tr>
+<tr>
+<td><strong>班级团支部</strong></td>
+<td>团日活动中的志愿服务环节</td>
+</tr>
+<tr>
+<td><strong>校外机构</strong></td>
+<td>红十字会、社区服务中心、公益组织等</td>
+</tr>
+<tr>
+<td><strong>大型赛会</strong></td>
+<td>马拉松、进博会、展会等志愿者招募</td>
+</tr>
+<tr>
+<td><strong>暑期支教</strong></td>
+<td>学校组织或自发组织的支教活动</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_230">志愿时长常见问题</h3>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>解答</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>毕业有硬性要求吗？</td>
+<td>部分学校要求本科期间累计一定时长（如40小时），立信具体要求请查学生手册</td>
+</tr>
+<tr>
+<td>志愿汇APP必须下载吗？</td>
+<td>大多数高校使用"志愿汇"作为官方记录平台，建议提前注册</td>
+</tr>
+<tr>
+<td>校外义工算吗？</td>
+<td>需提前向学院团委报备，经审核后计入</td>
+</tr>
+<tr>
+<td>时长不够怎么办？</td>
+<td>关注班级群、学院公众号的志愿活动招募，学期末通常会有集中补录</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_231">第二课堂学分（通用参考）</h3>
+<p>部分高校将志愿时长与<strong>第二课堂学分</strong>挂钩：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>思想政治</td>
+<td>党团活动、主题班会</td>
+</tr>
+<tr>
+<td>社会实践</td>
+<td>志愿服务、社会调研、实习</td>
+</tr>
+<tr>
+<td>创新创业</td>
+<td>学科竞赛、科研项目、创业实践</td>
+</tr>
+<tr>
+<td>文体活动</td>
+<td>运动会、文艺汇演、社团活动</td>
+</tr>
+<tr>
+<td>技能特长</td>
+<td>考证、培训、讲座</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="其他通知">📌 其他通知</h2>
+<blockquote>
+<p>收录不属于上述分类的其他重要通知</p>
+</blockquote>
+<h3 id="vpn">校园网络与VPN</h3>
+<h4 id="vpn_1">什么是立信VPN？</h4>
+<p>在没有校园网的环境下，以下服务需要连接VPN才能访问：
+- 课外活动预约
+- 数字校园登录
+- 图书馆预约
+- 体测成绩查询
+- 教务系统选课等</p>
+<h4 id="vpn_2">VPN 连接方法</h4>
+<p><strong>类型</strong>: L2TP/IPSec PSK</p>
+<p><strong>安卓手机连接步骤</strong>:
+1. 手机桌面点击 <strong>设置</strong>
+2. 点击 <strong>"更多连接"</strong>
+3. 点击 <strong>"VPN"</strong>
+4. 点击 <strong>"添加VPN网络"</strong>
+5. 类型选择 <strong>"L2TP/IPSec PSK"</strong></p>
+<blockquote>
+<p>📎 完整教程含视频，详见原文：
+https://mp.weixin.qq.com/s/PGiKPzkHxF51g3zeK7Zdtg</p>
+<p>来源：立信学生事务中心 官方公众号</p>
+</blockquote>
+<p>（待补充：VPN服务器地址、用户名密码等具体配置信息）</p>
+<h3 id="_233">校园卡/网络</h3>
+<ul>
+<li>校园卡充值、挂失、补办</li>
+<li>校园网/WiFi使用</li>
+<li>邮箱激活</li>
+</ul>
+<h3 id="_234">医保/报销</h3>
+<ul>
+<li>大学生医保参保</li>
+<li>就医报销流程</li>
+<li>异地就医备案</li>
+</ul>
+<h3 id="_235">证明开具</h3>
+<ul>
+<li>在读证明</li>
+<li>成绩单打印</li>
+<li>学生证补办</li>
+</ul>
+<p>（待补充：各部门办公地点、办理时间）</p>
+<p>（待补充）</p>
+<hr />
+<h2 id="常用联系方式速查">📞 常用联系方式速查</h2>
+<table>
+<thead>
+<tr>
+<th>部门/服务</th>
+<th>电话</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>后勤保障处（王老师）</td>
+<td>18021099142</td>
+<td>校车/用车咨询</td>
+</tr>
+<tr>
+<td>上川路校区卫生保健</td>
+<td>50218536</td>
+<td>医疗咨询</td>
+</tr>
+<tr>
+<td>文翔路校区卫生保健</td>
+<td>67705013</td>
+<td>医疗咨询</td>
+</tr>
+<tr>
+<td>上川路校区物业</td>
+<td>50218560</td>
+<td>维修/保洁</td>
+</tr>
+<tr>
+<td>文翔路校区物业</td>
+<td>67705404</td>
+<td>维修/保洁</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="资料来源汇总">📝 资料来源汇总</h2>
+<table>
+<thead>
+<tr>
+<th>资料类别</th>
+<th>来源</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>教师评价</td>
+<td>金山文档《立信选课推荐及避坑》</td>
+<td>2026-07</td>
+</tr>
+<tr>
+<td>校区/宿舍信息</td>
+<td>小红书学生分享</td>
+<td>2026-07</td>
+</tr>
+<tr>
+<td>校区地图</td>
+<td>学校融媒体中心官方发布</td>
+<td>—</td>
+</tr>
+<tr>
+<td>学校通知</td>
+<td>学校官网 (lixin.edu.cn)</td>
+<td>2026-07</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>本资料库持续更新中，欢迎补充新内容。</em></p>
+    </div>
+  </main>
+</div>
+
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function goSection(id){
+  var el=document.getElementById(id);
+  if(el){
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+    document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+    var nav=document.querySelector('[data-target="'+id+'"]');
+    if(nav) nav.classList.add('active');
+  }
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+var searchTimeout;
+function handleSearch(){
+  clearTimeout(searchTimeout);
+  searchTimeout=setTimeout(doSearch,120);
+}
+function doSearch(){
+  var query=document.getElementById('searchInput').value.trim().toLowerCase();
+  var body=document.getElementById('contentBody');
+  var countEl=document.getElementById('searchCount');
+  body.querySelectorAll('.highlight').forEach(function(el){
+    var p=el.parentNode;
+    p.replaceChild(document.createTextNode(el.textContent),el);
+    p.normalize();
+  });
+  if(!query){countEl.textContent='';document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('hidden')});return;}
+  var matchCount=0;
+  var walker=document.createTreeWalker(body,NodeFilter.SHOW_TEXT,null,false);
+  var nodes=[];
+  var node;
+  while(node=walker.nextNode()){if(node.nodeValue.toLowerCase().includes(query))nodes.push(node);}
+  nodes.forEach(function(node){
+    var p=node.parentNode;
+    if(p.tagName==='SCRIPT'||p.closest('.highlight'))return;
+    var text=node.nodeValue;
+    var esc=query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re=new RegExp('('+esc+')','gi');
+    var span=document.createElement('span');
+    span.innerHTML=text.replace(re,'<span class="highlight">$1</span>');
+    p.replaceChild(span,node);
+    matchCount++;
+  });
+  document.querySelectorAll('.nav-item').forEach(function(item){
+    item.classList.toggle('hidden',!item.textContent.toLowerCase().includes(query));
+  });
+  countEl.textContent=matchCount>0?'找到 '+matchCount+' 处匹配':'无匹配结果';
+}
+
+// Scroll spy
+var h2s=document.querySelectorAll('.content-body h2');
+var observer=new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+      var nav=document.querySelector('[data-target="'+entry.target.id+'"]');
+      if(nav){nav.classList.add('active');nav.scrollIntoView({behavior:'smooth',block:'nearest'});}
+    }
+  });
+},{rootMargin:'-70px 0px -75% 0px'});
+h2s.forEach(function(h2){observer.observe(h2)});
+
+// Back to top
+window.addEventListener('scroll',function(){
+  document.getElementById('backToTop').classList.toggle('visible',window.scrollY>500);
+});
+
+// Keyboard shortcut
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();}
+});
+</script>
+</body>
+</html>
