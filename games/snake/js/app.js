@@ -220,7 +220,17 @@ function bindMenus() {
 
   // 排行榜
   let currentTab = 'local', currentTimeRange = 'day';
+  function syncBoardTabs() {
+    $('tabLocal')?.classList.toggle('active', currentTab === 'local');
+    $('tabGlobal')?.classList.toggle('active', currentTab === 'global');
+    $('timeDay')?.classList.toggle('active', currentTimeRange === 'day');
+    $('timeWeek')?.classList.toggle('active', currentTimeRange === 'week');
+    $('timeAll')?.classList.toggle('active', currentTimeRange === 'all');
+    const clearBtn = $('clearBtn');
+    if (clearBtn) clearBtn.style.display = currentTab === 'local' ? '' : 'none';
+  }
   function refreshBoard() {
+    syncBoardTabs();
     const mf = $('filterMode')?.value || 'all';
     const df = $('filterDiff')?.value || 'all';
     if (currentTab === 'global') {

@@ -189,9 +189,10 @@ export function renderHistory(mf, df) {
 
 export async function renderGlobal(mf, df, tr) {
   const el = document.getElementById('hlist'); if (!el) return;
-  el.innerHTML = '<div class="empty">加载中…</div>';
+  el.innerHTML = '<div class="empty">正在加载全站排行榜…</div>';
   const data = await fetchGlobal(tr);
-  if (!data) { el.innerHTML = '<div class="empty">连接失败，请检查网络</div>'; return; }
+  if (!data) { el.innerHTML = '<div class="empty">全站排行榜暂时无法读取，请检查网络或稍后再试。</div>'; return; }
+  if (!data.length) { el.innerHTML = '<div class="empty">全站排行榜暂时还没有成绩记录。</div>'; return; }
 
   // ★ 优化：使用反向映射表 O(1) 查找，替代 16 个 if-else 分支
   const norm = data.map(x => {
@@ -203,7 +204,7 @@ export async function renderGlobal(mf, df, tr) {
   let fd = norm;
   if (mf !== 'all') fd = fd.filter(x => x.pm === mf);
   if (df !== 'all') fd = fd.filter(x => x.pd === df);
-  if (!fd.length) { el.innerHTML = '<div class="empty">该时间范围内无对应记录</div>'; return; }
+  if (!fd.length) { el.innerHTML = '<div class="empty">当前筛选条件下暂无全站成绩。</div>'; return; }
   el.innerHTML = fd.slice(0, 20).map((e, i) => {
     const m = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
     return '<li><span class="hd">' + m + ' ' + esc(e.name) + ' · ' + esc(e.pm) + '-' + esc(e.pd) + '</span><span class="hs">' + e.score + ' 分</span></li>';
