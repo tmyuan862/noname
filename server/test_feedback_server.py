@@ -459,6 +459,53 @@ class FeedbackApiTests(unittest.TestCase):
         self.assertEqual(len(response["draft"]["image_urls"]), 2)
         self.assertTrue(response["draft"]["image_urls"][1].endswith("/images/bus-table.png"))
 
+    def test_wechat_webpage_analysis_defaults_to_summary_only_mode(self):
+        html = """
+        <html><head><title>迎新报到指引</title></head><body>
+        <article>
+          <h1>2026 级新生报到指引</h1>
+          <p>发布时间：2026-08-20</p>
+          <p>学生处</p>
+          <p>请新生按时报到，提前准备身份证、录取通知书等材料。</p>
+          <img src="https://mmbiz.qpic.cn/test-cover.jpg" />
+        </article>
+        </body></html>
+        """
+        ai_payload = {"choices": [{"message": {"content": json.dumps({
+            "title": "2026 级新生报到指引",
+            "category": "registration",
+            "summary": "新生需提前准备身份证、录取通知书等材料，并按时报到。",
+            "content": "请新生按时报到，提前准备身份证、录取通知书等材料。",
+            "publish_date": "2026-08-20",
+            "department": "学生处",
+            "picked_image_urls": ["https://mmbiz.qpic.cn/test-cover.jpg"],
+        }, ensure_ascii=False)}}]}
+
+        class FakeWebResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self, *_): return html.encode("utf-8")
+            def geturl(self): return "https://mp.weixin.qq.com/s/example123"
+            @property
+            def headers(self): return {"Content-Type": "text/html; charset=utf-8"}
+
+        class FakeAiResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def read(self): return json.dumps(ai_payload, ensure_ascii=False).encode("utf-8")
+
+        ai_config = SimpleNamespace(notice_ai_enabled=True, notice_ai_api_key="test-key", notice_ai_base_url="https://api.deepseek.com", notice_ai_model="deepseek-chat")
+        with mock.patch("feedback_server.is_private_hostname", return_value=False), \
+             mock.patch("feedback_server.WEB_URLOPEN", return_value=FakeWebResponse()), \
+             mock.patch("feedback_server.AI_URLOPEN", return_value=FakeAiResponse()), \
+             mock.patch("feedback_server.CONFIG", ai_config):
+            status, response = self.request("/admin/resources/analyze-url", "POST", {"url": "https://mp.weixin.qq.com/s/example123"})
+        self.assertEqual(status, 200)
+        self.assertEqual(response["compliance_mode"], "summary_only")
+        self.assertEqual(response["draft"]["image_urls"], [])
+        self.assertIn("站内摘要导览", response["draft"]["content"])
+        self.assertIn("微信公众号", response["message"])
+
     def test_webpage_analysis_rejects_redirect_to_private_address(self):
         class RedirectedResponse:
             def __enter__(self): return self

@@ -93,6 +93,48 @@ def normalize_image_urls(value: object, limit: int = 12) -> list[str]:
     return urls
 
 
+def is_wechat_article_url(url: str) -> bool:
+    parsed = urlparse(str(url or "").strip())
+    host = (parsed.hostname or "").lower()
+    return host == "mp.weixin.qq.com" and parsed.path.startswith("/s")
+
+
+def build_summary_only_content(draft: dict) -> str:
+    title = str(draft.get("title", "")).strip()
+    summary = clean_resource_content(str(draft.get("summary", "")).strip())
+    publish_date = str(draft.get("publish_date", "")).strip()
+    department = str(draft.get("department", "")).strip()
+    url = str(draft.get("url", "")).strip()
+    lines = ["【站内摘要导览】"]
+    if title:
+        lines.append(title)
+    if summary:
+        lines.extend(["", summary])
+    meta = [item for item in [publish_date, department] if item]
+    if meta:
+        lines.extend(["", "【来源信息】", " / ".join(meta)])
+    if url:
+        lines.append("原文链接：" + url)
+    lines.extend(["", "【说明】", "该内容来自微信公众号，站内默认仅提供摘要导览与信源，不全文转载；请以原文页面和学校官方通知为准。"])
+    return "\n".join(lines).strip()[:100000]
+
+
+def apply_summary_only_mode(result: dict | None, message: str) -> tuple[dict | None, str]:
+    if not isinstance(result, dict):
+        return result, message
+    draft = result.get("draft")
+    if not isinstance(draft, dict):
+        return result, message
+    if not is_wechat_article_url(str(draft.get("url", ""))):
+        result["compliance_mode"] = "standard"
+        return result, message
+    draft["content"] = build_summary_only_content(draft)
+    draft["image_urls"] = []
+    result["draft"] = draft
+    result["compliance_mode"] = "summary_only"
+    return result, "检测到微信公众号链接，已自动切换为摘要发布模式。"
+
+
 def normalize_resource(item: dict) -> dict | None:
     if not isinstance(item, dict):
         return None
@@ -927,6 +969,7 @@ class FeedbackHandler(BaseHTTPRequestHandler):
             if result is None:
                 self.send_json(422, {"error": "webpage_analysis_failed", "message": message})
                 return
+            result, message = apply_summary_only_mode(result, message)
             self.send_json(200, {"ok": True, **result, "message": message})
             return
         if self.path == "/admin/resources/analyze":
