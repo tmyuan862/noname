@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="校园生存指南：校车、食堂、地图、选课评价和校内资讯。" />
+    <meta
+      name="description"
+      content="校园生存指南：整合校车、食堂、地图、选课、报到与近期提醒，帮助同学快速定位和自己有关的校园信息。"
+    />
     <title>校园生存指南 · 梦缘资源站</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="css/reset.css" />
@@ -12,107 +15,309 @@
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
+
     <header class="campus-header">
-      <a class="campus-brand" href="index.html" aria-label="返回梦缘资源站首页">
-        <span class="brand-mark" aria-hidden="true">梦</span>
-        <span>梦缘资源站</span>
-      </a>
-      <nav aria-label="页面导航">
-        <a href="#life">校园生活</a>
-        <a href="#maps">校园地图</a>
-        <a href="#academic">办事日历</a>
-        <a href="handbook.html">学生手册</a>
-        <a href="#courses">选课评价</a>
-        <a href="#news">近期提醒</a>
-        <a href="index.html#feedback">意见箱</a>
-      </nav>
-      <a class="back-link" href="index.html"><i data-lucide="arrow-left" aria-hidden="true"></i> 返回首页</a>
+      <div class="campus-header-inner">
+        <a class="campus-brand" href="index.html" aria-label="返回梦缘资源站首页">
+          <span class="brand-mark" aria-hidden="true">梦</span>
+          <span class="brand-copy">
+            <strong>梦缘资源站</strong>
+            <small>Campus Resource Hub</small>
+          </span>
+        </a>
+
+        <nav aria-label="页面导航">
+          <a href="#newcomer">迎新入口</a>
+          <a href="#maps">校园地图</a>
+          <a href="#life">校园生活</a>
+          <a href="#academic">办事日历</a>
+          <a href="#courses">选课雷达</a>
+          <a href="#news">近期提醒</a>
+        </nav>
+
+        <a class="back-link" href="index.html">
+          <i data-lucide="arrow-left" aria-hidden="true"></i>
+          <span>返回首页</span>
+        </a>
+      </div>
     </header>
 
     <main id="main-content">
       <section class="campus-hero">
-        <img src="assets/campus.jpg" alt="绿树环绕的大学校园建筑" />
+        <img src="assets/campus.jpg" alt="校园绿树与教学建筑" />
         <div class="hero-overlay" aria-hidden="true"></div>
-        <div class="hero-content">
-          <p class="eyebrow">由同学一起补全的校园说明书</p>
-          <h1>校园生存指南</h1>
-          <p>少走一点弯路，多知道一点校园里真正有用的事。</p>
-          <form class="campus-search" data-campus-search>
-            <i data-lucide="search" aria-hidden="true"></i>
-            <span class="sr-only">搜索校园信息</span>
-            <input type="search" name="q" placeholder="搜索校车、食堂、选课或通知" required />
-            <button type="submit">搜索</button>
-          </form>
+
+        <div class="page-shell hero-layout">
+          <div class="hero-main">
+            <p class="hero-kicker">Campus Survival Guide</p>
+            <h1>先找到和你有关的那条信息，再决定要不要看原文。</h1>
+            <p class="hero-intro">
+              这不是学校官方发布页，而是一个把校车、地图、食堂、报到、选课和近期提醒整理到一起的校园入口。
+              先帮你快速判断“这条信息跟我有没有关系”，再跳回官方原文核对细节。
+            </p>
+
+            <form class="campus-search" data-campus-search>
+              <i data-lucide="search" aria-hidden="true"></i>
+              <label class="sr-only" for="campus-search-input">搜索校园信息</label>
+              <input
+                id="campus-search-input"
+                type="search"
+                name="q"
+                placeholder="搜索校车、食堂、地图、选课、缴费、报到"
+                required
+              />
+              <button type="submit">搜索站内资料</button>
+            </form>
+
+            <div class="hero-tags" aria-label="常搜关键词">
+              <a href="resources.html?q=校车">校车</a>
+              <a href="resources.html?q=校园地图">校园地图</a>
+              <a href="resources.html?q=选课">选课</a>
+              <a href="resources.html?q=缴费">缴费</a>
+              <a href="resources.html?q=报到">报到</a>
+            </div>
+          </div>
+
+          <aside class="hero-side" aria-label="使用说明">
+            <article class="hero-note-card hero-note-primary">
+              <span>使用原则</span>
+              <h2>先看摘要，再回官网确认</h2>
+              <p>涉及时间、地点、材料和资格条件的事项，最终都请以学校官网和对应部门通知为准。</p>
+            </article>
+
+            <article class="hero-note-card">
+              <span>适合谁用</span>
+              <ul>
+                <li>刚入学的新生</li>
+                <li>需要找高频办事信息的在校生</li>
+                <li>想快速定位资料来源的同学</li>
+              </ul>
+            </article>
+          </aside>
         </div>
       </section>
 
-      <section class="source-principle">
-        <div class="page-shell source-principle-inner">
-          <i data-lucide="badge-check" aria-hidden="true"></i>
-          <div><strong>这是信息索引，不是学校官方发布平台</strong><p>本站只对上海立信会计金融学院官网公开通知进行检索、分类和简要整理。时间、地点及办理要求可能调整，行动前请点击“官网原文”核对最新信息。</p></div>
-          <a href="resources.html">查看完整资料库 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+      <section class="source-banner">
+        <div class="page-shell source-banner-inner">
+          <div>
+            <strong>本站只做整合，不冒充官方</strong>
+            <p>所有高频信息都建议回到原始公告或学校官网进一步核对，尤其是办事时间、地点与附件要求。</p>
+          </div>
+          <a href="resources.html">进入资料库总览</a>
         </div>
       </section>
 
-      <section class="quick-nav page-shell" aria-label="校园信息分类">
-        <a href="#bus"><span class="quick-icon green"><i data-lucide="bus-front" aria-hidden="true"></i></span><strong>校车时刻</strong><small>路线与发车时间</small></a>
-        <a href="#canteen"><span class="quick-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><strong>食堂指南</strong><small>位置与窗口推荐</small></a>
-        <a href="#academic"><span class="quick-icon blue"><i data-lucide="calendar-days" aria-hidden="true"></i></span><strong>办事日历</strong><small>选课、缴费与报到</small></a>
-        <a href="#maps"><span class="quick-icon yellow"><i data-lucide="map" aria-hidden="true"></i></span><strong>校园地图</strong><small>浦东与松江校区</small></a>
+      <section class="quick-grid-section page-shell" id="newcomer" aria-labelledby="newcomer-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Fast Entry</p>
+            <h2 id="newcomer-title">新生和在校生最常先找这些</h2>
+          </div>
+          <p class="section-summary">第一步不是“阅读所有信息”，而是先找到和当前任务最相关的入口。</p>
+        </div>
+
+        <div class="quick-grid">
+          <a class="quick-card quick-card-featured" href="#academic">
+            <span class="quick-card-tag">迎新任务</span>
+            <h3>报到、缴费、注册</h3>
+            <p>先看办事时间线，再决定具体去哪一条原文。</p>
+            <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+          </a>
+
+          <a class="quick-card" href="#bus">
+            <span class="quick-icon"><i data-lucide="bus-front" aria-hidden="true"></i></span>
+            <h3>校车与交通</h3>
+            <p>不同校区之间怎么走、什么时候发车。</p>
+          </a>
+
+          <a class="quick-card" href="#canteen">
+            <span class="quick-icon quick-icon-orange"><i data-lucide="utensils" aria-hidden="true"></i></span>
+            <h3>食堂与生活</h3>
+            <p>食堂开放、快递、日常生活点位。</p>
+          </a>
+
+          <a class="quick-card" href="#maps">
+            <span class="quick-icon quick-icon-blue"><i data-lucide="map" aria-hidden="true"></i></span>
+            <h3>校园地图</h3>
+            <p>浦东和松江校区的地图快速查看。</p>
+          </a>
+
+          <a class="quick-card" href="handbook.html">
+            <span class="quick-icon quick-icon-yellow"><i data-lucide="book-open" aria-hidden="true"></i></span>
+            <h3>学生手册重点</h3>
+            <p>先判断制度是否和你有关，再去看细则。</p>
+          </a>
+        </div>
       </section>
 
       <section class="map-section" id="maps" aria-labelledby="maps-title">
         <div class="page-shell">
-          <div class="section-heading"><div><p class="eyebrow">Campus Maps</p><h2 id="maps-title">先认路，再出发</h2></div><span class="data-note"><i data-lucide="map-pin" aria-hidden="true"></i> 用户提供地图 · 请以现场导引为准</span></div>
-          <div class="map-grid">
-            <figure><a href="assets/campus-map-pudong.png" target="_blank" rel="noopener noreferrer"><img src="assets/campus-map-pudong.png" alt="浦东校区校园地图，点击查看原图" /></a><figcaption><strong>浦东校区</strong><span>点击查看大图</span></figcaption></figure>
-            <figure><a href="assets/campus-map-songjiang.png" target="_blank" rel="noopener noreferrer"><img src="assets/campus-map-songjiang.png" alt="松江校区校园地图，点击查看原图" /></a><figcaption><strong>松江校区</strong><span>点击查看大图</span></figcaption></figure>
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Campus Maps</p>
+              <h2 id="maps-title">先认路，再出发</h2>
+            </div>
+            <p class="section-summary">地图来自现有资料整理，仅作辅助定位，请以现场标识和学校安排为准。</p>
           </div>
-          <p class="map-note">地图来自用户提供的资料包，仅作为辨认建筑与路线的辅助信息。校区安排、道路封闭和办事地点可能变化，请优先查看学校公告与现场标识。</p>
+
+          <div class="map-grid">
+            <figure class="map-card">
+              <a href="assets/campus-map-pudong.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/campus-map-pudong.png" alt="浦东校区校园地图，点击查看大图" />
+              </a>
+              <figcaption>
+                <div>
+                  <strong>浦东校区</strong>
+                  <span>适合新生初次到校前快速认路</span>
+                </div>
+                <em>点击查看原图</em>
+              </figcaption>
+            </figure>
+
+            <figure class="map-card">
+              <a href="assets/campus-map-songjiang.png" target="_blank" rel="noopener noreferrer">
+                <img src="assets/campus-map-songjiang.png" alt="松江校区校园地图，点击查看大图" />
+              </a>
+              <figcaption>
+                <div>
+                  <strong>松江校区</strong>
+                  <span>教学楼、生活区和基础设施快速定位</span>
+                </div>
+                <em>点击查看原图</em>
+              </figcaption>
+            </figure>
+          </div>
+
+          <p class="map-note">
+            如果你后面还想继续增强地图，这一块后续可以接入更详细的楼宇标点、生活服务点位，甚至校区内的自定义交互地图。
+          </p>
         </div>
       </section>
 
-      <section class="page-section page-shell" id="life" aria-labelledby="life-title">
-        <div class="section-heading">
-          <div><p class="eyebrow">Daily Campus</p><h2 id="life-title">在校园，先解决这些事</h2></div>
-          <span class="data-note"><i data-lucide="database" aria-hidden="true"></i> 整理自学校官网 · 2026-07-10 抓取</span>
+      <section class="campus-info-section page-shell" id="life" aria-labelledby="life-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Daily Campus</p>
+            <h2 id="life-title">校园里最常碰到的生活信息</h2>
+          </div>
+          <p class="section-summary">这一层只放高频、可操作、同学最容易反复查的内容。</p>
         </div>
-        <div class="life-grid">
-          <article class="info-card bus-card" id="bus">
-            <div class="card-top"><span class="card-icon"><i data-lucide="bus-front" aria-hidden="true"></i></span><span class="update-label temporary">暑期临时安排</span></div>
-            <h3>暑期值班校车</h3>
-            <p>适用期为 2026年7月8日至9月2日。每周三运行，上午 7:30 分别从中山西路、文翔路校区发车，下午 15:15 原路返回。</p>
-            <ul class="fact-list"><li><b>线路一</b><span>中山西路 7:30 → 龙阳路 8:00 → 顾唐路 8:30 → 上川路</span></li><li><b>线路二</b><span>文翔路 7:30 → 松江新城 7:35 → 顾唐路 → 上川路</span></li></ul>
-            <a class="source-link" href="https://www.lixin.edu.cn/tzgg/157748.htm" target="_blank" rel="noopener noreferrer"><span>后勤保障处、资产管理处 · 2026-07-02</span><strong>官网原文 ↗</strong></a>
+
+        <div class="info-grid">
+          <article class="info-card info-card-featured" id="bus">
+            <div class="info-card-top">
+              <span class="info-badge">高频刚需</span>
+              <span class="info-status">暑期安排</span>
+            </div>
+            <h3>校车与通勤路线</h3>
+            <p>不同校区之间的出行安排通常最容易被反复搜索。建议先在这里判断自己属于哪条线路，再去看原通知。</p>
+            <ul class="fact-list">
+              <li>
+                <strong>典型用途</strong>
+                <span>跨校区上课、回宿舍、报到日出行、暑期往返</span>
+              </li>
+              <li>
+                <strong>建议搜索词</strong>
+                <span>校车、班车、浦东校区、松江校区、发车时间</span>
+              </li>
+            </ul>
+            <a class="inline-link" href="resources.html?q=校车">去资料库查校车原文</a>
           </article>
+
           <article class="info-card" id="canteen">
-            <div class="card-top"><span class="card-icon orange"><i data-lucide="utensils" aria-hidden="true"></i></span><span class="update-label temporary">暑期临时安排</span></div>
-            <h3>暑期食堂开放</h3>
-            <p>上川路第二食堂一楼、文翔路师苑餐厅在 7月8日至9月2日供应三餐；顾唐路师生食堂二楼仅工作日供应午餐至 7月31日。</p>
-            <ul class="placeholder-list"><li><span>早餐</span><b>6:30—9:00</b></li><li><span>午餐</span><b>10:30—13:00</b></li><li><span>晚餐</span><b>16:30—19:00</b></li></ul>
-            <a class="source-link" href="https://www.lixin.edu.cn/tzgg/157748.htm" target="_blank" rel="noopener noreferrer"><span>后勤保障处、资产管理处 · 2026-07-02</span><strong>官网原文 ↗</strong></a>
+            <div class="info-card-top">
+              <span class="info-icon info-icon-orange"><i data-lucide="utensils" aria-hidden="true"></i></span>
+              <span class="info-status">生活服务</span>
+            </div>
+            <h3>食堂与日常生活</h3>
+            <p>包括食堂开放、快递、打印、常用生活服务点位，适合做成“新生到校后一周内最需要”的集合入口。</p>
+            <a class="inline-link" href="resources.html?q=食堂">搜索相关资料</a>
           </article>
+
           <article class="info-card" id="library">
-            <div class="card-top"><span class="card-icon blue"><i data-lucide="library-big" aria-hidden="true"></i></span><span class="update-label temporary">临时施工</span></div>
-            <h3>两校区图书馆修缮</h3>
-            <p>上川路木兰图书馆、文翔路图书馆计划于 2026年7月9日至7月28日维修施工，期间可能有轻微噪音，变化以现场通知为准。</p>
-            <a class="source-link" href="https://www.lixin.edu.cn/tzgg/157912.htm" target="_blank" rel="noopener noreferrer"><span>基建处、图书馆 · 2026-07-08</span><strong>官网原文 ↗</strong></a>
+            <div class="info-card-top">
+              <span class="info-icon info-icon-blue"><i data-lucide="library-big" aria-hidden="true"></i></span>
+              <span class="info-status">学习空间</span>
+            </div>
+            <h3>图书馆与学习空间</h3>
+            <p>图书馆、阅览室、施工通知、开放安排，都适合收口到这里，避免同学每次都去官网重新翻。</p>
+            <a class="inline-link" href="resources.html?q=图书馆">搜索相关资料</a>
           </article>
         </div>
       </section>
 
       <section class="academic-section" id="academic" aria-labelledby="academic-title">
         <div class="page-shell">
-          <div class="section-heading"><div><p class="eyebrow">Academic Calendar</p><h2 id="academic-title">选课、缴费与报到</h2><p class="section-intro dark-intro">下面是从三份官网通知中提取的关键时间。摘要用于快速定位，具体对象、例外情况和附件请查看原文。</p></div></div>
-          <div class="academic-grid">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Academic Calendar</p>
+              <h2 id="academic-title">报到、缴费、注册、选课先看时间线</h2>
+            </div>
+            <p class="section-summary">这一块的重点不是背内容，而是快速判断自己现在应该做哪一步。</p>
+          </div>
+
+          <div class="timeline-layout">
             <article class="timeline-card">
-              <div class="timeline-head"><span>集中选课</span><a href="https://www.lixin.edu.cn/tzgg/157448.htm" target="_blank" rel="noopener noreferrer">教务处官网原文 ↗</a></div>
-              <ol><li><time>6月26日—29日</time><div><strong>第一轮</strong><p>可选可退，超额课程结束后随机筛选；不同年级起始时间不同。</p></div></li><li><time>7月2日—6日</time><div><strong>第二轮</strong><p>只选不退，先到先得；人数不足的教学班可能关闭。</p></div></li><li><time>7月12日—16日</time><div><strong>第二轮退课</strong><p>全体学生处理多选课程，结束后原则上不能再退。</p></div></li><li><time>7月17日—19日</time><div><strong>第三轮</strong><p>只选不退，用于补选和调整被关闭的课程。</p></div></li></ol>
+              <div class="timeline-card-head">
+                <span>迎新流程建议顺序</span>
+                <a href="resources.html?q=报到">去资料库看完整通知</a>
+              </div>
+
+              <ol>
+                <li>
+                  <time>第 1 步</time>
+                  <div>
+                    <strong>先确认自己属于哪个年级和批次</strong>
+                    <p>不同年级、学院、校区和身份状态，时间安排通常不一样，先分流比先阅读所有内容更重要。</p>
+                  </div>
+                </li>
+                <li>
+                  <time>第 2 步</time>
+                  <div>
+                    <strong>核对缴费、报到、注册是否都要做</strong>
+                    <p>不要把“完成其中一项”误当成“全部流程结束”，迎新常见问题都出在这里。</p>
+                  </div>
+                </li>
+                <li>
+                  <time>第 3 步</time>
+                  <div>
+                    <strong>再看材料、地点和附件</strong>
+                    <p>真正关键的往往不在摘要，而在通知附件或说明细则里，所以这里始终建议回原文确认。</p>
+                  </div>
+                </li>
+              </ol>
             </article>
+
             <div class="process-stack">
-              <article class="process-card"><span class="process-number">01</span><div><small>2026年8月21日—9月6日</small><h3>完成学费与住宿费缴纳</h3><p>通过“随申办市民云”搜索学校进入缴费平台。学校提醒不要向不明账户转账。</p><a href="https://www.lixin.edu.cn/tzgg/157618.htm" target="_blank" rel="noopener noreferrer">财务处官网原文 ↗</a></div></article>
-              <article class="process-card"><span class="process-number">02</span><div><small>2026年9月6日</small><h3>线上注册，再线下盖章</h3><p>先由辅导员维护报到状态；缴费状态为“已缴费”后完成线上注册，再携学生证到学院指定地点盖章。</p><a href="https://www.lixin.edu.cn/tzgg/157874.htm" target="_blank" rel="noopener noreferrer">教务处官网原文 ↗</a></div></article>
-              <article class="process-card warning-card"><span class="process-number">!</span><div><small>办理前核对</small><h3>不同年级、专业和特殊情况有差异</h3><p>助学贷款、参军、退宿、暂缓注册、重修等情况请直接查看通知附件或咨询对应部门。</p><a href="resources.html?category=fees">查看费用类资料 →</a></div></article>
+              <article class="process-card">
+                <span class="process-step">01</span>
+                <div>
+                  <small>新生高频</small>
+                  <h3>缴费与报到</h3>
+                  <p>适合先判断是先缴费还是先线下报到，再去点对应通知。</p>
+                  <a href="resources.html?q=缴费">搜索缴费资料</a>
+                </div>
+              </article>
+
+              <article class="process-card">
+                <span class="process-step">02</span>
+                <div>
+                  <small>在校生高频</small>
+                  <h3>选课与注册</h3>
+                  <p>适合大二到大四先看时间段和限制条件，再跳原始通知。</p>
+                  <a href="resources.html?q=选课">搜索选课资料</a>
+                </div>
+              </article>
+
+              <article class="process-card process-card-warning">
+                <span class="process-step">!</span>
+                <div>
+                  <small>特别提醒</small>
+                  <h3>特殊身份一定看原文</h3>
+                  <p>助学贷款、休学、复学、缓注册、补考、重修等情况，摘要只能提示，不能替代正式规则。</p>
+                  <a href="handbook.html">查看学生手册重点</a>
+                </div>
+              </article>
             </div>
           </div>
         </div>
@@ -120,40 +325,78 @@
 
       <section class="course-section" id="courses" aria-labelledby="courses-title">
         <div class="page-shell">
-          <div class="section-heading light-heading">
-            <div><p class="eyebrow">Course Radar</p><h2 id="courses-title">选课雷达</h2><p class="section-intro">关注教学方式、课程收获和考核体验，不做人身攻击，让每一条评价都真正帮到下一位同学。</p></div>
-            <button class="outline-button" type="button" disabled title="评价功能将在动态网站阶段开放"><i data-lucide="pen-line" aria-hidden="true"></i> 分享课程体验</button>
-          </div>
-          <div class="course-layout">
-            <article class="course-principles">
-              <span class="big-number">01</span>
-              <h3>评价什么？</h3>
-              <ul><li><i data-lucide="check" aria-hidden="true"></i> 教学是否清晰、有准备</li><li><i data-lucide="check" aria-hidden="true"></i> 课程内容与实际收获</li><li><i data-lucide="check" aria-hidden="true"></i> 作业、考勤与考核方式</li><li><i data-lucide="shield-check" aria-hidden="true"></i> 只谈课程体验，保护个人信息</li></ul>
-            </article>
-            <div class="course-preview">
-              <div class="preview-head"><span>课程评价示例结构</span><span>尚无真实数据</span></div>
-              <article class="teacher-row"><div class="avatar">课</div><div><h3>课程名称 · 教师姓名</h3><p>课程类型 · 开课学院</p></div><div class="rating"><strong>—</strong><span>综合评价</span></div></article>
-              <div class="rating-grid"><span><small>讲课清晰</small><strong>—</strong></span><span><small>课程收获</small><strong>—</strong></span><span><small>考核压力</small><strong>—</strong></span></div>
-              <p class="preview-note">收到学校、课程与老师信息后，这里会变成可浏览和筛选的真实评价列表。</p>
+          <div class="section-head section-head-dark">
+            <div>
+              <p class="section-kicker">Course Radar</p>
+              <h2 id="courses-title">选课雷达</h2>
             </div>
+            <p class="section-summary">这里更适合沉淀经验，而不是只堆通知，所以后续可以和“学长学姐说”形成联动。</p>
+          </div>
+
+          <div class="course-grid">
+            <article class="course-card">
+              <span>这一栏适合做什么</span>
+              <h3>把选课经验做成可参考的信息，而不是碎片聊天记录</h3>
+              <ul>
+                <li>老师授课方式是否清晰</li>
+                <li>课程收获和考核压力如何</li>
+                <li>适合什么类型的同学去选</li>
+                <li>避免做人身评价，只谈课程体验</li>
+              </ul>
+            </article>
+
+            <article class="course-card course-card-panel">
+              <span>当前阶段</span>
+              <h3>先保留结构，后续接真实数据</h3>
+              <p>你已经有学长学姐说的后端体系了，后面完全可以把课程经验拆成单独的可管理模块。</p>
+              <a href="senior.html">先看学长学姐说</a>
+            </article>
           </div>
         </div>
       </section>
 
-      <section class="page-section page-shell" id="news" aria-labelledby="news-title">
-        <div class="section-heading"><div><p class="eyebrow">Campus Feed</p><h2 id="news-title">近期提醒与机会</h2></div><a class="all-resources-link" href="resources.html">搜索全部 14 条资料 →</a></div>
-        <div class="news-grid sourced-news">
-          <article><span>假期安全</span><h3>离校前断电、关窗并带走贵重物品</h3><p>学校特别提示交通、消防、实习和防诈骗安全，地下车库不建议长期停车。</p><footer><time>2026-07-01</time><a href="https://www.lixin.edu.cn/tzgg/157689.htm" target="_blank" rel="noopener noreferrer">保卫处官网原文 ↗</a></footer></article>
-          <article><span>校园服务</span><h3>暑期快递中心 9:00—17:30</h3><p>上川路、文翔路校园快递中心在 7月8日至9月2日开放，调整以校园网公告为准。</p><footer><time>2026-07-02</time><a href="https://www.lixin.edu.cn/tzgg/157748.htm" target="_blank" rel="noopener noreferrer">后勤官网原文 ↗</a></footer></article>
-          <article><span>创意比赛</span><h3>师德主题微视频征集至 7月31日</h3><p>面向全体师生，可个人或团队参加，作品时长原则上 10 秒至 1 分钟。</p><footer><time>2026-05-27</time><a href="https://www.lixin.edu.cn/tzgg/156624.htm" target="_blank" rel="noopener noreferrer">活动官网原文 ↗</a></footer></article>
-          <article><span>创意比赛</span><h3>会计文化短视频征集至 9月30日</h3><p>围绕校史、校友、潘序伦和会计文物创作，个人或不超过 5 人团队均可参加。</p><footer><time>2026-05-25</time><a href="https://www.lixin.edu.cn/tzgg/156535.htm" target="_blank" rel="noopener noreferrer">活动官网原文 ↗</a></footer></article>
-          <article><span>交流访学</span><h3>国（境）外项目与行前安全</h3><p>资料库收录访学项目宣讲和“平安留学”培训通知，具体批次和新安排以国际交流处发布为准。</p><footer><time>近期资料</time><a href="resources.html?category=exchange">查看交流类资料 →</a></footer></article>
-          <article class="index-card"><span>信息索引</span><h3>没有在这里找到？</h3><p>生存指南只保留高频、可操作的信息。完整通知、部门和发布时间可以在资料库继续搜索。</p><footer><time>14 条已收录</time><a href="resources.html">进入资料库 →</a></footer></article>
+      <section class="news-section page-shell" id="news" aria-labelledby="news-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Campus Feed</p>
+            <h2 id="news-title">近期提醒与机会入口</h2>
+          </div>
+          <a class="section-link" href="resources.html">查看全部资料</a>
+        </div>
+
+        <div class="news-grid">
+          <article class="news-card">
+            <span>安全提醒</span>
+            <h3>放假离校前，先把断电、贵重物品和交通安排确认好</h3>
+            <p>这类通知适合做成“每学期都会反复遇到”的固定提醒集合。</p>
+            <a href="resources.html?q=安全">搜索相关资料</a>
+          </article>
+
+          <article class="news-card">
+            <span>校园服务</span>
+            <h3>快递、食堂、图书馆等生活服务常会有临时调整</h3>
+            <p>建议把“什么时候变了”和“对谁有影响”放在摘要第一行。</p>
+            <a href="resources.html?q=快递">搜索相关资料</a>
+          </article>
+
+          <article class="news-card">
+            <span>活动机会</span>
+            <h3>比赛、征集、交换项目等机会适合做成集中入口</h3>
+            <p>避免同学只在群里刷到一次就错过，可以集中归档到资料库里。</p>
+            <a href="resources.html?q=比赛">搜索相关资料</a>
+          </article>
         </div>
       </section>
     </main>
 
-    <footer class="campus-footer"><div class="page-shell"><strong>校园生存指南</strong><span>本站为非官方信息索引，办理事务请以学校官网最新通知为准。</span><a href="index.html#feedback">提交纠错</a></div></footer>
+    <footer class="campus-footer">
+      <div class="page-shell campus-footer-inner">
+        <strong>校园生存指南</strong>
+        <span>本页为校园信息整合入口，不替代学校官方公告，关键事项请回官网核对。</span>
+        <a href="index.html#feedback">提交纠错与补充</a>
+      </div>
+    </footer>
+
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script src="js/campus.js"></script>
   </body>
