@@ -1,8 +1,71 @@
-.public-feedback-section { padding-top: 72px; padding-bottom: 40px; }
-.public-feedback-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-.public-feedback-card { padding: 20px; border: 1px solid var(--line); background: var(--white); }
-.public-feedback-card header { display: flex; justify-content: space-between; gap: 14px; color: var(--muted); font-size: 11px; }
-.public-feedback-card > p { margin-top: 14px; white-space: pre-wrap; line-height: 1.65; }
-.public-feedback-card blockquote { margin-top: 14px; padding: 12px; border: 1px solid #d9dfca; background: var(--paper); font-size: 13px; line-height: 1.65; }
-.public-feedback-more { min-height: 42px; margin-top: 16px; padding: 0 16px; border: 1px solid var(--ink); background: transparent; cursor: pointer; font-weight: 750; }
-@media(max-width:700px){.public-feedback-list{grid-template-columns:1fr}.public-feedback-section{padding-top:52px}}
+.public-feedback-section {
+  padding-top: 72px;
+  padding-bottom: 40px;
+}
+
+.public-feedback-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.public-feedback-card {
+  padding: 20px;
+  border: 1px solid rgba(216, 224, 236, 0.95);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.06);
+}
+
+.public-feedback-card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--ink-faint);
+  font-size: 11px;
+}
+
+.public-feedback-card header strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.public-feedback-card > p {
+  margin-top: 14px;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+.public-feedback-card blockquote {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(29, 78, 216, 0.12);
+  border-radius: 16px;
+  background: rgba(29, 78, 216, 0.05);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.public-feedback-more {
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 0 18px;
+  border: 1px solid rgba(216, 224, 236, 1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+@media (max-width: 700px) {
+  .public-feedback-list {
+    grid-template-columns: 1fr;
+  }
+
+  .public-feedback-section {
+    padding-top: 52px;
+  }
+}
